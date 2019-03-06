@@ -1,10 +1,18 @@
 package com.casasolarctpi.appsolar.controllers;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.FontRequest;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -15,9 +23,15 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ExpandableListView;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 
 import com.casasolarctpi.appsolar.R;
+import com.casasolarctpi.appsolar.fragments.AcercaDeFragment;
+import com.casasolarctpi.appsolar.fragments.ContactanosFragment;
+import com.casasolarctpi.appsolar.fragments.IndexFragment;
+import com.casasolarctpi.appsolar.fragments.PerfilFragment;
 import com.casasolarctpi.appsolar.models.Constants;
 import com.casasolarctpi.appsolar.models.ExpandableListAdapter;
 
@@ -32,6 +46,11 @@ public class MenuPrincipal extends AppCompatActivity
     ExpandableListAdapter listAdapterExpandable;
     String[] listDataHeader;
     HashMap<String, String []> listDataChild;
+    String [] [] listChildren;
+
+    ConstraintLayout contentViewMenu;
+
+    DrawerLayout drawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,24 +63,31 @@ public class MenuPrincipal extends AppCompatActivity
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
+        toggle.getDrawerArrowDrawable().setColor(getResources().getColor(R.color.colorPrimaryDark));
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setItemIconTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimaryDark)));
+        navigationView.setItemTextColor(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimaryDark)));
         inizialite();
         inputListExpandable();
         createExpandableListView();
+        getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new IndexFragment()).commit();
 
 
         navigationView.setNavigationItemSelectedListener(this);
     }
 
     private void inizialite() {
+        contentViewMenu= findViewById(R.id.contentViewMenu);
         expListView = findViewById(R.id.expandable_list);
+        drawer = findViewById(R.id.drawer_layout);
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -73,6 +99,7 @@ public class MenuPrincipal extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_principal, menu);
+//        tintMenuItemIcon(this,menu,R.id.,getResources().getColor(R.color.colorPrimaryDark));
         return true;
     }
 
@@ -97,10 +124,13 @@ public class MenuPrincipal extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_manage) {
+        if (id == R.id.index) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new IndexFragment()).commit();
 
+        } else if (id == R.id.profile) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new PerfilFragment()).commit();
+
+        }else if (id == R.id.logout){
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -110,12 +140,12 @@ public class MenuPrincipal extends AppCompatActivity
 
     //Llamado de listas e ingreso de HashMap para el expandablelistview con navigation drawer
     public void inputListExpandable(){
-        listDataHeader = Constants.LIST_GROUP;
+        listDataHeader = Constants.GROUP_LIST;
         listDataChild = new HashMap<>();
-        String [] [] listChilds = Constants.LISTS_CHILDS;
+        listChildren = Constants.CHILDREN_LISTS;
 
         for (int i=0; i<listDataHeader.length; i++){
-            listDataChild.put(listDataHeader[i],listChilds[i]);
+            listDataChild.put(listDataHeader[i],listChildren[i]);
         }
 
 
@@ -125,11 +155,41 @@ public class MenuPrincipal extends AppCompatActivity
     //Creaciónde y llamadado del ExpandableListView
     public void createExpandableListView(){
         listAdapterExpandable = new ExpandableListAdapter(this,listDataHeader,listDataChild);
+        listAdapterExpandable.setOnChildClickListener(new ExpandableListAdapter.OnChildClickListener() {
+            @Override
+            public void childClick(int groupId, int childId) {
+                Intent intent;
+                if (groupId==0){
+                    Uri uri = Uri.parse(Constants.LIST_LINKS_CONOCENOS[childId]);
+                    intent = new Intent(Intent.ACTION_VIEW, uri);
+                    startActivity(intent);
+
+
+                }else {
+                    switch (childId){
+                        case 0:
+                            getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new ContactanosFragment()).commit();
+                            break;
+                        case 1:
+                            getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new AcercaDeFragment()).commit();
+                            break;
+                    }
+                }
+                try {
+                    drawer.closeDrawer(GravityCompat.START);
+                }catch (Exception ignored){
+                    Log.e("Error en drawer",ignored.getMessage());
+                }
+
+            }
+        });
         expListView.setAdapter(listAdapterExpandable);
 
         for (int i=0; i<listAdapterExpandable.getGroupCount(); i++){
-            expListView.expandGroup(i);
+            //expListView.expandGroup(i);
         }
+
+
     }
 
 

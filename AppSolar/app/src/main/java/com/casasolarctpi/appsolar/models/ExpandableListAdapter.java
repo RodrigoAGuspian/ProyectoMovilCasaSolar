@@ -2,10 +2,13 @@ package com.casasolarctpi.appsolar.models;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ExpandableListView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.casasolarctpi.appsolar.R;
@@ -17,6 +20,14 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     private Context context;
     private String[] mListDataHeader;
     private HashMap<String, String[]> mListDataChild;
+    private OnChildClickListener onChildClickListener;
+    public interface OnChildClickListener{
+        void childClick(int groupId, int childId);
+    }
+
+    public void setOnChildClickListener(OnChildClickListener onChildClickListener) {
+        this.onChildClickListener = onChildClickListener;
+    }
 
     public ExpandableListAdapter(Context context, String[] mListDataHeader, HashMap<String, String[]> mListDataChild) {
         this.context = context;
@@ -67,6 +78,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.item_list_group,null);
             TextView txtListHeader = convertView.findViewById(R.id.txtListHeader);
+
             txtListHeader.setText(headerTitle);
             txtListHeader.setTypeface(null, Typeface.BOLD);
 
@@ -75,18 +87,43 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+    public View getChildView(final int groupPosition, final int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
         final String childText = (String) getChild(groupPosition,childPosition);
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.item_child,null);
 
+
         }
 
         TextView txtItem= convertView.findViewById(R.id.txtItemChild);
         txtItem.setText(childText);
+        ImageView imgChild = convertView.findViewById(R.id.imgChild);
+        if (Constants.GROUP_LIST[groupPosition].equals(Constants.GROUP_LIST[1])) {
+            if (Constants.CONOCENOS_LIST[childPosition].equals(Constants.CONOCENOS_LIST[0])){
+                imgChild.setBackground(context.getResources().getDrawable(R.drawable.ic_contacts));
+            }else {
+                imgChild.setBackground(context.getResources().getDrawable(R.drawable.ic_info));
+            }
+        }else{
+            imgChild.setBackground(context.getResources().getDrawable(R.drawable.ic_link));
+        }
+
+        convertView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (onChildClickListener!=null){
+                    onChildClickListener.childClick(groupPosition,childPosition);
+                }
+            }
+        });
+
+
+
         return convertView;
     }
+
+
 
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
