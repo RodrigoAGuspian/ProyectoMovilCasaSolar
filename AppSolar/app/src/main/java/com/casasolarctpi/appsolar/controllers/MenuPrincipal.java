@@ -1,11 +1,13 @@
 package com.casasolarctpi.appsolar.controllers;
 
+import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.provider.FontRequest;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -32,12 +34,20 @@ import com.casasolarctpi.appsolar.fragments.AcercaDeFragment;
 import com.casasolarctpi.appsolar.fragments.ContactanosFragment;
 import com.casasolarctpi.appsolar.fragments.IndexFragment;
 import com.casasolarctpi.appsolar.fragments.PerfilFragment;
+import com.casasolarctpi.appsolar.models.ChartValues;
 import com.casasolarctpi.appsolar.models.Constants;
 import com.casasolarctpi.appsolar.models.ExpandableListAdapter;
+import com.casasolarctpi.appsolar.models.RestClient;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MenuPrincipal extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -51,6 +61,10 @@ public class MenuPrincipal extends AppCompatActivity
     ConstraintLayout contentViewMenu;
 
     DrawerLayout drawer;
+
+    private MutableLiveData<List<ChartValues>> liveData;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +91,8 @@ public class MenuPrincipal extends AppCompatActivity
 
 
         navigationView.setNavigationItemSelectedListener(this);
+
+
     }
 
     private void inizialite() {
@@ -191,6 +207,8 @@ public class MenuPrincipal extends AppCompatActivity
 
 
     }
+
+
 
 
 }

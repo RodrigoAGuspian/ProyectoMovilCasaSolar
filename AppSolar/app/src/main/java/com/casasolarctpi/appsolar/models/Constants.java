@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Constants {
+    //Cosntante para el consumo de servicios web
+    public static  final String BASE_URL="https://innovatec-server.herokuapp.com/";
     //Declaración de constantes
     public static final String [] GROUP_LIST = {"Páginas","Conócenos",};
     public static final String [] PAGES_LIST = {"Sena","Sena Regional", "CTPI Cauca", "Sennova",};
