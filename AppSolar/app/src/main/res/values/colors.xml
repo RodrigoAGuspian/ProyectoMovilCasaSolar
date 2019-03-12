@@ -1,13 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#FFFFFF</color>
-    <color name="colorPrimaryDark">#26A69A</color>
-    <color name="colorAccent">#00C600</color>
+    <color name="colorPrimary">#2CC1B4</color>
+    <color name="colorPrimaryDark">#009084</color>
+    <color name="colorAccent">#2CC1B4</color>
+    <color name="colorAccent1">#00C600</color>
     <color name="colorMenu">#000000</color>
 
     <color name="colorGraficaLinea1">#68BAE0</color>
     <color name="colorGraficaPunto1">#4F81BC</color>
     <color name="colorGraficaLinea2">#E69B69</color>
     <color name="colorGraficaPunto2">#C6504E</color>
-    <color name="color_custmo_marker">#EBF4F4F4</color>
+    <color name="color_custmo_marker">#FFFFFF</color>
+
+    <color name="primaryColor">#FA7223</color>
+    <color name="primaryLightColor">#FFA353</color>
+    <color name="primaryDarkColor">#C04200</color>
+    <color name="secondaryColor">#2CC1B4</color>
+    <color name="secondaryLightColor">#6DF4E6</color>
+    <color name="secondaryDarkColor">#009084</color>
+    <color name="trasparent">#00FFFFFF</color>
+
 </resources>

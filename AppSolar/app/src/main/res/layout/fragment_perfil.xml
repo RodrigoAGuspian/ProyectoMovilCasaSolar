@@ -196,7 +196,7 @@
                     android:layout_marginBottom="8dp"
                     android:backgroundTint="@color/colorPrimaryDark"
                     android:text="@string/actualizar"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@color/color_custmo_marker"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"

@@ -77,13 +77,13 @@ public class MenuPrincipal extends AppCompatActivity
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
-        toggle.getDrawerArrowDrawable().setColor(getResources().getColor(R.color.colorPrimaryDark));
+        toggle.getDrawerArrowDrawable().setColor(getResources().getColor(R.color.color_custmo_marker));
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        navigationView.setItemIconTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimaryDark)));
-        navigationView.setItemTextColor(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimaryDark)));
+        navigationView.setItemIconTintList(ColorStateList.valueOf(getResources().getColor(R.color.primaryDarkColor)));
+        navigationView.setItemTextColor(ColorStateList.valueOf(getResources().getColor(R.color.primaryDarkColor)));
         inizialite();
         inputListExpandable();
         createExpandableListView();

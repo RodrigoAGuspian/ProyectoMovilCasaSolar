@@ -1,6 +1,7 @@
 package com.casasolarctpi.appsolar.models;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.Log;
@@ -63,15 +64,23 @@ public class CustomMarkerView extends MarkerView {
 
     @Override
     public MPPointF getOffsetForDrawingAtPoint(float posX, float posY) {
+        return super.getOffsetForDrawingAtPoint(posX, posY);
+    }
 
-        Log.e("asd",""+posX);
-        if (posX>1000){
-            float tmp = posX-600;
-            Log.e("asd1",""+tmp);
-            return super.getOffsetForDrawingAtPoint(0, posY);
+    @Override
+    public void draw(Canvas canvas, float posX, float posY) {
+        int tmp =getWidth();
+        posX += getOffset().getX();
 
-        }else {
-            return super.getOffsetForDrawingAtPoint(posX, posY);
-        }
+        // AVOID OFFSCREEN
+
+        posX=0;
+        posY=0;
+
+        canvas.translate(posX, posY);
+        draw(canvas);
+        canvas.translate(-posX, -posY);
+
+        super.draw(canvas, posX, posY);
     }
 }

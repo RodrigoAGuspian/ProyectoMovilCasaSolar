@@ -14,7 +14,7 @@
         android:layout_marginBottom="8dp"
         android:paddingLeft="?android:attr/expandableListPreferredItemPaddingLeft"
         android:text="TextView"
-        android:textColor="@color/colorPrimaryDark"
+        android:textColor="@color/primaryDarkColor"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imgChild"
@@ -31,5 +31,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:background="@drawable/ic_link"
-        android:backgroundTint="@color/colorPrimaryDark"/>
+        android:backgroundTint="@color/primaryDarkColor"/>
 </android.support.constraint.ConstraintLayout>
