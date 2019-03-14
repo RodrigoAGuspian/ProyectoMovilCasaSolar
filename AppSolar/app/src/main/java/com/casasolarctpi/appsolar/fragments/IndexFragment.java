@@ -3,6 +3,7 @@ package com.casasolarctpi.appsolar.fragments;
 
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.text.method.ScrollingMovementMethod;
@@ -11,34 +12,32 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.casasolarctpi.appsolar.R;
+import com.casasolarctpi.appsolar.controllers.MenuPrincipal;
 import com.casasolarctpi.appsolar.models.ChartValues;
 import com.casasolarctpi.appsolar.models.Constants;
 import com.casasolarctpi.appsolar.models.CustomMarkerView;
-import com.casasolarctpi.appsolar.models.DataValues;
+import com.casasolarctpi.appsolar.models.DatosTH;
 import com.casasolarctpi.appsolar.models.RestClient;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.components.Legend.LegendForm;
 import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-import com.github.mikephil.charting.utils.ViewPortHandler;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -56,37 +55,44 @@ public class IndexFragment extends Fragment {
         // Required empty public constructor
     }
 
-    TextView txtInfoPrincipal;
-    LineChart lineChart;
-    View view;
-    List<Entry> entries = new ArrayList<>();
-    List<Entry> entries1 = new ArrayList<>();
-    List<ILineDataSet> dataSets = new ArrayList<>();
+    //Declaración de variables
+    private TextView txtInfoPrincipal;
+    private LineChart lineChart;
+    private View view;
+    private List<Entry> entries = new ArrayList<>();
+    private List<Entry> entries1 = new ArrayList<>();
+    private ChartValues chartValues = new ChartValues();
+    private List<ILineDataSet> dataSets = new ArrayList<>();
+    private XAxis xAxis;
+    public boolean bandera = false;
+    List<DatosTH> datosTHList = new ArrayList<>();
+
     public static List<String> labelsChart = new ArrayList<>();
-    public static ChartValues chartValues = new ChartValues();
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        FirebaseApp.initializeApp(Objects.requireNonNull(getContext()));
         view =inflater.inflate(R.layout.fragment_index, container, false);
         iniziliate();
         haveScroll();
-        loadData();
+        inputDataFirebase();
         return view;
     }
 
+    //Método para crear ejecto scroll al texto principal
     private void haveScroll() {
         txtInfoPrincipal.setMovementMethod(new ScrollingMovementMethod());
     }
 
+    //inicializacion de vistas
     private void iniziliate() {
         lineChart = view.findViewById(R.id.chart);
         txtInfoPrincipal = view.findViewById(R.id.txtInfoPrincipal);
     }
 
 
+    //Método para cargar los datos del servicio web con RetroFit
     public void loadData(){
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().detectAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -102,7 +108,7 @@ public class IndexFragment extends Fragment {
                 switch (response.code()){
                     case 200:
                         chartValues= response.body();
-                        inputValues();
+
                         Log.e("Datos",response.message());
                         break;
                     case 404:
@@ -121,28 +127,55 @@ public class IndexFragment extends Fragment {
 
     }
 
-    public void inputValues() {
-        final List<DataValues> valores = chartValues.getValores();
-        Date date = new Date();
-        DateFormat dateFormatView = new SimpleDateFormat("hh:mm:ss a");
-        DateFormat dateFormatToTransform = new SimpleDateFormat("HH:mm:ss");
 
+    //Método para el ingreso de datos desde de la base de datos  (Real time DataBase)de Firebase
+    public void inputDataFirebase(){
+        DatabaseReference datos = MenuPrincipal.reference.child("datos");
+        //Query para limitar los datos
+        Query ultimosDatos = datos.limitToLast(20);
+        ultimosDatos.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                //GenericTypeIndicator<ArrayList<DatosTH>> t = new GenericTypeIndicator<ArrayList<DatosTH>>(){};
+                datosTHList.clear();
+                for (DataSnapshot child: dataSnapshot.getChildren()) {
+                    datosTHList.add(child.getValue(DatosTH.class));
+                }
 
-        for (int i = 0; i < valores.size(); i++) {
-            try {
-                date = dateFormatToTransform.parse(valores.get(i).getFecha_hora().substring(10,19));
-
-            } catch (ParseException e) {
-                e.printStackTrace();
+                if (!bandera) {
+                    inputValuesChart();
+                    bandera=true;
+                }else {
+                    inputValuesRealTime();
+                }
             }
 
-            labelsChart.add(dateFormatView.format(date));
-            entries.add(new Entry(i, valores.get(i).getVoltaje()));
-            entries1.add(new Entry(i, valores.get(i).getIrradiancia()));
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    //Método para el ingreso de los valores a la gráfica
+    public void inputValuesChart() {
+        for (int i = 0; i < datosTHList.size(); i++) {
+            labelsChart.add(datosTHList.get(i).getHora());
+            float dato1=0;
+            float dato2=0;
+            try {
+                dato1=Float.parseFloat(datosTHList.get(i).getHumedad());
+                dato2=Float.parseFloat(datosTHList.get(i).getTemperatura());
+
+            }catch (Exception ignore){
+
+            }
+            entries.add(new Entry(i, dato1));
+            entries1.add(new Entry(i, dato2));
         }
 
-        LineDataSet lineDataSet = new LineDataSet(entries, "Voltaje");
-        LineDataSet lineDataSet1 = new LineDataSet(entries1, "Irradiancia");
+        LineDataSet lineDataSet = new LineDataSet(entries, "Humedad");
+        LineDataSet lineDataSet1 = new LineDataSet(entries1, "Temperatura");
 
         lineDataSet.setColor(getContext().getResources().getColor(R.color.colorGraficaPunto1));
         lineDataSet1.setColor(getContext().getResources().getColor(R.color.colorGraficaPunto2));
@@ -162,8 +195,8 @@ public class IndexFragment extends Fragment {
         data.setDrawValues(false);
         lineChart.setData(data);
         Description description = new Description();
-        description.setText("Fecha de los datos tomados: "+valores.get(0).getFecha_hora().substring(0,10));
-        XAxis xAxis = lineChart.getXAxis();
+        description.setText("Fecha de los datos tomados: "+datosTHList.get(0).getFecha_dato());
+        xAxis = lineChart.getXAxis();
 
         xAxis.setValueFormatter(new IndexAxisValueFormatter(labelsChart));
         xAxis.setLabelRotationAngle(-10f);
@@ -173,7 +206,34 @@ public class IndexFragment extends Fragment {
         CustomMarkerView customMarkerView = new CustomMarkerView(getContext(), R.layout.item_custom_marker);
         lineChart.setMarker(customMarkerView);
         lineChart.setTouchEnabled(true);
-        lineChart.invalidate();
+        //lineChart.invalidate();
+
+    }
+
+
+    //Método para el ingreso datos a la gráfica a tiempo real
+    private void inputValuesRealTime() {
+        entries.clear();
+        entries1.clear();
+        labelsChart.clear();
+        for (int i = 0; i < datosTHList.size(); i++) {
+            labelsChart.add(datosTHList.get(i).getHora());
+            float dato1=0;
+            float dato2=0;
+            try {
+                dato1=Float.parseFloat(datosTHList.get(i).getHumedad());
+                dato2=Float.parseFloat(datosTHList.get(i).getTemperatura());
+
+            }catch (Exception ignore){
+
+            }
+            entries.add(new Entry(i, dato1));
+            entries1.add(new Entry(i, dato2));
+            lineChart.notifyDataSetChanged();
+            lineChart.invalidate();
+
+        }
+        xAxis.setValueFormatter(new IndexAxisValueFormatter(labelsChart));
 
     }
 

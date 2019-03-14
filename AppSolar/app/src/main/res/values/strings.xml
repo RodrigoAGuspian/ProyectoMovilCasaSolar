@@ -31,7 +31,9 @@
     <string name="informacion_principal">El grupo de Investigación, Desarrollo Tecnológico e innovación CTPI SENA Cauca(Innovatec) como parte de sus líneas de investigación desarrollar proyectos de investigación aplicada e innovación en energías renovables, eficiencia energétìca y gestión de la energía; con lo cual busca aportar en el desarrollo regional y nacional mediante los resultados obtenidos en cada uno de los proyectos desarrollados, adicionalmente se busca dar soluciones a problemáticas reales de zonas rurales, urbanas, empresariales, industriales y en general problemáticas que involucren el uso e integración de las energías renovables de la mano de la eficiencia energética.\n \nEn está página se podrá encontrar información de cada uno de los proyectos desarrollados en el grupo, proyectos futuros e información relacionada con el semillero de investigaciòón en energías renovables, así como estrategias de divulgación del conocimiento en las áreas de interés del grupo de investigación; adicionalmente se presenta información en tiempo real de diferente variables o sistemas de energías renovables monitoreadas como partes de los proyectos desarrollados, así como acceso a la base de datos histórica de los sistemas o variables monitoreadas en los proyectos.\n \nA continuación se presenta la gráfica en tiempo real de la irradiancia solar en el laboratorio de investigación en energías renovables y eficiencia energética del Centro Teleinformatica Producción Industrial del SENA Regional Cauca; para tener acceso a gráficas y bases de datos de interés debe acceder por la barra de navegación de cada uno de los proyectos.</string>
     <string name="voltaje_vs_irradiancia">Voltaje vs Irradiancia</string>
     <string name="fecha">Fecha</string>
-    <string name="voltaje">Voltaje</string>
-    <string name="irradiancia">Irradiancia</string>
+    <string name="dato1">Humedad</string>
+    <string name="dato2">Temperatura</string>
+    <string name="innovaTec">InnovaTec</string>
+
 
 </resources>

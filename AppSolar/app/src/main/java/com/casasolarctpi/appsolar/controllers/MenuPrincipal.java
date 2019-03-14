@@ -1,69 +1,48 @@
 package com.casasolarctpi.appsolar.controllers;
 
-import android.arch.lifecycle.MutableLiveData;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.StrictMode;
-import android.provider.FontRequest;
 import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.graphics.drawable.DrawableCompat;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ExpandableListView;
-import android.widget.ImageView;
-import android.widget.Toast;
-
 
 import com.casasolarctpi.appsolar.R;
 import com.casasolarctpi.appsolar.fragments.AcercaDeFragment;
 import com.casasolarctpi.appsolar.fragments.ContactanosFragment;
+import com.casasolarctpi.appsolar.fragments.HumedadFragment;
 import com.casasolarctpi.appsolar.fragments.IndexFragment;
 import com.casasolarctpi.appsolar.fragments.PerfilFragment;
-import com.casasolarctpi.appsolar.models.ChartValues;
+import com.casasolarctpi.appsolar.fragments.TemperaturaFragment;
 import com.casasolarctpi.appsolar.models.Constants;
 import com.casasolarctpi.appsolar.models.ExpandableListAdapter;
-import com.casasolarctpi.appsolar.models.RestClient;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MenuPrincipal extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    //Declaración de variables
     private ExpandableListView expListView;
-    ExpandableListAdapter listAdapterExpandable;
-    String[] listDataHeader;
-    HashMap<String, String []> listDataChild;
-    String [] [] listChildren;
-
-    ConstraintLayout contentViewMenu;
-
-    DrawerLayout drawer;
-
-    private MutableLiveData<List<ChartValues>> liveData;
-
+    private ExpandableListAdapter listAdapterExpandable;
+    private String[] listDataHeader;
+    private HashMap<String, String []> listDataChild;
+    private String [] [] listChildren;
+    public ConstraintLayout contentViewMenu;
+    private  DrawerLayout drawer;
+    public static DatabaseReference reference;
 
 
     @Override
@@ -72,33 +51,42 @@ public class MenuPrincipal extends AppCompatActivity
         setContentView(R.layout.activity_menu_principal);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.getDrawerArrowDrawable().setColor(getResources().getColor(R.color.color_custmo_marker));
         toggle.syncState();
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.setItemIconTintList(ColorStateList.valueOf(getResources().getColor(R.color.primaryDarkColor)));
         navigationView.setItemTextColor(ColorStateList.valueOf(getResources().getColor(R.color.primaryDarkColor)));
         inizialite();
+        inizialiteFirebaseApp();
         inputListExpandable();
         createExpandableListView();
         getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new IndexFragment()).commit();
-
+        getSupportActionBar().setTitle(getResources().getString(R.string.inicio));
 
         navigationView.setNavigationItemSelectedListener(this);
 
 
+
     }
 
+    //Inicialización de vistas.
     private void inizialite() {
         contentViewMenu= findViewById(R.id.contentViewMenu);
         expListView = findViewById(R.id.expandable_list);
         drawer = findViewById(R.id.drawer_layout);
+    }
+
+    //Conexión entre la app y FirebaseApp ,activar persistencia de la base de datos de Firebase y referenciar la instacia de la base de datos
+    private void inizialiteFirebaseApp(){
+        FirebaseApp.initializeApp(this);
+        try {FirebaseDatabase.getInstance().setPersistenceEnabled(true);}catch (Exception e){}
+
+        reference= FirebaseDatabase.getInstance().getReference();
     }
 
     @Override
@@ -142,11 +130,20 @@ public class MenuPrincipal extends AppCompatActivity
 
         if (id == R.id.index) {
             getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new IndexFragment()).commit();
+            getSupportActionBar().setTitle(getResources().getString(R.string.inicio));
 
         } else if (id == R.id.profile) {
             getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new PerfilFragment()).commit();
+            getSupportActionBar().setTitle(getResources().getString(R.string.perfil));
 
+        }else if (id == R.id.item_Humedad){
+            getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new HumedadFragment()).commit();
+            getSupportActionBar().setTitle(getResources().getString(R.string.dato1));
+        }else if (id == R.id.item_Temperatura){
+            getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new TemperaturaFragment()).commit();
+            getSupportActionBar().setTitle(getResources().getString(R.string.dato2));
         }else if (id == R.id.logout){
+
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -168,7 +165,7 @@ public class MenuPrincipal extends AppCompatActivity
 
     }
 
-    //Creaciónde y llamadado del ExpandableListView
+    //Creación del ExpandableListView y agrego del click
     public void createExpandableListView(){
         listAdapterExpandable = new ExpandableListAdapter(this,listDataHeader,listDataChild);
         listAdapterExpandable.setOnChildClickListener(new ExpandableListAdapter.OnChildClickListener() {
@@ -202,7 +199,7 @@ public class MenuPrincipal extends AppCompatActivity
         expListView.setAdapter(listAdapterExpandable);
 
         for (int i=0; i<listAdapterExpandable.getGroupCount(); i++){
-            //expListView.expandGroup(i);
+            //expListView.expandGroup(i); // esta linea de código es para expandir los menús
         }
 
 

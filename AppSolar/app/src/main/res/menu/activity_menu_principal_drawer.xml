@@ -11,6 +11,16 @@
             />
 
         <item
+            android:id="@+id/item_Humedad"
+            android:title="@string/dato1"
+            />
+
+        <item
+            android:id="@+id/item_Temperatura"
+            android:title="@string/dato2"
+            />
+
+        <item
             android:id="@+id/profile"
             android:title="@string/perfil"
             android:icon="@drawable/ic_person"/>

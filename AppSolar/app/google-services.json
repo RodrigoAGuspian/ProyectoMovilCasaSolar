@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "715135539587",
+    "firebase_url": "https://datoscasasolar.firebaseio.com",
+    "project_id": "datoscasasolar",
+    "storage_bucket": "datoscasasolar.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:715135539587:android:be7526259c62dcd5",
+        "android_client_info": {
+          "package_name": "com.casasolarctpi.appsolar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "715135539587-69t48n4at4l6a9g59d0hugen200a1fda.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCFa7cR5rRowV0__dwcGcdtcuP0jM9cDd8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
