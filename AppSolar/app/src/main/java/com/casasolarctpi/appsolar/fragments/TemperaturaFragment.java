@@ -129,6 +129,7 @@ public class TemperaturaFragment extends Fragment {
         customMarkerView.setColorDelDato(getResources().getColor(R.color.colorGraficaLinea2));
         temperaturaChart.setMarker(customMarkerView);
         temperaturaChart.setTouchEnabled(true);
+        temperaturaChart.invalidate();
 
     }
 

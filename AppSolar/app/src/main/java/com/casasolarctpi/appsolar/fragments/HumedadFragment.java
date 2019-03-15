@@ -34,7 +34,7 @@ import java.util.List;
 public class HumedadFragment extends Fragment {
 
     //Declaración de variables
-    private LineChart temperaturaChart;
+    private LineChart humedadChart;
     private View view;
     private List<Entry> entry1 = new ArrayList<>();
     private List<String> labelsChart = new ArrayList<>();
@@ -59,7 +59,7 @@ public class HumedadFragment extends Fragment {
 
     //Inicialización de vistas
     private void inizialite() {
-        temperaturaChart = view.findViewById(R.id.temperaturaChart);
+        humedadChart = view.findViewById(R.id.humedadChart);
 
     }
 
@@ -116,19 +116,20 @@ public class HumedadFragment extends Fragment {
         LineData data= new LineData(lineDataSet);
         data.setDrawValues(false);
         Description description = new Description();
-        temperaturaChart.setData(data);
+        humedadChart.setData(data);
         description.setText("Fecha de los dato tomados: "+datosTHList.get(0).getFecha_dato());
-        xAxis = temperaturaChart.getXAxis();
+        xAxis = humedadChart.getXAxis();
         xAxis.setValueFormatter(new IndexAxisValueFormatter(labelsChart));
         xAxis.setLabelRotationAngle(-10f);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        temperaturaChart.setDescription(description);
-        temperaturaChart.setDrawMarkers(true);
+        humedadChart.setDescription(description);
+        humedadChart.setDrawMarkers(true);
         CustomMarkerViewData1 customMarkerView = new CustomMarkerViewData1(getContext(),R.layout.item_custom_marker);
         customMarkerView.setTipoDelDato(getResources().getString(R.string.dato1));
         customMarkerView.setColorDelDato(getResources().getColor(R.color.colorGraficaLinea1));
-        temperaturaChart.setMarker(customMarkerView);
-        temperaturaChart.setTouchEnabled(true);
+        humedadChart.setMarker(customMarkerView);
+        humedadChart.setTouchEnabled(true);
+        humedadChart.invalidate();
 
     }
 
@@ -145,8 +146,8 @@ public class HumedadFragment extends Fragment {
 
             }
             entry1.add(new Entry(i,dato));
-            temperaturaChart.notifyDataSetChanged();
-            temperaturaChart.invalidate();
+            humedadChart.notifyDataSetChanged();
+            humedadChart.invalidate();
 
 
         }

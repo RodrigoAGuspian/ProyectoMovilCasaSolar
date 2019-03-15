@@ -34,6 +34,25 @@
     <string name="dato1">Humedad</string>
     <string name="dato2">Temperatura</string>
     <string name="innovaTec">InnovaTec</string>
+    <string name="consultas">Consultas</string>
+    <string name="mensaje_week">Por favor seleccione un día (esta selección tomará toda la semana de dicho día)</string>
+    <string name="a">a</string>
+    <string name="enero">Enero</string>
+    <string name="febrero">Febrero</string>
+    <string name="marzo">Marzo</string>
+    <string name="abril">Abril</string>
+    <string name="mayo">Mayo</string>
+    <string name="junio">Junio</string>
+    <string name="julio">Julio</string>
+    <string name="agosto">Agosto</string>
+    <string name="septiembre">Septiembre</string>
+    <string name="octubre">Octubre</string>
+    <string name="noviembre">Noviembre</string>
+    <string name="diciembre">Diciembre</string>
+    <string name="contactanos">Contáctanos</string>
+    <string name="acerca_de">Acerca de</string>
+    <string name="paginas">Páginas</string>
+    <string name="conocenos">Conócenos</string>
 
 
 </resources>

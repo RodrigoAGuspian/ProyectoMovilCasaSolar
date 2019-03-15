@@ -23,7 +23,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/temperaturaChart"
+        android:id="@+id/humedadChart"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginBottom="8dp"

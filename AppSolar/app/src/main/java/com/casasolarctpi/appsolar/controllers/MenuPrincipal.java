@@ -18,6 +18,7 @@ import android.widget.ExpandableListView;
 
 import com.casasolarctpi.appsolar.R;
 import com.casasolarctpi.appsolar.fragments.AcercaDeFragment;
+import com.casasolarctpi.appsolar.fragments.ConsultasFragment;
 import com.casasolarctpi.appsolar.fragments.ContactanosFragment;
 import com.casasolarctpi.appsolar.fragments.HumedadFragment;
 import com.casasolarctpi.appsolar.fragments.IndexFragment;
@@ -44,11 +45,11 @@ public class MenuPrincipal extends AppCompatActivity
     private  DrawerLayout drawer;
     public static DatabaseReference reference;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu_principal);
+        Constants.setContext(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -142,6 +143,9 @@ public class MenuPrincipal extends AppCompatActivity
         }else if (id == R.id.item_Temperatura){
             getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new TemperaturaFragment()).commit();
             getSupportActionBar().setTitle(getResources().getString(R.string.dato2));
+        }else if (id == R.id.consultas){
+            getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu, new ConsultasFragment()).commit();
+
         }else if (id == R.id.logout){
 
         }

@@ -206,7 +206,7 @@ public class IndexFragment extends Fragment {
         CustomMarkerView customMarkerView = new CustomMarkerView(getContext(), R.layout.item_custom_marker);
         lineChart.setMarker(customMarkerView);
         lineChart.setTouchEnabled(true);
-        //lineChart.invalidate();
+        lineChart.invalidate();
 
     }
 
