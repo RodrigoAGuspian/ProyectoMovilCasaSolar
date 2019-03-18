@@ -43,6 +43,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
     MaterialSpinner mSMes;
     NumberPicker nPAnio;
     Date dateToQuery;
+    Date dateDay;
 
     Dialog dialog;
     int mode;
@@ -215,6 +216,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                 Calendar calendar = new GregorianCalendar(year,month,dayOfMonth);
                 dateToQuery = calendar.getTime();
                 txtDate1.setText(date);
+                dateDay = new GregorianCalendar(year,month,dayOfMonth).getTime();
                 showChartDay();
                 break;
         }
