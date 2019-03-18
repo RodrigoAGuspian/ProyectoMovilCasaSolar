@@ -2,6 +2,7 @@ package com.casasolarctpi.appsolar.controllers;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,11 +20,13 @@ import java.util.TimerTask;
 
 public class Splash extends AppCompatActivity {
     ImageView imageView;
+    public static Context context;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_splash);
+        context = this;
         FirebaseApp.initializeApp(this);
         imageView = findViewById(R.id.imgSplash);
         TimerTask timerTask = new TimerTask() {

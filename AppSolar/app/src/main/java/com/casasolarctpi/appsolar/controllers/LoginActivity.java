@@ -8,6 +8,7 @@ import android.view.Window;
 import android.widget.Button;
 
 import com.casasolarctpi.appsolar.R;
+import com.casasolarctpi.appsolar.models.Constants;
 
 public class LoginActivity extends AppCompatActivity {
     Button btnLogin;
