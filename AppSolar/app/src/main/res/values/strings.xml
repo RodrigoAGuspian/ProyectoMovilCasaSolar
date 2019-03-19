@@ -53,6 +53,7 @@
     <string name="acerca_de">Acerca de</string>
     <string name="paginas">Páginas</string>
     <string name="conocenos">Conócenos</string>
+    <string name="no_hay_datos">No hay datos del día seleccionado</string>
 
 
 </resources>

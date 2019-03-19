@@ -124,7 +124,7 @@ public class TemperaturaFragment extends Fragment {
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         temperaturaChart.setDescription(description);
         temperaturaChart.setDrawMarkers(true);
-        CustomMarkerViewData1 customMarkerView = new CustomMarkerViewData1(getContext(),R.layout.item_custom_marker);
+        CustomMarkerViewData1 customMarkerView = new CustomMarkerViewData1(getContext(),R.layout.item_custom_marker,labelsChart);
         customMarkerView.setTipoDelDato(getResources().getString(R.string.dato2));
         customMarkerView.setColorDelDato(getResources().getColor(R.color.colorGraficaLinea2));
         temperaturaChart.setMarker(customMarkerView);

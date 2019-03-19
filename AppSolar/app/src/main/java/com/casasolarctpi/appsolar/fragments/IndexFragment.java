@@ -203,7 +203,7 @@ public class IndexFragment extends Fragment {
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         lineChart.setDescription(description);
         lineChart.setDrawMarkers(true);
-        CustomMarkerView customMarkerView = new CustomMarkerView(getContext(), R.layout.item_custom_marker);
+        CustomMarkerView customMarkerView = new CustomMarkerView(getContext(), R.layout.item_custom_marker,labelsChart);
         lineChart.setMarker(customMarkerView);
         lineChart.setTouchEnabled(true);
         lineChart.invalidate();

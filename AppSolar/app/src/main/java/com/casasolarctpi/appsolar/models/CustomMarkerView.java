@@ -15,10 +15,14 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.utils.MPPointF;
 
+import java.util.List;
+
 public class CustomMarkerView extends MarkerView {
 
 
     private TextView txtCustomMarker1, txtCustomMarker2;
+    private List<String> labelsChart;
+
 
     /**
      * Constructor. Sets up the MarkerView with a custom layout resource.
@@ -26,11 +30,12 @@ public class CustomMarkerView extends MarkerView {
      * @param context
      * @param layoutResource the layout resource to use for the MarkerView
      */
-    public CustomMarkerView(Context context, int layoutResource) {
+
+    public CustomMarkerView(Context context, int layoutResource, List<String> labelsChart) {
         super(context, layoutResource);
+        this.labelsChart = labelsChart;
         txtCustomMarker1 = findViewById(R.id.txtCustomMarker1);
         txtCustomMarker2 = findViewById(R.id.txtCustomMarker2);
-
     }
 
     @Override
@@ -39,12 +44,12 @@ public class CustomMarkerView extends MarkerView {
 
         switch (highlight.getDataSetIndex() ){
             case 0:
-                txtCustomMarker1.setText(getResources().getString(R.string.fecha)+": "+IndexFragment.labelsChart.get((int) e.getX()));
+                txtCustomMarker1.setText(getResources().getString(R.string.fecha)+": "+labelsChart.get((int) e.getX()));
                 txtCustomMarker2.setText(getResources().getString(R.string.dato1)+": " + e.getY());
                 txtCustomMarker2.setTextColor(getResources().getColor(R.color.colorGraficaPunto1));
                 break;
             case 1:
-                txtCustomMarker1.setText(getResources().getString(R.string.fecha)+": "+IndexFragment.labelsChart.get((int) e.getX()));
+                txtCustomMarker1.setText(getResources().getString(R.string.fecha)+": "+labelsChart.get((int) e.getX()));
                 txtCustomMarker2.setText(getResources().getString(R.string.dato2)+": " + e.getY());
                 txtCustomMarker2.setTextColor(getResources().getColor(R.color.colorGraficaPunto2));
                 break;

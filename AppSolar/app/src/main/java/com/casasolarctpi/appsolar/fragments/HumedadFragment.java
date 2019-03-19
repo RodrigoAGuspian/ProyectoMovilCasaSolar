@@ -124,7 +124,7 @@ public class HumedadFragment extends Fragment {
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         humedadChart.setDescription(description);
         humedadChart.setDrawMarkers(true);
-        CustomMarkerViewData1 customMarkerView = new CustomMarkerViewData1(getContext(),R.layout.item_custom_marker);
+        CustomMarkerViewData1 customMarkerView = new CustomMarkerViewData1(getContext(),R.layout.item_custom_marker,labelsChart);
         customMarkerView.setTipoDelDato(getResources().getString(R.string.dato1));
         customMarkerView.setColorDelDato(getResources().getColor(R.color.colorGraficaLinea1));
         humedadChart.setMarker(customMarkerView);

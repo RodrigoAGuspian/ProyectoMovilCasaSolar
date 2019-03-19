@@ -11,6 +11,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -19,17 +20,24 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.NumberPicker;
+import android.widget.ProgressBar;
 import android.widget.TabHost;
 import android.widget.Toast;
 
 import com.casasolarctpi.appsolar.R;
 import com.casasolarctpi.appsolar.controllers.MenuPrincipal;
 import com.casasolarctpi.appsolar.models.Constants;
+import com.casasolarctpi.appsolar.models.CustomMarkerView;
 import com.casasolarctpi.appsolar.models.DatosTH;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -61,9 +69,11 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
     Date dateToQuery;
     String fechaATexto;
     Dialog dialog;
+    ProgressBar pBConsultas;
     int mode;
     List<DatosTH> datosGenerales = new ArrayList<>();
     private List<ILineDataSet> dataSets = new ArrayList<>();
+    private XAxis xAxis;
     List<DatosTH> datosTHList = new ArrayList<>();
     public static List<String> labelsChart = new ArrayList<>();
 
@@ -124,7 +134,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         mSMes = view.findViewById(R.id.spinnerMes);
         nPAnio = view.findViewById(R.id.nPAnio);
 
-
+        pBConsultas = view.findViewById(R.id.pBConsultas);
 
 
     }
@@ -257,6 +267,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
         switch (mode) {
             case 1:
+                pBConsultas.setVisibility(View.VISIBLE);
                 int realMonth = month + 1;
                 fechaATexto = dayOfMonth + "-" + realMonth + "-" + year;
                 Calendar calendar = new GregorianCalendar(year,month,dayOfMonth);
@@ -271,41 +282,97 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
     private void showChartDay() {
         List<Entry> entries = new ArrayList<>();
         List<Entry> entries1 = new ArrayList<>();
-        List<DatosTH> datosFiltrado = new ArrayList<>();
-
-
-
+        lineChart1.clear();
+        dataSets.clear();
+        String hora = "";
+        String tmpHora = "";
+        List<Float> datosMinuto  = new ArrayList<>();
+        List<Float> datosMinuto1  = new ArrayList<>();
+        int contador =0;
         for (int i=0;i<datosGenerales.size();i++){
             DatosTH datosTH = datosGenerales.get(i);
             if (datosTH.getFecha_dato().equals(fechaATexto)){
-                try {
-                    float dato1 = Float.parseFloat(datosTH.getHumedad());
-                    float dato2 = Float.parseFloat(datosTH.getTemperatura());
+                hora = datosTH.getHora();
 
-                }catch (Exception ignored){
-
+                if (tmpHora.length()<1){
+                    tmpHora= datosTH.getHora();
                 }
+                if (hora.equals(tmpHora)){
+                    datosMinuto.add(Float.parseFloat(datosTH.getHumedad()));
+                    datosMinuto1.add(Float.parseFloat(datosTH.getTemperatura()));
+                }else {
+                    tmpHora= datosTH.getHora();
+                    labelsChart.add(datosTH.getHora());
+                    entries.add(new Entry(contador, promedio(datosMinuto)));
+                    entries1.add(new Entry(contador, promedio(datosMinuto1)));
+                    contador++;
+                }
+
             }
 
             //Organizar codigo
-            labelsChart.add(datosTHList.get(i).getHora());
-            float dato1=0;
-            float dato2=0;
-            try {
-                dato1=Float.parseFloat(datosTHList.get(i).getHumedad());
-                dato2=Float.parseFloat(datosTHList.get(i).getTemperatura());
-
-            }catch (Exception ignore){
-
-            }
-            entries.add(new Entry(i, dato1));
-            entries1.add(new Entry(i, dato2));
-
 
         }
 
+        //Log.e("Datos",entries.toString()+"\n"+labelsChart.toString());
+
+        if (entries.size()!=0) {
 
 
+            LineDataSet lineDataSet = new LineDataSet(entries, "Humedad");
+            LineDataSet lineDataSet1 = new LineDataSet(entries1, "Temperatura");
+
+            lineDataSet.setColor(getContext().getResources().getColor(R.color.colorGraficaPunto1));
+            lineDataSet1.setColor(getContext().getResources().getColor(R.color.colorGraficaPunto2));
+
+            lineDataSet.setCircleColor(getContext().getResources().getColor(R.color.colorGraficaLinea1));
+            lineDataSet1.setCircleColor(getContext().getResources().getColor(R.color.colorGraficaLinea2));
+
+            lineDataSet.setValueTextColor(getContext().getResources().getColor(R.color.colorGraficaLinea1));
+            lineDataSet1.setValueTextColor(getContext().getResources().getColor(R.color.colorGraficaLinea2));
+
+            lineDataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+            lineDataSet1.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+
+            dataSets.add(lineDataSet);
+            dataSets.add(lineDataSet1);
+            LineData data = new LineData(dataSets);
+            data.setDrawValues(false);
+            lineChart1.setData(data);
+            Description description = new Description();
+            description.setText("Fecha de los datos tomados: " + fechaATexto);
+            xAxis = lineChart1.getXAxis();
+
+            xAxis.setValueFormatter(new IndexAxisValueFormatter(labelsChart));
+            xAxis.setLabelRotationAngle(-10f);
+            xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+            lineChart1.setDescription(description);
+            lineChart1.setDrawMarkers(true);
+            CustomMarkerView customMarkerView = new CustomMarkerView(getContext(), R.layout.item_custom_marker, labelsChart);
+            lineChart1.setMarker(customMarkerView);
+            lineChart1.setTouchEnabled(true);
+            lineChart1.invalidate();
+
+
+        }else {
+            Toast.makeText(getContext(), R.string.no_hay_datos, Toast.LENGTH_SHORT).show();
+        }
+        pBConsultas.setVisibility(View.INVISIBLE);
+
+    }
+
+    private float promedio(List<Float> datosMinuto) {
+        float acumulador=0;
+        for (int i=0;i<datosMinuto.size();i++){
+            acumulador+=datosMinuto.get(i);
+        }
+        try {
+            return acumulador/datosMinuto.size();
+
+        }catch (Exception ignore){
+            return 0;
+
+        }
 
     }
 

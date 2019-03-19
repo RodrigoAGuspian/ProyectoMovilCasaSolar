@@ -11,10 +11,14 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.utils.MPPointF;
 
+import java.util.List;
+
 public class CustomMarkerViewData1 extends MarkerView {
     private TextView txtCustomMarker1, txtCustomMarker2;
     private int colorDelDato = 0;
     private String tipoDelDato = "";
+    private List<String> labelsChart;
+
     public void setColorDelDato(int colorDelDato) {
         this.colorDelDato = colorDelDato;
     }
@@ -29,17 +33,18 @@ public class CustomMarkerViewData1 extends MarkerView {
      * @param context
      * @param layoutResource the layout resource to use for the MarkerView
      */
-    public CustomMarkerViewData1(Context context, int layoutResource) {
+
+    public CustomMarkerViewData1(Context context, int layoutResource, List<String> labelsChart) {
         super(context, layoutResource);
+        this.labelsChart = labelsChart;
         txtCustomMarker1 = findViewById(R.id.txtCustomMarker1);
         txtCustomMarker2 = findViewById(R.id.txtCustomMarker2);
     }
 
-
     @Override
     public void refreshContent(Entry e, Highlight highlight) {
         super.refreshContent(e, highlight);
-        txtCustomMarker1.setText(getResources().getString(R.string.fecha)+": "+ IndexFragment.labelsChart.get((int) e.getX()));
+        txtCustomMarker1.setText(getResources().getString(R.string.fecha)+": "+ labelsChart.get((int) e.getX()));
         txtCustomMarker2.setText(tipoDelDato+": " + e.getY());
         txtCustomMarker2.setTextColor(colorDelDato);
 
