@@ -32,5 +32,10 @@ public class Constants {
     public static final int MIN_YEAR = 2018;
     public static final int MAX_YEAR = 2099;
 
+    //Días de la semana
+    public static final String [] DIAS_DE_LA_SEMANA = {Splash.context.getString(R.string.domingo),Splash.context.getString(R.string.lunes),Splash.context.getString(R.string.martes),Splash.context.getString(R.string.miercoles), Splash.context.getString(R.string.jueves),Splash.context.getString(R.string.viernes),Splash.context.getString(R.string.sabado)};
+
+
+
 }
 

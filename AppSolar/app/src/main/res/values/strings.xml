@@ -54,6 +54,13 @@
     <string name="paginas">Páginas</string>
     <string name="conocenos">Conócenos</string>
     <string name="no_hay_datos">No hay datos del día seleccionado</string>
+    <string name="domingo">Domingo</string>
+    <string name="lunes">Lunes</string>
+    <string name="martes">Martes</string>
+    <string name="miercoles">Miércoles</string>
+    <string name="jueves">Jueves</string>
+    <string name="viernes">Viernes</string>
+    <string name="sabado">Sábado</string>
 
 
 </resources>

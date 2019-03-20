@@ -28,16 +28,20 @@ import com.casasolarctpi.appsolar.R;
 import com.casasolarctpi.appsolar.controllers.MenuPrincipal;
 import com.casasolarctpi.appsolar.models.Constants;
 import com.casasolarctpi.appsolar.models.CustomMarkerView;
+import com.casasolarctpi.appsolar.models.DatoSemana;
 import com.casasolarctpi.appsolar.models.DatosTH;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -47,11 +51,13 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.jaredrummler.materialspinner.MaterialSpinner;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -218,10 +224,23 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                 int mes = datePicker.getMonth()+1;
 
                 String fecha1 = datePicker.getDayOfMonth()+"-"+mes+"-"+datePicker.getYear();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+
+                Date date = new Date();
+                try {
+                    date = dateFormat.parse(fecha1);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+
+                }
+
                 Calendar calendar = new GregorianCalendar(datePicker.getYear(),datePicker.getMonth(),datePicker.getDayOfMonth());
                 Calendar calendar1 = new GregorianCalendar(datePicker.getYear(),datePicker.getMonth(),datePicker.getDayOfMonth());
-                calendar.setFirstDayOfWeek(Calendar.SUNDAY);
 
+                calendar.setTime(date);
+
+
+                calendar.setFirstDayOfWeek(Calendar.SUNDAY);
                 calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
                 calendar.set(Calendar.AM_PM, Calendar.AM);
                 calendar.set(Calendar.HOUR, 0);
@@ -229,11 +248,12 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                 calendar.set(Calendar.SECOND, 0);
 
 
-                calendar.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
-                calendar.set(Calendar.AM_PM, Calendar.PM);
-                calendar.set(Calendar.HOUR, 11);
-                calendar.set(Calendar.MINUTE, 59);
-                calendar.set(Calendar.SECOND, 59);
+                calendar1.setTime(date);
+                calendar1.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+                calendar1.set(Calendar.AM_PM, Calendar.PM);
+                calendar1.set(Calendar.HOUR, 11);
+                calendar1.set(Calendar.MINUTE, 59);
+                calendar1.set(Calendar.SECOND, 59);
 
                 Date primerDia = calendar.getTime();
                 Date ultimoDia = calendar1.getTime();
@@ -289,8 +309,10 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         List<Float> datosMinuto  = new ArrayList<>();
         List<Float> datosMinuto1  = new ArrayList<>();
         int contador =0;
+        DatosTH datosTH;
+        labelsChart = new ArrayList<>();
         for (int i=0;i<datosGenerales.size();i++){
-            DatosTH datosTH = datosGenerales.get(i);
+            datosTH = datosGenerales.get(i);
             if (datosTH.getFecha_dato().equals(fechaATexto)){
                 hora = datosTH.getHora();
 
@@ -298,17 +320,24 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                     tmpHora= datosTH.getHora();
                 }
                 if (hora.equals(tmpHora)){
-                    datosMinuto.add(Float.parseFloat(datosTH.getHumedad()));
-                    datosMinuto1.add(Float.parseFloat(datosTH.getTemperatura()));
+                    try {
+                        datosMinuto.add(Float.parseFloat(datosTH.getHumedad()));
+                        datosMinuto1.add(Float.parseFloat(datosTH.getTemperatura()));
+
+                    }catch (Exception e){
+                    }
                 }else {
                     tmpHora= datosTH.getHora();
                     labelsChart.add(datosTH.getHora());
                     entries.add(new Entry(contador, promedio(datosMinuto)));
                     entries1.add(new Entry(contador, promedio(datosMinuto1)));
+                    datosMinuto.clear();
+                    datosMinuto1.clear();
                     contador++;
                 }
 
             }
+
 
             //Organizar codigo
 
@@ -325,14 +354,16 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
             lineDataSet.setColor(getContext().getResources().getColor(R.color.colorGraficaPunto1));
             lineDataSet1.setColor(getContext().getResources().getColor(R.color.colorGraficaPunto2));
 
-            lineDataSet.setCircleColor(getContext().getResources().getColor(R.color.colorGraficaLinea1));
-            lineDataSet1.setCircleColor(getContext().getResources().getColor(R.color.colorGraficaLinea2));
-
             lineDataSet.setValueTextColor(getContext().getResources().getColor(R.color.colorGraficaLinea1));
             lineDataSet1.setValueTextColor(getContext().getResources().getColor(R.color.colorGraficaLinea2));
 
             lineDataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
             lineDataSet1.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+
+            lineDataSet.setDrawCircles(false);
+            lineDataSet1.setDrawCircles(false);
+            lineDataSet.setFormSize(10f);
+            lineDataSet1.setFormSize(10f);
 
             dataSets.add(lineDataSet);
             dataSets.add(lineDataSet1);
@@ -378,8 +409,126 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
 
     private void showChartWeek(Date primerDia, Date ultimoDia) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        List<BarEntry> entries = new ArrayList<>();
+        List<BarEntry> entries1 = new ArrayList<>();
+
+        Calendar tmpCalendar = new GregorianCalendar();
+        tmpCalendar.setTime(primerDia);
+        Date tmpDate = tmpCalendar.getTime();
+        int realMonth=0;
+        String [] fechaSemana = new String[7];
+        List<DatoSemana> [] datosFiltrados = new List[7];
+
+        for (int i=0; i<datosFiltrados.length;i++){
+            datosFiltrados[i]=new ArrayList<>();
+        }
+
+
+        for (int i=0; i<fechaSemana.length;i++){
+            realMonth=tmpDate.getMonth()+1;
+            int dia = tmpCalendar.get(Calendar.DAY_OF_MONTH);
+            int anio = tmpCalendar.get(Calendar.YEAR);
+            fechaSemana[i]=dia+"-"+realMonth+"-"+anio;
+            tmpCalendar.add(tmpCalendar.DAY_OF_MONTH,1);
+            tmpDate=tmpCalendar.getTime();
+
+        }
+
+        for (int i=0; i<datosGenerales.size();i++){
+            DatosTH datosTH = datosGenerales.get(i);
+            for (int j=0; j<fechaSemana.length;j++){
+                if (datosTH.getFecha_dato().equals(fechaSemana[j])){
+                    datosFiltrados[j].add(new DatoSemana(j,datosTH));
+                    j=fechaSemana.length;
+                }
+
+            }
+
+        }
+
+        for (int i=0; i<datosFiltrados.length;i++){
+            entries.add(new BarEntry(i,promedioDia(datosFiltrados[i],0)));
+            entries1.add(new BarEntry(i,promedioDia(datosFiltrados[i],1)));
+
+        }
+
+
+        BarDataSet barDataSet = new BarDataSet(entries,"Humedad");
+        BarDataSet barDataSet1 = new BarDataSet(entries1,"Temperatura");
+        barDataSet.setColor(getContext().getResources().getColor(R.color.colorGraficaPunto1));
+        barDataSet1.setColor(getContext().getResources().getColor(R.color.colorGraficaPunto2));
+        barDataSet.setBarShadowColor(getContext().getResources().getColor(R.color.colorGraficaLinea1));
+        barDataSet1.setBarShadowColor(getContext().getResources().getColor(R.color.colorGraficaLinea2));
+        List<IBarDataSet> dataBarSets = new ArrayList<>();
+        dataBarSets.add(barDataSet);
+        dataBarSets.add(barDataSet1);
+        BarData data = new BarData(barDataSet,barDataSet1);
+        data.setBarWidth(0.45f); // set custom bar width
+        barChart1.setData(data);
+        barChart1.groupBars(0, 0.02f, 0f);
+        xAxis = barChart1.getXAxis();
+        xAxis.setValueFormatter(new IndexAxisValueFormatter(Constants.DIAS_DE_LA_SEMANA));
+        xAxis.setCenterAxisLabels(true);
+        xAxis.setLabelRotationAngle(-5f);
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setTextSize(8);
+        xAxis.setAxisMaximum(7);
+        barChart1.invalidate(); // refresh
+
+
+
 
     }
+
+    private float promedioDia(List<DatoSemana> datosFiltrado, int modo) {
+        float acumulador=0;
+
+        switch (modo){
+            case 0:
+                try {
+                    for (int i=0;i<datosFiltrado.size();i++){
+                        try {
+                            acumulador+=Float.parseFloat(datosFiltrado.get(i).getDatosTH().getHumedad());
+                        }catch (Exception ignore){
+
+                        }
+                    }
+
+                }catch (Exception ignore){
+
+                }
+
+                break;
+
+            case 1:
+
+                try {
+                    for (int i=0;i<datosFiltrado.size();i++){
+                        try {
+                            acumulador+=Float.parseFloat(datosFiltrado.get(i).getDatosTH().getTemperatura());
+                        }catch (Exception ignore){
+
+                        }
+                    }
+
+                }catch (Exception ignore){
+
+                }
+
+                break;
+        }
+
+        try {
+            return acumulador/datosFiltrado.size();
+
+        }catch (Exception ignore){
+            return 0f;
+
+        }
+
+    }
+
 
     public void showChartMonth(){
 
