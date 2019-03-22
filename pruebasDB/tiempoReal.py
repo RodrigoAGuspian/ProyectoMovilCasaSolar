@@ -8,7 +8,8 @@ firebase_admin.initialize_app(cred, {
 })
 
 
-ref = db.reference('datos')
+ref = db.reference('tiempoReal')
+refData = db.reference('datos')
 snapshot= ref.get()
 
 i=0
@@ -16,27 +17,36 @@ try:
     print(str(i))
     print(len(snapshot))
     i=len(snapshot)
+    if i==60:
+        i=0
+        pass
 except Exception as e:
     pass
 
+
+
 ser = serial.Serial('COM2', 9600)
 while True:
-
+    tiempo=0;
     fechaNow = datetime.datetime.now()
     dia = str(fechaNow.day)
     mes = str(fechaNow.month)
     anno = str(fechaNow.year)
     hora = str(fechaNow.strftime("%I"))+":"+str((fechaNow.strftime("%M")))+" "+str((fechaNow.strftime("%p")))
     fechaActual = dia+"-"+mes+"-"+anno
+    fechaActual1 =dia+"-"+mes+"-"+anno+" "+str(fechaNow.strftime("%H"))+":"+str((fechaNow.strftime("%M")))+":"+str((fechaNow.strftime("%S")))
     inf = ser.readline()
-    nowRef = ref.child("y"+anno).child("m"+mes).child("d"+dia)
     try:
+
+       
         dato2= str(inf).split(": ")[2][0:5]
         dato1= str(inf).split(": ")[1][0:5]
         #print(dato1+"asd"+dato2)
         print(inf)
-        nowRef.child(str(i)).set({
+        ref.child(str(i)).set({
+            'fechaActual':fechaActual,
             'hora':hora,
+            'fechaActual1':fechaActual1,
             'temperatura':dato1,
             'humedad':dato2,
             "corrienteBateria" : "0.0",
@@ -48,10 +58,37 @@ while True:
             "voltajePanel" : "0.0",
 
         })
-        i=i+1
+        
+        if i==59:
+            nowRef = refData.child("y"+anno).child("m"+mes).child("d"+dia)
+            i=0
+            j=0
+            try:
+                j= len(nowRef.get())
+                pass
+            except Exception as a:
+                pass
+            nowRef.child(str(j)).set({
+                'hora':hora,
+                'temperatura':dato1,
+                'humedad':dato2,
+                "corrienteBateria" : "0.0",
+                "corrienteCargas" : "0.0",
+                "corrientePanel" : "0.0",
+                "irradiancia" : "1.0",
+                "voltajeBateria" : "0.0",
+                "voltajeCargas" : "0.0",
+                "voltajePanel" : "0.0",
+            })
+        else:
+            i=i+1
+
+
+
+        
     except Exception as e:
         pass
     
     
-    time.sleep(60)
+    time.sleep(1)
 ser.close()
