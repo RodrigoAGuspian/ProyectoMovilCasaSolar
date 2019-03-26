@@ -1,12 +1,17 @@
 package com.casasolarctpi.appsolar.models;
 
+import java.util.List;
+
 public class DatoSemana {
     private int dia;
-    private DatosTH datosTH;
+    private List<DatosCompletos> datosCompletos;
 
-    public DatoSemana(int dia, DatosTH datosTH) {
+    public DatoSemana() {
+    }
+
+    public DatoSemana(int dia, List<DatosCompletos> datosCompletos) {
         this.dia = dia;
-        this.datosTH = datosTH;
+        this.datosCompletos = datosCompletos;
     }
 
     public int getDia() {
@@ -17,11 +22,11 @@ public class DatoSemana {
         this.dia = dia;
     }
 
-    public DatosTH getDatosTH() {
-        return datosTH;
+    public List<DatosCompletos> getDatosCompletos() {
+        return datosCompletos;
     }
 
-    public void setDatosTH(DatosTH datosTH) {
-        this.datosTH = datosTH;
+    public void setDatosCompletos(List<DatosCompletos> datosCompletos) {
+        this.datosCompletos = datosCompletos;
     }
 }

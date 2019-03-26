@@ -24,6 +24,13 @@
             />
 
         <item
+            android:id="@+id/item_Irradiancia"
+            android:title="@string/dato3"
+            android:icon="@drawable/ic_sun"
+
+            />
+
+        <item
             android:id="@+id/consultas"
             android:title="@string/consultas"
             android:icon="@drawable/ic_file_search"
@@ -36,7 +43,7 @@
 
         <item
             android:id="@+id/logout"
-            android:title="@string/cerrar_sesi_n"
+            android:title="@string/cerrar_sesion"
             android:icon="@drawable/ic_exit_to_app"/>
     </group>
 

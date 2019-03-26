@@ -44,14 +44,20 @@ public class CustomMarkerView extends MarkerView {
 
         switch (highlight.getDataSetIndex() ){
             case 0:
-                txtCustomMarker1.setText(getResources().getString(R.string.fecha)+": "+labelsChart.get((int) e.getX()));
+                txtCustomMarker1.setText(getResources().getString(R.string.hora)+": "+labelsChart.get((int) e.getX()));
                 txtCustomMarker2.setText(getResources().getString(R.string.dato1)+": " + e.getY());
                 txtCustomMarker2.setTextColor(getResources().getColor(R.color.colorGraficaPunto1));
                 break;
             case 1:
-                txtCustomMarker1.setText(getResources().getString(R.string.fecha)+": "+labelsChart.get((int) e.getX()));
+                txtCustomMarker1.setText(getResources().getString(R.string.hora)+": "+labelsChart.get((int) e.getX()));
                 txtCustomMarker2.setText(getResources().getString(R.string.dato2)+": " + e.getY());
                 txtCustomMarker2.setTextColor(getResources().getColor(R.color.colorGraficaPunto2));
+                break;
+
+            case 2:
+                txtCustomMarker1.setText(getResources().getString(R.string.hora)+": "+labelsChart.get((int) e.getX()));
+                txtCustomMarker2.setText(getResources().getString(R.string.dato3)+": " + e.getY());
+                txtCustomMarker2.setTextColor(getResources().getColor(R.color.colorGraficaPunto3));
                 break;
         }
 

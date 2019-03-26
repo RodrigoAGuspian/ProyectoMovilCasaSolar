@@ -12,10 +12,13 @@ import com.casasolarctpi.appsolar.R;
 import com.casasolarctpi.appsolar.controllers.MenuPrincipal;
 import com.casasolarctpi.appsolar.models.CustomMarkerView;
 import com.casasolarctpi.appsolar.models.CustomMarkerViewData1;
+import com.casasolarctpi.appsolar.models.DatosCompletos;
 import com.casasolarctpi.appsolar.models.DatosTH;
+import com.casasolarctpi.appsolar.models.DatosTiempoReal;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -23,6 +26,7 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
@@ -41,7 +45,7 @@ public class TemperaturaFragment extends Fragment {
     private List<String> labelsChart = new ArrayList<>();
     private XAxis xAxis;
     boolean bandera = false;
-    List<DatosTH> datosTHList = new ArrayList<>();
+    List<DatosTiempoReal> datosTiempoRealList = new ArrayList<>();
 
     public TemperaturaFragment() {
         // Required empty public constructor
@@ -65,24 +69,20 @@ public class TemperaturaFragment extends Fragment {
 
     //Método para el ingreso de datos desde de la base de datos  (Real time DataBase)de Firebase
     private void inputDataFirebase() {
-        DatabaseReference datos = MenuPrincipal.reference.child("datos");
+        DatabaseReference datosTiempoReal = MenuPrincipal.reference.child("tiempoReal");
         //Query para limitar los datos
-        Query ultimosDatos =datos.limitToLast(20);
-        ultimosDatos.addValueEventListener(new ValueEventListener() {
+        datosTiempoReal.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                datosTHList.clear();
-                for (DataSnapshot child: dataSnapshot.getChildren()){
-                    datosTHList.add(child.getValue(DatosTH.class));
-                }
+                GenericTypeIndicator<ArrayList<DatosTiempoReal>> t = new GenericTypeIndicator<ArrayList<DatosTiempoReal>>(){};
+                datosTiempoRealList = dataSnapshot.getValue(t);
 
-                if (!bandera){
+                if (!bandera) {
                     inputValuesChart();
                     bandera=true;
                 }else {
                     inputValuesRealTime();
                 }
-
             }
 
             @Override
@@ -92,36 +92,45 @@ public class TemperaturaFragment extends Fragment {
         });
 
 
-
     }
 
     //Método para el ingreso de los valores a la gráfica
     private void inputValuesChart() {
-        for (int i=0; i<datosTHList.size();i++){
-            labelsChart.add(datosTHList.get(i).getHora());
+        for (int i=0; i<datosTiempoRealList.size();i++){
+            labelsChart.add(datosTiempoRealList.get(i).getHora());
             float dato1=0;
             try {
-                dato1=Float.parseFloat(datosTHList.get(i).getTemperatura());
+                dato1=Float.parseFloat(datosTiempoRealList.get(i).getTemperatura());
             }catch (Exception ignore){
 
             }
             entry1.add(new Entry(i,dato1));
         }
 
-        LineDataSet lineDataSet = new LineDataSet(entry1,"Temperatura");
+        LineDataSet lineDataSet = new LineDataSet(entry1,getResources().getString(R.string.dato2));
         lineDataSet.setColor(getContext().getResources().getColor(R.color.colorGraficaPunto2));
         lineDataSet.setCircleColor(getContext().getResources().getColor(R.color.colorGraficaLinea2));
         lineDataSet.setValueTextColor(getContext().getResources().getColor(R.color.colorGraficaLinea2));
         lineDataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        lineDataSet.setDrawCircles(false);
         LineData data= new LineData(lineDataSet);
         data.setDrawValues(false);
         Description description = new Description();
         temperaturaChart.setData(data);
-        description.setText("Fecha de los dato tomados: "+datosTHList.get(0).getFecha_dato());
+        description.setText(getString(R.string.fecha_datos_tomados)+" "+datosTiempoRealList.get(0).getFechaActual());
         xAxis = temperaturaChart.getXAxis();
         xAxis.setValueFormatter(new IndexAxisValueFormatter(labelsChart));
         xAxis.setLabelRotationAngle(-10f);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        YAxis yAxisLeft = temperaturaChart.getAxisLeft();
+        YAxis yAxisRight = temperaturaChart.getAxisRight();
+
+        yAxisLeft.setAxisMaximum(50);
+        yAxisRight.setAxisMaximum(50);
+        yAxisLeft.setAxisMinimum(-20);
+        yAxisRight.setAxisMinimum(-20);
+
+
         temperaturaChart.setDescription(description);
         temperaturaChart.setDrawMarkers(true);
         CustomMarkerViewData1 customMarkerView = new CustomMarkerViewData1(getContext(),R.layout.item_custom_marker,labelsChart);
@@ -133,15 +142,15 @@ public class TemperaturaFragment extends Fragment {
 
     }
 
-    //Método para el ingrese de daots a la gráfica a tiempo real
+    //Método para el ingrese de datos a la gráfica a tiempo real
     private void inputValuesRealTime() {
         entry1.clear();
         labelsChart.clear();
-        for (int i=0; i<datosTHList.size();i++){
-            labelsChart.add(datosTHList.get(i).getHora());
+        for (int i=0; i<datosTiempoRealList.size();i++){
+            labelsChart.add(datosTiempoRealList.get(i).getHora());
             float dato=0;
             try {
-                dato=Float.parseFloat(datosTHList.get(i).getTemperatura());
+                dato=Float.parseFloat(datosTiempoRealList.get(i).getTemperatura());
             }catch (Exception ignore){
 
             }

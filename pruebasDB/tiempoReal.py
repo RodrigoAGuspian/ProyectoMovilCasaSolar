@@ -39,8 +39,10 @@ while True:
     try:
 
        
-        dato2= str(inf).split(": ")[2][0:5]
         dato1= str(inf).split(": ")[1][0:5]
+        dato2= str(inf).split(": ")[2][0:5]
+        dato3= str(inf).split(": ")[3][0:5]
+        dato4= str(inf).split(": ")[4][0:5]
         #print(dato1+"asd"+dato2)
         print(inf)
         ref.child(str(i)).set({
@@ -52,7 +54,7 @@ while True:
             "corrienteBateria" : "0.0",
             "corrienteCargas" : "0.0",
             "corrientePanel" : "0.0",
-            "irradiancia" : "1.0",
+            "irradiancia" : dato4,
             "voltajeBateria" : "0.0",
             "voltajeCargas" : "0.0",
             "voltajePanel" : "0.0",

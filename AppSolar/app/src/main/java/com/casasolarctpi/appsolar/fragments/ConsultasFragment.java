@@ -29,11 +29,13 @@ import com.casasolarctpi.appsolar.controllers.MenuPrincipal;
 import com.casasolarctpi.appsolar.models.Constants;
 import com.casasolarctpi.appsolar.models.CustomMarkerView;
 import com.casasolarctpi.appsolar.models.DatoSemana;
+import com.casasolarctpi.appsolar.models.DatosCompletos;
 import com.casasolarctpi.appsolar.models.DatosTH;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
@@ -65,7 +67,6 @@ import java.util.List;
  */
 public class ConsultasFragment extends Fragment implements OnClickListener, OnDateSetListener {
     View view;
-    TabHost tabHost;
     Button btnConsulta1, btnConsulta2, btnConsulta3;
     BarChart barChart1, barChart2;
     LineChart lineChart1;
@@ -77,17 +78,17 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
     Dialog dialog;
     ProgressBar pBConsultas;
     int mode;
-    List<DatosTH> datosGenerales = new ArrayList<>();
     private List<ILineDataSet> dataSets = new ArrayList<>();
     private XAxis xAxis;
-    List<DatosTH> datosTHList = new ArrayList<>();
     public static List<String> labelsChart = new ArrayList<>();
+    final List<DatosCompletos>[] datosCompletosSemana = new List[7];
+    List<BarEntry> entriesBarWeek = new ArrayList<>();
+    List<BarEntry> entriesBarWeek1 = new ArrayList<>();
 
 
     public ConsultasFragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -96,7 +97,6 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         view = inflater.inflate(R.layout.fragment_consultas, container, false);
         iniziliate();
         inputDataToSpinner();
-        inputDataOfFirebase();
         return view;
     }
 
@@ -134,6 +134,10 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         barChart1 = view.findViewById(R.id.barChart1);
         barChart2 = view.findViewById(R.id.barChart2);
 
+        lineChart1.setVisibility(View.INVISIBLE);
+        barChart1.setVisibility(View.INVISIBLE);
+        barChart2.setVisibility(View.INVISIBLE);
+
         txtDate1 = view.findViewById(R.id.txtConsulta1);
         txtDate2 = view.findViewById(R.id.txtConsulta2);
 
@@ -158,45 +162,28 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
     }
 
-    private void inputDataOfFirebase() {
-        DatabaseReference datos = MenuPrincipal.reference.child("datos");
-        datos.addValueEventListener(new ValueEventListener() {
+    private void getDataDayOFFireBase(int year, int month, int dayOfMonth){
+        final List<DatosCompletos>[] datosCompletos = new List[]{new ArrayList<>()};
+        DatabaseReference datosDia = MenuPrincipal.reference.child("datos").child("y"+year).child("m"+month).child("d"+dayOfMonth);
+
+        datosDia.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                GenericTypeIndicator<List<DatosTH>> t = new GenericTypeIndicator<List<DatosTH>>() {};
-                datosGenerales = dataSnapshot.getValue(t);
+                GenericTypeIndicator<ArrayList<DatosCompletos>> t = new GenericTypeIndicator<ArrayList<DatosCompletos>>() {};
+                try {
+                    showChartDay(dataSnapshot.getValue(t));
 
+                }catch (Exception ignore){
 
+                }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
+
         });
-
-
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.btnConsulta1:
-                mode=1;
-                showDatePickerDialog();
-                break;
-
-            case R.id.btnConsulta2:
-                mode=2;
-                showDatePickerWeekDialog();
-                break;
-
-
-            case R.id.btnConsulta3:
-                mode=3;
-                showChartMonth();
-                break;
-        }
     }
 
     public void showDatePickerDialog() {
@@ -206,12 +193,142 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
     }
 
+    @Override
+    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+        switch (mode) {
+            case 1:
+                pBConsultas.setVisibility(View.VISIBLE);
+                int realMonth = month + 1;
+                fechaATexto = dayOfMonth + "-" + realMonth + "-" + year;
+                Calendar calendar = new GregorianCalendar(year,month,dayOfMonth);
+                dateToQuery = calendar.getTime();
+                txtDate1.setText(fechaATexto);
+                //dateDay = new GregorianCalendar(year,month,dayOfMonth).getTime();
+                getDataDayOFFireBase(year,realMonth,dayOfMonth);
+                break;
+        }
+    }
+
+    private void showChartDay(List<DatosCompletos> datosCompletosList) {
+        List<Entry> entries = new ArrayList<>();
+        List<Entry> entries1 = new ArrayList<>();
+        lineChart1.clear();
+        dataSets.clear();
+        DatosCompletos datosCompletos;
+        labelsChart = new ArrayList<>();
+        if (datosCompletosList!=null) {
+            for (int i = 0; i < datosCompletosList.size(); i++) {
+                datosCompletos = datosCompletosList.get(i);
+                labelsChart.add(datosCompletos.getHora());
+                try {
+                    entries.add(new Entry(i, Float.parseFloat(datosCompletos.getHumedad())));
+                    entries1.add(new Entry(i,Float.parseFloat(datosCompletos.getTemperatura())));
+                }catch (Exception ignored){
+
+                }
+
+            }
+        }else {
+            Toast.makeText(getContext(), getResources().getString(R.string.no_hay_datos), Toast.LENGTH_SHORT).show();
+        }
+
+        //Log.e("Datos",entries.toString()+"\n"+labelsChart.toString());
+
+        if (entries.size()!=0) {
+
+
+            LineDataSet lineDataSet = new LineDataSet(entries, getResources().getString(R.string.dato1));
+            LineDataSet lineDataSet1 = new LineDataSet(entries1, getResources().getString(R.string.dato2));
+
+            lineDataSet.setColor(getContext().getResources().getColor(R.color.colorGraficaPunto1));
+            lineDataSet1.setColor(getContext().getResources().getColor(R.color.colorGraficaPunto2));
+
+            lineDataSet.setValueTextColor(getContext().getResources().getColor(R.color.colorGraficaLinea1));
+            lineDataSet1.setValueTextColor(getContext().getResources().getColor(R.color.colorGraficaLinea2));
+
+            lineDataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+            lineDataSet1.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+
+            lineDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
+            lineDataSet1.setAxisDependency(YAxis.AxisDependency.RIGHT);
+
+            lineDataSet.setDrawCircles(false);
+            lineDataSet1.setDrawCircles(false);
+            lineDataSet.setFormSize(10f);
+            lineDataSet1.setFormSize(10f);
+
+            dataSets.add(lineDataSet);
+            dataSets.add(lineDataSet1);
+            LineData data = new LineData(dataSets);
+            data.setDrawValues(false);
+            lineChart1.setData(data);
+            Description description = new Description();
+            description.setText(getResources().getString(R.string.fecha_datos_tomados) + fechaATexto);
+            xAxis = lineChart1.getXAxis();
+            xAxis.setValueFormatter(new IndexAxisValueFormatter(labelsChart));
+            xAxis.setLabelRotationAngle(-10f);
+            xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+            lineChart1.setDescription(description);
+            lineChart1.setDrawMarkers(true);
+            CustomMarkerView customMarkerView = new CustomMarkerView(getContext(), R.layout.item_custom_marker, labelsChart);
+            lineChart1.setMarker(customMarkerView);
+            lineChart1.setTouchEnabled(true);
+            lineChart1.setVisibility(View.VISIBLE);
+            lineChart1.invalidate();
+
+
+        }else {
+            Toast.makeText(getContext(), R.string.no_hay_datos, Toast.LENGTH_SHORT).show();
+        }
+        pBConsultas.setVisibility(View.INVISIBLE);
+
+    }
+
+    private void searchDate(Date primerDia){
+        Calendar tmpCalendar = new GregorianCalendar();
+        tmpCalendar.setTime(primerDia);
+        Date tmpDate = tmpCalendar.getTime();
+        int realMonth;
+        int dia;
+        int anio;
+
+        for (int i=0; i<7;i++){
+            realMonth=tmpDate.getMonth()+1;
+            dia = tmpCalendar.get(Calendar.DAY_OF_MONTH);
+            anio = tmpCalendar.get(Calendar.YEAR);
+            getDataDayOFFireBaseWeek(anio,realMonth,dia,i);
+            tmpCalendar.add(Calendar.DAY_OF_MONTH,1);
+            tmpDate=tmpCalendar.getTime();
+
+        }
+
+    }
+
+    private void getDataDayOFFireBaseWeek(int year, int month, int dayOfMonth,final int contador){
+
+        DatabaseReference datosDia = MenuPrincipal.reference.child("datos").child("y"+year).child("m"+month).child("d"+dayOfMonth);
+        datosDia.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                GenericTypeIndicator<ArrayList<DatosCompletos>> t = new GenericTypeIndicator<ArrayList<DatosCompletos>>() {};
+                datosCompletosSemana[contador] = dataSnapshot.getValue(t);
+                if (contador==6){
+                    showChartWeek();
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
 
     public void showDatePickerWeekDialog(){
-        Toast.makeText(getContext(), R.string.mensaje_week, Toast.LENGTH_LONG).show();
+        Toast.makeText(getContext(), R.string.mensaje_week, Toast.LENGTH_SHORT).show();
         dialog = new Dialog(getContext());
         dialog.setContentView(R.layout.item_select_week);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         final DatePicker datePicker = dialog.findViewById(R.id.calendarioWeek);
         Button btnAceptar = dialog.findViewById(R.id.btnAceptar);
         final Button btnCancelar = dialog.findViewById(R.id.btnCancelar);
@@ -262,7 +379,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
                 txtDate2.setText(format.format(primerDia)+" "+getResources().getString(R.string.a)+" "+format.format(ultimoDia));
 
-                showChartWeek(primerDia,ultimoDia);
+                searchDate(primerDia);
                 dialog.cancel();
 
             }
@@ -281,181 +398,20 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
     }
 
+    private void showChartWeek() {
+        entriesBarWeek = new ArrayList<>();
+        entriesBarWeek1 = new ArrayList<>();
+        barChart1.clear();
+        barChart1.clearAnimation();
 
 
-    @Override
-    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-        switch (mode) {
-            case 1:
-                pBConsultas.setVisibility(View.VISIBLE);
-                int realMonth = month + 1;
-                fechaATexto = dayOfMonth + "-" + realMonth + "-" + year;
-                Calendar calendar = new GregorianCalendar(year,month,dayOfMonth);
-                dateToQuery = calendar.getTime();
-                txtDate1.setText(fechaATexto);
-                //dateDay = new GregorianCalendar(year,month,dayOfMonth).getTime();
-                showChartDay();
-                break;
-        }
-    }
-
-    private void showChartDay() {
-        List<Entry> entries = new ArrayList<>();
-        List<Entry> entries1 = new ArrayList<>();
-        lineChart1.clear();
-        dataSets.clear();
-        String hora = "";
-        String tmpHora = "";
-        List<Float> datosMinuto  = new ArrayList<>();
-        List<Float> datosMinuto1  = new ArrayList<>();
-        int contador =0;
-        DatosTH datosTH;
-        labelsChart = new ArrayList<>();
-        for (int i=0;i<datosGenerales.size();i++){
-            datosTH = datosGenerales.get(i);
-            if (datosTH.getFecha_dato().equals(fechaATexto)){
-                hora = datosTH.getHora();
-
-                if (tmpHora.length()<1){
-                    tmpHora= datosTH.getHora();
-                }
-                if (hora.equals(tmpHora)){
-                    try {
-                        datosMinuto.add(Float.parseFloat(datosTH.getHumedad()));
-                        datosMinuto1.add(Float.parseFloat(datosTH.getTemperatura()));
-
-                    }catch (Exception e){
-                    }
-                }else {
-                    tmpHora= datosTH.getHora();
-                    labelsChart.add(datosTH.getHora());
-                    entries.add(new Entry(contador, promedio(datosMinuto)));
-                    entries1.add(new Entry(contador, promedio(datosMinuto1)));
-                    datosMinuto.clear();
-                    datosMinuto1.clear();
-                    contador++;
-                }
-
-            }
-
-
-            //Organizar codigo
-
+        for (int i=0; i<7;i++){
+            entriesBarWeek.add(new BarEntry(i,promedioDia(datosCompletosSemana[i],0)));
+            entriesBarWeek1.add(new BarEntry(i,promedioDia(datosCompletosSemana[i],1)));
         }
 
-        //Log.e("Datos",entries.toString()+"\n"+labelsChart.toString());
-
-        if (entries.size()!=0) {
-
-
-            LineDataSet lineDataSet = new LineDataSet(entries, "Humedad");
-            LineDataSet lineDataSet1 = new LineDataSet(entries1, "Temperatura");
-
-            lineDataSet.setColor(getContext().getResources().getColor(R.color.colorGraficaPunto1));
-            lineDataSet1.setColor(getContext().getResources().getColor(R.color.colorGraficaPunto2));
-
-            lineDataSet.setValueTextColor(getContext().getResources().getColor(R.color.colorGraficaLinea1));
-            lineDataSet1.setValueTextColor(getContext().getResources().getColor(R.color.colorGraficaLinea2));
-
-            lineDataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-            lineDataSet1.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-
-            lineDataSet.setDrawCircles(false);
-            lineDataSet1.setDrawCircles(false);
-            lineDataSet.setFormSize(10f);
-            lineDataSet1.setFormSize(10f);
-
-            dataSets.add(lineDataSet);
-            dataSets.add(lineDataSet1);
-            LineData data = new LineData(dataSets);
-            data.setDrawValues(false);
-            lineChart1.setData(data);
-            Description description = new Description();
-            description.setText("Fecha de los datos tomados: " + fechaATexto);
-            xAxis = lineChart1.getXAxis();
-
-            xAxis.setValueFormatter(new IndexAxisValueFormatter(labelsChart));
-            xAxis.setLabelRotationAngle(-10f);
-            xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-            lineChart1.setDescription(description);
-            lineChart1.setDrawMarkers(true);
-            CustomMarkerView customMarkerView = new CustomMarkerView(getContext(), R.layout.item_custom_marker, labelsChart);
-            lineChart1.setMarker(customMarkerView);
-            lineChart1.setTouchEnabled(true);
-            lineChart1.invalidate();
-
-
-        }else {
-            Toast.makeText(getContext(), R.string.no_hay_datos, Toast.LENGTH_SHORT).show();
-        }
-        pBConsultas.setVisibility(View.INVISIBLE);
-
-    }
-
-    private float promedio(List<Float> datosMinuto) {
-        float acumulador=0;
-        for (int i=0;i<datosMinuto.size();i++){
-            acumulador+=datosMinuto.get(i);
-        }
-        try {
-            return acumulador/datosMinuto.size();
-
-        }catch (Exception ignore){
-            return 0;
-
-        }
-
-    }
-
-
-    private void showChartWeek(Date primerDia, Date ultimoDia) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-        List<BarEntry> entries = new ArrayList<>();
-        List<BarEntry> entries1 = new ArrayList<>();
-
-        Calendar tmpCalendar = new GregorianCalendar();
-        tmpCalendar.setTime(primerDia);
-        Date tmpDate = tmpCalendar.getTime();
-        int realMonth=0;
-        String [] fechaSemana = new String[7];
-        List<DatoSemana> [] datosFiltrados = new List[7];
-
-        for (int i=0; i<datosFiltrados.length;i++){
-            datosFiltrados[i]=new ArrayList<>();
-        }
-
-
-        for (int i=0; i<fechaSemana.length;i++){
-            realMonth=tmpDate.getMonth()+1;
-            int dia = tmpCalendar.get(Calendar.DAY_OF_MONTH);
-            int anio = tmpCalendar.get(Calendar.YEAR);
-            fechaSemana[i]=dia+"-"+realMonth+"-"+anio;
-            tmpCalendar.add(tmpCalendar.DAY_OF_MONTH,1);
-            tmpDate=tmpCalendar.getTime();
-
-        }
-
-        for (int i=0; i<datosGenerales.size();i++){
-            DatosTH datosTH = datosGenerales.get(i);
-            for (int j=0; j<fechaSemana.length;j++){
-                if (datosTH.getFecha_dato().equals(fechaSemana[j])){
-                    datosFiltrados[j].add(new DatoSemana(j,datosTH));
-                    j=fechaSemana.length;
-                }
-
-            }
-
-        }
-
-        for (int i=0; i<datosFiltrados.length;i++){
-            entries.add(new BarEntry(i,promedioDia(datosFiltrados[i],0)));
-            entries1.add(new BarEntry(i,promedioDia(datosFiltrados[i],1)));
-
-        }
-
-
-        BarDataSet barDataSet = new BarDataSet(entries,"Humedad");
-        BarDataSet barDataSet1 = new BarDataSet(entries1,"Temperatura");
+        BarDataSet barDataSet = new BarDataSet(entriesBarWeek,getResources().getString(R.string.dato1));
+        BarDataSet barDataSet1 = new BarDataSet(entriesBarWeek1,getResources().getString(R.string.dato2));
         barDataSet.setColor(getContext().getResources().getColor(R.color.colorGraficaPunto1));
         barDataSet1.setColor(getContext().getResources().getColor(R.color.colorGraficaPunto2));
         barDataSet.setBarShadowColor(getContext().getResources().getColor(R.color.colorGraficaLinea1));
@@ -464,9 +420,9 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         dataBarSets.add(barDataSet);
         dataBarSets.add(barDataSet1);
         BarData data = new BarData(barDataSet,barDataSet1);
-        data.setBarWidth(0.45f); // set custom bar width
+        data.setBarWidth(0.48f); // set custom bar width
         barChart1.setData(data);
-        barChart1.groupBars(0, 0.02f, 0f);
+        barChart1.groupBars(0, 0.04f, 0f);
         xAxis = barChart1.getXAxis();
         xAxis.setValueFormatter(new IndexAxisValueFormatter(Constants.DIAS_DE_LA_SEMANA));
         xAxis.setCenterAxisLabels(true);
@@ -474,14 +430,20 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setTextSize(8);
         xAxis.setAxisMaximum(7);
+
+        YAxis yAxisLeft = barChart1.getAxisLeft();
+        YAxis yAxisRight = barChart1.getAxisRight();
+        yAxisLeft.setAxisMaximum(120);
+        yAxisLeft.setAxisMinimum(0);
+        yAxisRight.setAxisMaximum(120);
+        yAxisRight.setAxisMinimum(0);
+        barChart1.setVisibility(View.VISIBLE);
         barChart1.invalidate(); // refresh
-
-
 
 
     }
 
-    private float promedioDia(List<DatoSemana> datosFiltrado, int modo) {
+    private float promedioDia(List<DatosCompletos> datosFiltrado, int modo) {
         float acumulador=0;
 
         switch (modo){
@@ -489,7 +451,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                 try {
                     for (int i=0;i<datosFiltrado.size();i++){
                         try {
-                            acumulador+=Float.parseFloat(datosFiltrado.get(i).getDatosTH().getHumedad());
+                            acumulador+=Float.parseFloat(datosFiltrado.get(i).getHumedad());
                         }catch (Exception ignore){
 
                         }
@@ -506,7 +468,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                 try {
                     for (int i=0;i<datosFiltrado.size();i++){
                         try {
-                            acumulador+=Float.parseFloat(datosFiltrado.get(i).getDatosTH().getTemperatura());
+                            acumulador+=Float.parseFloat(datosFiltrado.get(i).getTemperatura());
                         }catch (Exception ignore){
 
                         }
@@ -529,12 +491,29 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
     }
 
-
     public void showChartMonth(){
 
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.btnConsulta1:
+                mode=1;
+                showDatePickerDialog();
+                break;
+
+            case R.id.btnConsulta2:
+                mode=2;
+                showDatePickerWeekDialog();
+                break;
 
 
-
+            case R.id.btnConsulta3:
+                mode=3;
+                showChartMonth();
+                break;
+        }
     }
 
 }

@@ -10,6 +10,8 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -22,15 +24,23 @@ import com.casasolarctpi.appsolar.fragments.ConsultasFragment;
 import com.casasolarctpi.appsolar.fragments.ContactanosFragment;
 import com.casasolarctpi.appsolar.fragments.HumedadFragment;
 import com.casasolarctpi.appsolar.fragments.IndexFragment;
+import com.casasolarctpi.appsolar.fragments.IrradianciaFragment;
 import com.casasolarctpi.appsolar.fragments.PerfilFragment;
 import com.casasolarctpi.appsolar.fragments.TemperaturaFragment;
 import com.casasolarctpi.appsolar.models.Constants;
 import com.casasolarctpi.appsolar.models.ExpandableListAdapter;
+import com.casasolarctpi.appsolar.models.ItemMenu;
+import com.casasolarctpi.appsolar.models.ItemSubMenu;
+import com.casasolarctpi.appsolar.models.ListMenu;
+import com.casasolarctpi.appsolar.models.MenuEAdapter;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.thoughtbot.expandablerecyclerview.listeners.OnGroupClickListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class MenuPrincipal extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -44,7 +54,8 @@ public class MenuPrincipal extends AppCompatActivity
     public ConstraintLayout contentViewMenu;
     private  DrawerLayout drawer;
     public static DatabaseReference reference;
-
+    RecyclerView recyclerMenu;
+    boolean bandera =true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,10 +74,18 @@ public class MenuPrincipal extends AppCompatActivity
         navigationView.setItemTextColor(ColorStateList.valueOf(getResources().getColor(R.color.primaryDarkColor)));
         inizialite();
         inizialiteFirebaseApp();
-        inputListExpandable();
-        createExpandableListView();
-        getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new IndexFragment()).commit();
-        getSupportActionBar().setTitle(getResources().getString(R.string.inicio));
+        //inputListExpandable();
+        //createExpandableListView();
+
+        if (bandera){
+            createRecyclerMenu();
+            getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new IndexFragment()).commit();
+            getSupportActionBar().setTitle(getResources().getString(R.string.inicio));
+            Log.e("asd","asdasdasd");
+            bandera=false;
+        }
+
+
 
         navigationView.setNavigationItemSelectedListener(this);
 
@@ -75,20 +94,21 @@ public class MenuPrincipal extends AppCompatActivity
     }
 
     //Inicialización de vistas.
+
     private void inizialite() {
         contentViewMenu= findViewById(R.id.contentViewMenu);
-        expListView = findViewById(R.id.expandable_list);
+        //expListView = findViewById(R.id.expandable_list);
         drawer = findViewById(R.id.drawer_layout);
+        recyclerMenu = findViewById(R.id.recyclerMenu);
     }
-
     //Conexión entre la app y FirebaseApp ,activar persistencia de la base de datos de Firebase y referenciar la instacia de la base de datos
+
     private void inizialiteFirebaseApp(){
         FirebaseApp.initializeApp(this);
-        try {FirebaseDatabase.getInstance().setPersistenceEnabled(true);}catch (Exception e){}
+        try {FirebaseDatabase.getInstance().setPersistenceEnabled(false);}catch (Exception e){}
 
         reference= FirebaseDatabase.getInstance().getReference();
     }
-
     @Override
     public void onBackPressed() {
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -129,21 +149,18 @@ public class MenuPrincipal extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.index) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new IndexFragment()).commit();
-            getSupportActionBar().setTitle(getResources().getString(R.string.inicio));
+
 
         } else if (id == R.id.profile) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new PerfilFragment()).commit();
-            getSupportActionBar().setTitle(getResources().getString(R.string.perfil));
+
 
         }else if (id == R.id.item_Humedad){
-            getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new HumedadFragment()).commit();
-            getSupportActionBar().setTitle(getResources().getString(R.string.dato1));
+
         }else if (id == R.id.item_Temperatura){
-            getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new TemperaturaFragment()).commit();
-            getSupportActionBar().setTitle(getResources().getString(R.string.dato2));
+
+        }else if (id == R.id.item_Irradiancia){
+
         }else if (id == R.id.consultas){
-            getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu, new ConsultasFragment()).commit();
 
         }else if (id == R.id.logout){
 
@@ -155,6 +172,7 @@ public class MenuPrincipal extends AppCompatActivity
     }
 
     //Llamado de listas e ingreso de HashMap para el expandablelistview con navigation drawer
+
     public void inputListExpandable(){
         listDataHeader = Constants.GROUP_LIST;
         listDataChild = new HashMap<>();
@@ -167,8 +185,8 @@ public class MenuPrincipal extends AppCompatActivity
 
 
     }
-
     //Creación del ExpandableListView y agrego del click
+
     public void createExpandableListView(){
         listAdapterExpandable = new ExpandableListAdapter(this,listDataHeader,listDataChild);
         listAdapterExpandable.setOnChildClickListener(new ExpandableListAdapter.OnChildClickListener() {
@@ -208,6 +226,120 @@ public class MenuPrincipal extends AppCompatActivity
 
     }
 
+    public void closeDrawer(){
+        try {
+            drawer.closeDrawer(GravityCompat.START);
+        }catch (Exception ignored){
+            Log.e("Error en drawer",ignored.getMessage());
+        }
+
+
+    }
+
+    private void createRecyclerMenu() {
+
+        ListMenu listMenu = new ListMenu();
+        listMenu.inputList();
+        final List<ItemMenu> list = listMenu.getItemMenus();
+        recyclerMenu.setHasFixedSize(true);
+        recyclerMenu.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL,false));
+        MenuEAdapter adapter = new MenuEAdapter(list);
+        adapter.setmListener(new MenuEAdapter.OnClickListener() {
+            @Override
+            public void itemClick(String n) {
+
+                if (n.equals(getResources().getString(R.string.inicio))){
+                    getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new IndexFragment()).commit();
+                    getSupportActionBar().setTitle(getResources().getString(R.string.inicio));
+                    closeDrawer();
+                }
+
+                if (n.equals(getResources().getString(R.string.dato1))){
+                    getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new HumedadFragment()).commit();
+                    getSupportActionBar().setTitle(getResources().getString(R.string.dato1));
+                    closeDrawer();
+                }
+
+                if (n.equals(getResources().getString(R.string.dato2))){
+                    getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new TemperaturaFragment()).commit();
+                    getSupportActionBar().setTitle(getResources().getString(R.string.dato2));
+                    closeDrawer();
+                }
+
+                if (n.equals(getResources().getString(R.string.dato3))){
+                    getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new IrradianciaFragment()).commit();
+                    getSupportActionBar().setTitle(getResources().getString(R.string.dato3));
+                    closeDrawer();
+                }
+
+                if (n.equals(getResources().getString(R.string.perfil))){
+                    getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new PerfilFragment()).commit();
+                    getSupportActionBar().setTitle(getResources().getString(R.string.perfil));
+                    closeDrawer();
+                }
+
+
+            }
+        });
+        adapter.setmOnChildListener(new MenuEAdapter.OnChildListener() {
+            @Override
+            public void itemClick(String group, int child) {
+                if (group.equals(getResources().getString(R.string.consultas))){
+                    switch (child){
+                        case 0:
+                            closeDrawer();
+                            break;
+
+                        case 1:
+                            closeDrawer();
+                            break;
+
+                        case 2:
+                            closeDrawer();
+                            break;
+
+                        case 3:
+                            closeDrawer();
+                            break;
+
+                        case 4:
+                            getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu, new ConsultasFragment()).commit();
+                            getSupportActionBar().setTitle(R.string.consultas);
+                            closeDrawer();
+
+                            break;
+
+                    }
+                }
+
+                if (group.equals(getResources().getString(R.string.paginas))){
+
+                    Uri uri = Uri.parse(Constants.LIST_LINKS_CONOCENOS[child]);
+                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                    startActivity(intent);
+                }
+
+                if (group.equals(getResources().getString(R.string.conocenos))){
+
+                    switch (child){
+                        case 0:
+                            getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new ContactanosFragment()).commit();
+                            break;
+                        case 1:
+                            getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new AcercaDeFragment()).commit();
+                            break;
+                    }
+                    closeDrawer();
+                }
+
+
+            }
+        });
+
+        recyclerMenu.setAdapter(adapter);
+
+
+    }
 
 
 

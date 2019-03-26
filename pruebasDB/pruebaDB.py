@@ -22,36 +22,15 @@ except Exception as e:
 ser = serial.Serial('COM2', 9600)
 while True:
 
-    fechaNow = datetime.datetime.now()
-    dia = str(fechaNow.day)
-    mes = str(fechaNow.month)
-    anno = str(fechaNow.year)
-    hora = str(fechaNow.strftime("%I"))+":"+str((fechaNow.strftime("%M")))+" "+str((fechaNow.strftime("%p")))
-    fechaActual = dia+"-"+mes+"-"+anno
     inf = ser.readline()
-    nowRef = ref.child("y"+anno).child("m"+mes).child("d"+dia)
-    try:
-        dato2= str(inf).split(": ")[2][0:5]
-        dato1= str(inf).split(": ")[1][0:5]
-        #print(dato1+"asd"+dato2)
-        print(inf)
-        nowRef.child(str(i)).set({
-            'hora':hora,
-            'temperatura':dato1,
-            'humedad':dato2,
-            "corrienteBateria" : "0.0",
-            "corrienteCargas" : "0.0",
-            "corrientePanel" : "0.0",
-            "irradiancia" : "1.0",
-            "voltajeBateria" : "0.0",
-            "voltajeCargas" : "0.0",
-            "voltajePanel" : "0.0",
+    print(inf)
+    dato1= str(inf).split(": ")[1][0:5]
+    dato2= str(inf).split(": ")[2][0:5]
+    dato3= str(inf).split(": ")[3][0:5]
+    dato4= str(inf).split(": ")[4][0:5]
 
-        })
-        i=i+1
-    except Exception as e:
-        pass
+    print(dato1,dato2,dato3,dato4)
     
     
-    time.sleep(60)
+    time.sleep(1)
 ser.close()

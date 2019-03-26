@@ -44,7 +44,7 @@ public class CustomMarkerViewData1 extends MarkerView {
     @Override
     public void refreshContent(Entry e, Highlight highlight) {
         super.refreshContent(e, highlight);
-        txtCustomMarker1.setText(getResources().getString(R.string.fecha)+": "+ labelsChart.get((int) e.getX()));
+        txtCustomMarker1.setText(getResources().getString(R.string.hora)+": "+ labelsChart.get((int) e.getX()));
         txtCustomMarker2.setText(tipoDelDato+": " + e.getY());
         txtCustomMarker2.setTextColor(colorDelDato);
 
