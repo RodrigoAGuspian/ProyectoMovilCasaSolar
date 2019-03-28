@@ -30,7 +30,12 @@ import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -46,6 +51,7 @@ public class TemperaturaFragment extends Fragment {
     private XAxis xAxis;
     boolean bandera = false;
     List<DatosTiempoReal> datosTiempoRealList = new ArrayList<>();
+    float valorMaximo, valorMinimo;
 
     public TemperaturaFragment() {
         // Required empty public constructor
@@ -96,15 +102,52 @@ public class TemperaturaFragment extends Fragment {
 
     //Método para el ingreso de los valores a la gráfica
     private void inputValuesChart() {
+
+        final Date[] date1 = {new Date(),new Date()};
+        final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        Collections.sort(datosTiempoRealList, new Comparator<DatosTiempoReal>() {
+            @Override
+            public int compare(DatosTiempoReal o1, DatosTiempoReal o2) {
+                try {
+                    date1[0] =dateFormat.parse(o1.getFechaActual1());
+                    date1[1] =dateFormat.parse(o2.getFechaActual1());
+                    if (date1[0].getTime() < date1[1].getTime()) {
+                        return -1;
+                    }
+                    if (date1[0].getTime() > date1[1].getTime()) {
+                        return 1;
+                    }
+                    return 0;
+
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    return 0;
+                }
+            }
+        });
+
+
         for (int i=0; i<datosTiempoRealList.size();i++){
             labelsChart.add(datosTiempoRealList.get(i).getHora());
-            float dato1=0;
+            float dato=0;
             try {
-                dato1=Float.parseFloat(datosTiempoRealList.get(i).getTemperatura());
+                dato=Float.parseFloat(datosTiempoRealList.get(i).getTemperatura());
+
+                if (dato>valorMaximo){
+                    valorMaximo = dato;
+                }
+
+                if (valorMinimo==0){
+                    valorMinimo=dato;
+                }
+                if (dato<valorMinimo){
+                    valorMinimo = dato;
+                }
+
             }catch (Exception ignore){
 
             }
-            entry1.add(new Entry(i,dato1));
+            entry1.add(new Entry(i,dato));
         }
 
         LineDataSet lineDataSet = new LineDataSet(entry1,getResources().getString(R.string.dato2));
@@ -122,13 +165,17 @@ public class TemperaturaFragment extends Fragment {
         xAxis.setValueFormatter(new IndexAxisValueFormatter(labelsChart));
         xAxis.setLabelRotationAngle(-10f);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+
+
         YAxis yAxisLeft = temperaturaChart.getAxisLeft();
         YAxis yAxisRight = temperaturaChart.getAxisRight();
 
-        yAxisLeft.setAxisMaximum(50);
-        yAxisRight.setAxisMaximum(50);
-        yAxisLeft.setAxisMinimum(-20);
-        yAxisRight.setAxisMinimum(-20);
+        yAxisLeft.setAxisMaximum(valorMaximo+0.2f);
+        yAxisRight.setAxisMaximum(valorMaximo+0.2f);
+        yAxisLeft.setAxisMinimum(valorMinimo-0.2f);
+        yAxisRight.setAxisMinimum(valorMinimo-0.2f);
+        valorMaximo=0;
+        valorMinimo=0;
 
 
         temperaturaChart.setDescription(description);
@@ -146,11 +193,48 @@ public class TemperaturaFragment extends Fragment {
     private void inputValuesRealTime() {
         entry1.clear();
         labelsChart.clear();
+
+        final Date[] date1 = {new Date(),new Date()};
+        final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        Collections.sort(datosTiempoRealList, new Comparator<DatosTiempoReal>() {
+            @Override
+            public int compare(DatosTiempoReal o1, DatosTiempoReal o2) {
+                try {
+                    date1[0] =dateFormat.parse(o1.getFechaActual1());
+                    date1[1] =dateFormat.parse(o2.getFechaActual1());
+                    if (date1[0].getTime() < date1[1].getTime()) {
+                        return -1;
+                    }
+                    if (date1[0].getTime() > date1[1].getTime()) {
+                        return 1;
+                    }
+                    return 0;
+
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    return 0;
+                }
+            }
+        });
+
+
         for (int i=0; i<datosTiempoRealList.size();i++){
             labelsChart.add(datosTiempoRealList.get(i).getHora());
             float dato=0;
             try {
                 dato=Float.parseFloat(datosTiempoRealList.get(i).getTemperatura());
+
+                if (dato>valorMaximo){
+                    valorMaximo = dato;
+                }
+
+                if (valorMinimo==0){
+                    valorMinimo=dato;
+                }
+                if (dato<valorMinimo){
+                    valorMinimo = dato;
+                }
+
             }catch (Exception ignore){
 
             }
@@ -160,7 +244,22 @@ public class TemperaturaFragment extends Fragment {
 
 
         }
+
+
+
+
+
         xAxis.setValueFormatter(new IndexAxisValueFormatter(labelsChart));
+
+        YAxis yAxisLeft = temperaturaChart.getAxisLeft();
+        YAxis yAxisRight = temperaturaChart.getAxisRight();
+
+        yAxisLeft.setAxisMaximum(valorMaximo+0.2f);
+        yAxisRight.setAxisMaximum(valorMaximo+0.2f);
+        yAxisLeft.setAxisMinimum(valorMinimo-0.2f);
+        yAxisRight.setAxisMinimum(valorMinimo-0.2f);
+        valorMaximo=0;
+        valorMinimo=0;
 
     }
 

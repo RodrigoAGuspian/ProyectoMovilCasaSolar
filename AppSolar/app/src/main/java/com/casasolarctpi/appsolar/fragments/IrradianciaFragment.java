@@ -47,6 +47,7 @@ public class IrradianciaFragment extends Fragment {
     private XAxis xAxis;
     boolean bandera = false;
     List<DatosTiempoReal> datosTiempoRealList = new ArrayList<>();
+    float valorMaximo, valorMinimo;
 
     public IrradianciaFragment() {
         // Required empty public constructor
@@ -97,16 +98,6 @@ public class IrradianciaFragment extends Fragment {
 
     //Método para el ingreso de los valores a la gráfica
     private void inputValuesChart() {
-        for (int i=0; i<datosTiempoRealList.size();i++){
-            labelsChart.add(datosTiempoRealList.get(i).getHora());
-            float dato1=0;
-            try {
-                dato1=Float.parseFloat(datosTiempoRealList.get(i).getIrradiancia());
-            }catch (Exception ignore){
-
-            }
-            entry1.add(new Entry(i,dato1));
-        }
 
         final Date[] date1 = {new Date(),new Date()};
         final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
@@ -131,6 +122,32 @@ public class IrradianciaFragment extends Fragment {
             }
         });
 
+
+        for (int i=0; i<datosTiempoRealList.size();i++){
+            labelsChart.add(datosTiempoRealList.get(i).getHora());
+            float dato=0;
+            try {
+                dato=Float.parseFloat(datosTiempoRealList.get(i).getIrradiancia());
+
+                if (dato>valorMaximo){
+                    valorMaximo = dato;
+                }
+
+                if (valorMinimo==0){
+                    valorMinimo=dato;
+                }
+                if (dato<valorMinimo){
+                    valorMinimo = dato;
+                }
+
+            }catch (Exception ignore){
+
+            }
+            entry1.add(new Entry(i,dato));
+        }
+
+
+
         LineDataSet lineDataSet = new LineDataSet(entry1,getResources().getString(R.string.dato3));
         lineDataSet.setColor(getContext().getResources().getColor(R.color.colorGraficaPunto3));
         lineDataSet.setCircleColor(getContext().getResources().getColor(R.color.colorGraficaPunto3));
@@ -146,13 +163,20 @@ public class IrradianciaFragment extends Fragment {
         xAxis.setValueFormatter(new IndexAxisValueFormatter(labelsChart));
         xAxis.setLabelRotationAngle(-10f);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+
+        if (valorMinimo>10){
+
+            valorMinimo-=10;
+        }
         YAxis yAxisLeft = irradianciaChart.getAxisLeft();
         YAxis yAxisRight = irradianciaChart.getAxisRight();
-        yAxisLeft.setAxisMaximum(1400);
 
-        yAxisRight.setAxisMaximum(1400);
-        yAxisLeft.setAxisMinimum(0);
-        yAxisRight.setAxisMinimum(0);
+        yAxisLeft.setAxisMaximum(valorMaximo+10);
+        yAxisRight.setAxisMaximum(valorMaximo+10);
+        yAxisLeft.setAxisMinimum(valorMinimo);
+        yAxisRight.setAxisMinimum(valorMinimo);
+        valorMaximo=0;
+        valorMinimo=0;
 
 
         irradianciaChart.setDescription(description);
@@ -195,10 +219,24 @@ public class IrradianciaFragment extends Fragment {
         });
 
         for (int i=0; i<datosTiempoRealList.size();i++){
+
             labelsChart.add(datosTiempoRealList.get(i).getHora());
             float dato=0;
+
             try {
                 dato=Float.parseFloat(datosTiempoRealList.get(i).getIrradiancia());
+
+                if (dato>valorMaximo){
+                    valorMaximo = dato;
+                }
+
+                if (valorMinimo==0){
+                    valorMinimo=dato;
+                }
+                if (dato<valorMinimo){
+                    valorMinimo = dato;
+                }
+
             }catch (Exception ignore){
 
             }
@@ -206,9 +244,28 @@ public class IrradianciaFragment extends Fragment {
             irradianciaChart.notifyDataSetChanged();
             irradianciaChart.invalidate();
 
-
         }
+
+
+
+
+
+        if (valorMinimo>10){
+
+            valorMinimo-=10;
+        }
+
         xAxis.setValueFormatter(new IndexAxisValueFormatter(labelsChart));
+
+        YAxis yAxisLeft = irradianciaChart.getAxisLeft();
+        YAxis yAxisRight = irradianciaChart.getAxisRight();
+
+        yAxisLeft.setAxisMaximum(valorMaximo+10);
+        yAxisRight.setAxisMaximum(valorMaximo+10);
+        yAxisLeft.setAxisMinimum(valorMinimo);
+        yAxisRight.setAxisMinimum(valorMinimo);
+        valorMaximo=0;
+        valorMinimo=0;
 
     }
 

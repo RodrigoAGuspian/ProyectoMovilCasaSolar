@@ -77,7 +77,7 @@ while True:
                 "corrienteBateria" : "0.0",
                 "corrienteCargas" : "0.0",
                 "corrientePanel" : "0.0",
-                "irradiancia" : "1.0",
+                "irradiancia" : dato4,
                 "voltajeBateria" : "0.0",
                 "voltajeCargas" : "0.0",
                 "voltajePanel" : "0.0",

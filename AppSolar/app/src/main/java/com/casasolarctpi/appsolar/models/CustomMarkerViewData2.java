@@ -12,19 +12,15 @@ import com.github.mikephil.charting.utils.MPPointF;
 
 import java.util.List;
 
-public class CustomMarkerViewData1 extends MarkerView {
+public class CustomMarkerViewData2 extends MarkerView {
     private TextView txtCustomMarker1, txtCustomMarker2;
-    private int colorDelDato = 0;
-    private String tipoDelDato = "";
     private List<String> labelsChart;
 
-    public void setColorDelDato(int colorDelDato) {
-        this.colorDelDato = colorDelDato;
-    }
+    private String dato1, dato2;
+    private int color1, color2;
 
-    public void setTipoDelDato(String tipoDelDato) {
-        this.tipoDelDato = tipoDelDato;
-    }
+
+
 
     /**
      * Constructor. Sets up the MarkerView with a custom layout resource.
@@ -33,9 +29,13 @@ public class CustomMarkerViewData1 extends MarkerView {
      * @param layoutResource the layout resource to use for the MarkerView
      */
 
-    public CustomMarkerViewData1(Context context, int layoutResource, List<String> labelsChart) {
+    public CustomMarkerViewData2(Context context, int layoutResource, List<String> labelsChart, String dato1, String dato2, int color1, int color2) {
         super(context, layoutResource);
         this.labelsChart = labelsChart;
+        this.dato1 = dato1;
+        this.dato2 = dato2;
+        this.color1 = color1;
+        this.color2 = color2;
         txtCustomMarker1 = findViewById(R.id.txtCustomMarker1);
         txtCustomMarker2 = findViewById(R.id.txtCustomMarker2);
     }
@@ -43,9 +43,19 @@ public class CustomMarkerViewData1 extends MarkerView {
     @Override
     public void refreshContent(Entry e, Highlight highlight) {
         super.refreshContent(e, highlight);
-        txtCustomMarker1.setText(getResources().getString(R.string.hora)+": "+ labelsChart.get((int) e.getX()));
-        txtCustomMarker2.setText(tipoDelDato+": " + e.getY());
-        txtCustomMarker2.setTextColor(colorDelDato);
+
+        switch (highlight.getDataSetIndex() ) {
+            case 0:
+                txtCustomMarker1.setText(getResources().getString(R.string.hora) + ": " + labelsChart.get((int) e.getX()));
+                txtCustomMarker2.setText(dato1 + ": " + e.getY());
+                txtCustomMarker2.setTextColor(color1);
+                break;
+            case 1:
+                txtCustomMarker1.setText(getResources().getString(R.string.hora) + ": " + labelsChart.get((int) e.getX()));
+                txtCustomMarker2.setText(dato2 + ": " + e.getY());
+                txtCustomMarker2.setTextColor(color2);
+                break;
+        }
 
     }
 

@@ -273,8 +273,11 @@ public class MenuPrincipal extends AppCompatActivity
         expaAdaperConsultas.setOnChildClickListener(new ExpandableListAdapter.OnChildClickListener() {
             @Override
             public void childClick(int groupId, int childId) {
+                ConsultasFragment.modoGraficar=childId;
                 switch (childId){
                     case 0:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu, new ConsultasFragment()).commit();
+                        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.irradiancia_temperatura);
                         closeDrawer();
                         break;
 
@@ -287,6 +290,8 @@ public class MenuPrincipal extends AppCompatActivity
                         break;
 
                     case 3:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu, new ConsultasFragment()).commit();
+                        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.irradiancia_temperatura);
                         closeDrawer();
                         break;
 

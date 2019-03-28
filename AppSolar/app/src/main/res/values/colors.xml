@@ -8,8 +8,8 @@
 
     <color name="colorGraficaLinea1">#68BAE0</color>
     <color name="colorGraficaPunto1">#1C88B0</color>
-    <color name="colorGraficaLinea2">#B01C3C</color>
-    <color name="colorGraficaLinea3">#E3493B</color>
+    <color name="colorGraficaLinea2">#FF8A65</color>
+    <color name="colorGraficaLinea3">#E53935</color>
     <color name="colorGraficaPunto2"> #E69B69</color>
     <color name="colorGraficaPunto3">#E3493B</color>
     <color name="color_custmo_marker">#FFFFFF</color>

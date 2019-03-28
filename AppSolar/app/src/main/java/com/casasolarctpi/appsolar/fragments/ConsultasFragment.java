@@ -29,6 +29,8 @@ import com.casasolarctpi.appsolar.R;
 import com.casasolarctpi.appsolar.controllers.MenuPrincipal;
 import com.casasolarctpi.appsolar.models.Constants;
 import com.casasolarctpi.appsolar.models.CustomMarkerView;
+import com.casasolarctpi.appsolar.models.CustomMarkerViewData1;
+import com.casasolarctpi.appsolar.models.CustomMarkerViewData2;
 import com.casasolarctpi.appsolar.models.DatoSemana;
 import com.casasolarctpi.appsolar.models.DatosCompletos;
 import com.casasolarctpi.appsolar.models.DatosTH;
@@ -71,8 +73,8 @@ import static com.jaredrummler.materialspinner.MaterialSpinner.*;
 public class ConsultasFragment extends Fragment implements OnClickListener, OnDateSetListener, OnItemSelectedListener {
     View view;
     Button btnConsulta1, btnConsulta2, btnConsulta3;
-    BarChart barChart1;
-    LineChart lineChart1, lineChart2;
+    BarChart barChart1, barChart2;
+    LineChart lineChart1;
     EditText txtDate1, txtDate2;
     MaterialSpinner mSMes;
     NumberPicker nPAnio;
@@ -82,7 +84,6 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
     ProgressBar pBConsultas;
     int mode;
     private List<ILineDataSet> dataSets = new ArrayList<>();
-    private List<ILineDataSet> dataSetsM = new ArrayList<>();
     private XAxis xAxis;
     public static List<String> labelsChart = new ArrayList<>();
     final List<DatosCompletos>[] datosCompletosSemana = new List[7];
@@ -90,6 +91,13 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
     List<BarEntry> entriesBarWeek = new ArrayList<>();
     List<BarEntry> entriesBarWeek1 = new ArrayList<>();
     int month, yearM, numDias;
+    public static int modoGraficar=0;
+
+    String datoInfo1;
+    String datoInfo2;
+
+    int colorDato1, colorDato2, colorDatoTexto1, colorDatoTexto2, modo1, modo2, yAxisMax1, yAxisMin1, yAxisMax2,yAxisMin2;
+
 
     public ConsultasFragment() {
         // Required empty public constructor
@@ -101,8 +109,76 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_consultas, container, false);
         iniziliate();
+        inputValuesToChart();
         inputDataToSpinner();
         return view;
+    }
+
+    private void inputValuesToChart() {
+
+        switch (modoGraficar){
+            case 0:
+                datoInfo1 = getResources().getString(R.string.dato3);
+                datoInfo2 = getResources().getString(R.string.dato1);
+
+                colorDato1 = getResources().getColor(R.color.colorGraficaPunto3);
+                colorDato2 = getResources().getColor(R.color.colorGraficaPunto1);
+
+                colorDatoTexto1 = getResources().getColor(R.color.colorGraficaLinea3);
+                colorDatoTexto2 = getResources().getColor(R.color.colorGraficaLinea1);
+
+                yAxisMax1=1000;
+                yAxisMax2=120;
+                yAxisMin1=0;
+                yAxisMin2=0;
+
+                modo1=2;
+                modo2=0;
+
+                break;
+
+            case 3:
+                datoInfo1 = getResources().getString(R.string.dato3);
+                datoInfo2 = getResources().getString(R.string.dato2);
+
+                colorDato1 = getResources().getColor(R.color.colorGraficaPunto3);
+                colorDato2 = getResources().getColor(R.color.colorGraficaPunto2);
+
+                colorDatoTexto1 = getResources().getColor(R.color.colorGraficaLinea3);
+                colorDatoTexto2 = getResources().getColor(R.color.colorGraficaLinea2);
+
+                yAxisMax1=1000;
+                yAxisMax2=50;
+                yAxisMin1=0;
+                yAxisMin2=-1;
+
+                modo1=2;
+                modo2=1;
+
+                break;
+
+            case 4:
+                datoInfo1 = getResources().getString(R.string.dato1);
+                datoInfo2 = getResources().getString(R.string.dato2);
+
+                colorDato1 = getResources().getColor(R.color.colorGraficaPunto1);
+                colorDato2 = getResources().getColor(R.color.colorGraficaPunto2);
+
+                colorDatoTexto1 = getResources().getColor(R.color.colorGraficaLinea1);
+                colorDatoTexto2 = getResources().getColor(R.color.colorGraficaLinea2);
+
+                yAxisMax1=120;
+                yAxisMax2=50;
+                yAxisMin1=0;
+                yAxisMin2=-1;
+
+                modo1=0;
+                modo2=1;
+
+                break;
+
+        }
+
     }
 
     private void iniziliate() {
@@ -136,12 +212,12 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         btnConsulta3.setOnClickListener(this);
 
         lineChart1 = view.findViewById(R.id.lineChart1);
-        lineChart2 = view.findViewById(R.id.lineChart2);
         barChart1 = view.findViewById(R.id.barChart1);
+        barChart2 = view.findViewById(R.id.barChart2);
 
         lineChart1.setVisibility(View.INVISIBLE);
-        lineChart2.setVisibility(View.INVISIBLE);
         barChart1.setVisibility(View.INVISIBLE);
+        barChart2.setVisibility(View.INVISIBLE);
 
         txtDate1 = view.findViewById(R.id.txtConsulta1);
         txtDate2 = view.findViewById(R.id.txtConsulta2);
@@ -227,8 +303,34 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                 datosCompletos = datosCompletosList.get(i);
                 labelsChart.add(datosCompletos.getHora());
                 try {
-                    entries.add(new Entry(i, Float.parseFloat(datosCompletos.getHumedad())));
-                    entries1.add(new Entry(i,Float.parseFloat(datosCompletos.getTemperatura())));
+                    switch (modoGraficar){
+                        case 0:
+                            entries.add(new Entry(i, Float.parseFloat(datosCompletos.getIrradiancia())));
+                            entries1.add(new Entry(i, Float.parseFloat(datosCompletos.getHumedad())));
+                            break;
+                        case 1:
+                            entries.add(new Entry(i, Float.parseFloat(datosCompletos.getHumedad())));
+                            entries1.add(new Entry(i, Float.parseFloat(datosCompletos.getTemperatura())));
+                            break;
+                        case 2:
+
+                            entries.add(new Entry(i, Float.parseFloat(datosCompletos.getHumedad())));
+                            entries1.add(new Entry(i, Float.parseFloat(datosCompletos.getTemperatura())));
+                            break;
+
+                        case 3:
+
+                            entries.add(new Entry(i, Float.parseFloat(datosCompletos.getIrradiancia())));
+                            entries1.add(new Entry(i, Float.parseFloat(datosCompletos.getTemperatura())));
+                            break;
+                        case 4:
+
+                            entries.add(new Entry(i, Float.parseFloat(datosCompletos.getHumedad())));
+                            entries1.add(new Entry(i, Float.parseFloat(datosCompletos.getTemperatura())));
+                            break;
+                    }
+
+
                 }catch (Exception ignored){
 
                 }
@@ -243,14 +345,14 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         if (entries.size()!=0) {
 
 
-            LineDataSet lineDataSet = new LineDataSet(entries, getResources().getString(R.string.dato1));
-            LineDataSet lineDataSet1 = new LineDataSet(entries1, getResources().getString(R.string.dato2));
+            LineDataSet lineDataSet = new LineDataSet(entries, datoInfo1);
+            LineDataSet lineDataSet1 = new LineDataSet(entries1, datoInfo2);
 
-            lineDataSet.setColor(getResources().getColor(R.color.colorGraficaPunto1));
-            lineDataSet1.setColor(getResources().getColor(R.color.colorGraficaPunto2));
+            lineDataSet.setColor(colorDato1);
+            lineDataSet1.setColor(colorDato2);
 
-            lineDataSet.setValueTextColor(getResources().getColor(R.color.colorGraficaLinea1));
-            lineDataSet1.setValueTextColor(getResources().getColor(R.color.colorGraficaLinea2));
+            lineDataSet.setValueTextColor(colorDatoTexto1);
+            lineDataSet1.setValueTextColor(colorDatoTexto2);
 
             lineDataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
             lineDataSet1.setMode(LineDataSet.Mode.CUBIC_BEZIER);
@@ -276,7 +378,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
             xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
             lineChart1.setDescription(description);
             lineChart1.setDrawMarkers(true);
-            CustomMarkerView customMarkerView = new CustomMarkerView(getContext(), R.layout.item_custom_marker, labelsChart);
+            CustomMarkerViewData2 customMarkerView = new CustomMarkerViewData2(getContext(),R.layout.item_custom_marker,labelsChart,datoInfo1,datoInfo2,colorDato1,colorDato2);
             lineChart1.setMarker(customMarkerView);
             lineChart1.setTouchEnabled(true);
             lineChart1.setVisibility(View.VISIBLE);
@@ -412,16 +514,16 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
 
         for (int i=0; i<7;i++){
-            entriesBarWeek.add(new BarEntry(i,promedioDia(datosCompletosSemana[i],0)));
-            entriesBarWeek1.add(new BarEntry(i,promedioDia(datosCompletosSemana[i],1)));
+            entriesBarWeek.add(new BarEntry(i,promedioDia(datosCompletosSemana[i],modo1)));
+            entriesBarWeek1.add(new BarEntry(i,promedioDia(datosCompletosSemana[i],modo2)));
         }
 
-        BarDataSet barDataSet = new BarDataSet(entriesBarWeek,getResources().getString(R.string.dato1));
-        BarDataSet barDataSet1 = new BarDataSet(entriesBarWeek1,getResources().getString(R.string.dato2));
-        barDataSet.setColor(getResources().getColor(R.color.colorGraficaPunto1));
-        barDataSet1.setColor(getResources().getColor(R.color.colorGraficaPunto2));
-        barDataSet.setBarShadowColor(getResources().getColor(R.color.colorGraficaLinea1));
-        barDataSet1.setBarShadowColor(getResources().getColor(R.color.colorGraficaLinea2));
+        BarDataSet barDataSet = new BarDataSet(entriesBarWeek,datoInfo1);
+        BarDataSet barDataSet1 = new BarDataSet(entriesBarWeek1,datoInfo2);
+        barDataSet.setColor(colorDato1);
+        barDataSet1.setColor(colorDato2);
+        barDataSet.setBarShadowColor(colorDatoTexto1);
+        barDataSet1.setBarShadowColor(colorDatoTexto2);
         List<IBarDataSet> dataBarSets = new ArrayList<>();
         dataBarSets.add(barDataSet);
         dataBarSets.add(barDataSet1);
@@ -437,12 +539,17 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         xAxis.setTextSize(8);
         xAxis.setAxisMaximum(7);
 
+
+
         YAxis yAxisLeft = barChart1.getAxisLeft();
         YAxis yAxisRight = barChart1.getAxisRight();
-        yAxisLeft.setAxisMaximum(120);
-        yAxisLeft.setAxisMinimum(0);
-        yAxisRight.setAxisMaximum(120);
-        yAxisRight.setAxisMinimum(0);
+        yAxisLeft.setAxisMaximum(yAxisMax1);
+        yAxisLeft.setAxisMinimum(yAxisMin1);
+        yAxisRight.setAxisMaximum(yAxisMax2);
+
+        if (yAxisMin2>=0){
+            yAxisRight.setAxisMinimum(yAxisMin2);
+        }
         barChart1.setVisibility(View.VISIBLE);
         barChart1.invalidate(); // refresh
 
@@ -450,7 +557,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
     }
 
     private void getDataMonth() {
-        lineChart2.setVisibility(INVISIBLE);
+        barChart2.setVisibility(INVISIBLE);
         pBConsultas.setVisibility(View.VISIBLE);
         yearM = nPAnio.getValue();
         month = mSMes.getSelectedIndex();
@@ -504,7 +611,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                         showChartMonth();
 
                     }catch (Exception e){
-
+                        Log.e("Error Grafica",e.getMessage());
                     }
                 }
             }
@@ -519,61 +626,66 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
     }
 
     public void showChartMonth(){
-        List<Entry> entry1 = new ArrayList<>();
-        List<Entry> entry2 = new ArrayList<>();
-        lineChart2.clearAnimation();
-        lineChart2.clear();
-        dataSetsM.clear();
+        List<BarEntry> entry1 = new ArrayList<>();
+        List<BarEntry> entry2 = new ArrayList<>();
+        barChart2.clearAnimation();
+        barChart2.clear();
 
         List<String> labelC = new ArrayList<>();
         XAxis xAxis1;
         labelC.add(" ");
         for (int i=0; i<datosCompletosMes.length;i++){
-            entry1.add(new Entry(i+1,promedioDia(datosCompletosMes[i],0)));
-            entry2.add(new Entry(i+1,promedioDia(datosCompletosMes[i],1)));
+            entry1.add(new BarEntry(i+1,promedioDia(datosCompletosMes[i],modo1)));
+            entry2.add(new BarEntry(i+1,promedioDia(datosCompletosMes[i],modo2)));
             labelC.add(" ");
         }
 
         if (entry1.size()!=0) {
 
 
-            LineDataSet lineDataSet = new LineDataSet(entry1, getResources().getString(R.string.dato1));
-            LineDataSet lineDataSet1 = new LineDataSet(entry2, getResources().getString(R.string.dato2));
+            BarDataSet barDataSet = new BarDataSet(entry1,datoInfo1);
+            BarDataSet barDataSet1 = new BarDataSet(entry2,datoInfo2);
 
-            lineDataSet.setColor(getResources().getColor(R.color.colorGraficaPunto1));
-            lineDataSet1.setColor(getResources().getColor(R.color.colorGraficaPunto2));
+            barDataSet.setColor(colorDato1);
+            barDataSet1.setColor(colorDato2);
 
-            lineDataSet.setValueTextColor(getResources().getColor(R.color.colorGraficaLinea1));
-            lineDataSet1.setValueTextColor(getResources().getColor(R.color.colorGraficaLinea2));
+            barDataSet.setValueTextColor(colorDatoTexto1);
+            barDataSet1.setValueTextColor(colorDatoTexto2);
 
-            lineDataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-            lineDataSet1.setMode(LineDataSet.Mode.CUBIC_BEZIER);
 
-            lineDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
-            lineDataSet1.setAxisDependency(YAxis.AxisDependency.RIGHT);
+            barDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
+            barDataSet1.setAxisDependency(YAxis.AxisDependency.RIGHT);
 
-            lineDataSet.setDrawCircles(false);
-            lineDataSet1.setDrawCircles(false);
-            lineDataSet.setFormSize(10f);
-            lineDataSet1.setFormSize(10f);
-
-            dataSetsM.add(lineDataSet);
-            dataSetsM.add(lineDataSet1);
-            LineData data = new LineData(dataSetsM);
-            data.setDrawValues(false);
-            lineChart2.setData(data);
+            List<IBarDataSet> dataBarSets = new ArrayList<>();
+            dataBarSets.add(barDataSet);
+            dataBarSets.add(barDataSet1);
+            BarData data = new BarData(barDataSet,barDataSet1);
+            data.setBarWidth(0.48f); // set custom bar width
+            barChart2.setData(data);
             Description description = new Description();
             description.setText(" ");
-            xAxis1 = lineChart2.getXAxis();
+            xAxis1 = barChart2.getXAxis();
+            xAxis1.setCenterAxisLabels(true);
             xAxis1.setLabelRotationAngle(-10f);
             xAxis1.setPosition(XAxis.XAxisPosition.BOTTOM);
-            lineChart2.setDescription(description);
-            lineChart2.setDrawMarkers(true);
-            CustomMarkerView customMarkerView = new CustomMarkerView(getContext(), R.layout.item_custom_marker, labelC);
-            lineChart2.setMarker(customMarkerView);
-            lineChart2.setTouchEnabled(true);
-            lineChart2.setVisibility(View.VISIBLE);
-            lineChart2.invalidate();
+
+            YAxis yAxisLeft = barChart2.getAxisLeft();
+            YAxis yAxisRight = barChart2.getAxisRight();
+            yAxisLeft.setAxisMaximum(yAxisMax1);
+            yAxisLeft.setAxisMinimum(yAxisMin1);
+            yAxisRight.setAxisMaximum(yAxisMax2);
+            if (yAxisMin2>=0){
+                yAxisRight.setAxisMinimum(yAxisMin2);
+            }else if (yAxisMin2==-1){
+                yAxisRight.setAxisMinimum(yAxisMin2);
+            }
+
+
+            barChart2.setDescription(description);
+            barChart2.groupBars(1, 0.04f, 0f);
+            barChart2.setTouchEnabled(true);
+            barChart2.setVisibility(View.VISIBLE);
+            barChart2.invalidate();
 
 
         }else {
@@ -610,6 +722,23 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                     for (int i=0;i<datosFiltrado.size();i++){
                         try {
                             acumulador+=Float.parseFloat(datosFiltrado.get(i).getTemperatura());
+                        }catch (Exception ignore){
+
+                        }
+                    }
+
+                }catch (Exception ignore){
+
+                }
+
+                break;
+
+            case 3:
+
+                try {
+                    for (int i=0;i<datosFiltrado.size();i++){
+                        try {
+                            acumulador+=Float.parseFloat(datosFiltrado.get(i).getIrradiancia());
                         }catch (Exception ignore){
 
                         }

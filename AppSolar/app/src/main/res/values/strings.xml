@@ -31,9 +31,9 @@
     <string name="informacion_principal">El grupo de Investigación, Desarrollo Tecnológico e innovación CTPI SENA Cauca(Innovatec), como parte de sus líneas de investigación desarrollar proyectos de investigación aplicada e innovación en energías renovables, eficiencia energétìca y gestión de la energía; con lo cual busca aportar en el desarrollo regional y nacional mediante los resultados obtenidos en cada uno de los proyectos desarrollados, adicionalmente se busca dar soluciones a problemáticas reales de zonas rurales, urbanas, empresariales, industriales y en general problemáticas que involucren el uso e integración de las energías renovables de la mano de la eficiencia energética.\n \nAqui podrá tener acceso a gráficas de tiempo real de irradiancia solar, humedad relativa, temperatura ambiente, corriente, voltaje y potencia fotovoltaica; así como acceso  al módulo de consultas  por dia, semana o mes de interés para el análisis de producción fotovoltaica, para el acceso a base de datos deberá registrarse en la página web del grupo de investigación (por definir), adicionalmente se cuenta con aplicaciones para proyectos específicos con energía renovables y eficiencia energética </string>
     <string name="voltaje_vs_irradiancia">Voltaje vs Irradiancia</string>
     <string name="fecha">Fecha</string>
-    <string name="dato1">Humedad</string>
-    <string name="dato2">Temperatura</string>
-    <string name="dato3">Irradiancia</string>
+    <string name="dato1">Humedad (%H)</string>
+    <string name="dato2">Temperatura (°C)</string>
+    <string name="dato3">Irradiancia (W/m²)</string>
     <string name="innovaTec">InnovaTec</string>
     <string name="mensaje_week">Por favor seleccione un día (esta selección tomará toda la semana de dicho día)</string>
     <string name="a">a</string>
@@ -69,9 +69,9 @@
     <string name="irradiancia_voltaje">Irradiancia y Voltaje</string>
     <string name="irradiancia_temperatura">Irradiancia y Temperatura</string>
     <string name="humedad_temperatura">Humedad y temperatura</string>
-
-
-    
+    <string name="seleccione_dia">Seleccione dia</string>
+    <string name="seleccione_dia_semana">Seleccione el dia de la semana</string>
+    <string name="graficar">Graficar</string>
 
 
 </resources>

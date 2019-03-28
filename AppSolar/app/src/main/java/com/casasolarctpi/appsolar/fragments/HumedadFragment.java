@@ -49,7 +49,7 @@ public class HumedadFragment extends Fragment {
     private XAxis xAxis;
     boolean bandera = false;
     List<DatosTiempoReal> datosTiempoRealList = new ArrayList<>();
-
+    float valorMaximo, valorMinimo;
     public HumedadFragment() {
         // Required empty public constructor
     }
@@ -102,17 +102,6 @@ public class HumedadFragment extends Fragment {
 
     //Método para el ingreso de los valores a la gráfica
     private void inputValuesChart() {
-        for (int i=0; i<datosTiempoRealList.size();i++){
-            labelsChart.add(datosTiempoRealList.get(i).getHora());
-            float dato1=0;
-            try {
-                dato1=Float.parseFloat(datosTiempoRealList.get(i).getHumedad());
-            }catch (Exception ignore){
-
-            }
-            entry1.add(new Entry(i,dato1));
-        }
-
         final Date[] date1 = {new Date(),new Date()};
         final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         Collections.sort(datosTiempoRealList, new Comparator<DatosTiempoReal>() {
@@ -136,6 +125,30 @@ public class HumedadFragment extends Fragment {
             }
         });
 
+        for (int i=0; i<datosTiempoRealList.size();i++){
+            labelsChart.add(datosTiempoRealList.get(i).getHora());
+            float dato=0;
+            try {
+                dato=Float.parseFloat(datosTiempoRealList.get(i).getHumedad());
+
+                if (dato>valorMaximo){
+                    valorMaximo = dato;
+                }
+
+                if (valorMinimo==0){
+                    valorMinimo=dato;
+                }
+                if (dato<valorMinimo){
+                    valorMinimo = dato;
+                }
+
+            }catch (Exception ignore){
+
+            }
+            entry1.add(new Entry(i,dato));
+        }
+
+
         LineDataSet lineDataSet = new LineDataSet(entry1,getResources().getString(R.string.dato1));
         lineDataSet.setColor(getContext().getResources().getColor(R.color.colorGraficaPunto1));
         lineDataSet.setCircleColor(getContext().getResources().getColor(R.color.colorGraficaLinea1));
@@ -154,10 +167,17 @@ public class HumedadFragment extends Fragment {
         YAxis yAxisLeft = humedadChart.getAxisLeft();
         YAxis yAxisRight = humedadChart.getAxisRight();
 
-        yAxisLeft.setAxisMaximum(120);
-        yAxisRight.setAxisMaximum(120);
-        yAxisLeft.setAxisMinimum(0);
-        yAxisRight.setAxisMinimum(0);
+        if (valorMinimo>10){
+            valorMinimo-=0.2f;
+        }
+
+
+        yAxisLeft.setAxisMaximum(valorMaximo+0.2f);
+        yAxisRight.setAxisMaximum(valorMaximo+0.2f);
+        yAxisLeft.setAxisMinimum(valorMinimo);
+        yAxisRight.setAxisMinimum(valorMinimo);
+        valorMaximo=0;
+        valorMinimo=0;
 
         humedadChart.setDescription(description);
         humedadChart.setDrawMarkers(true);
@@ -204,6 +224,18 @@ public class HumedadFragment extends Fragment {
             float dato=0;
             try {
                 dato=Float.parseFloat(datosTiempoRealList.get(i).getHumedad());
+
+                if (dato>valorMaximo){
+                    valorMaximo = dato;
+                }
+
+                if (valorMinimo==0){
+                    valorMinimo=dato;
+                }
+                if (dato<valorMinimo){
+                    valorMinimo = dato;
+                }
+
             }catch (Exception ignore){
 
             }
@@ -214,6 +246,23 @@ public class HumedadFragment extends Fragment {
 
         }
         xAxis.setValueFormatter(new IndexAxisValueFormatter(labelsChart));
+
+        YAxis yAxisLeft = humedadChart.getAxisLeft();
+        YAxis yAxisRight = humedadChart.getAxisRight();
+
+        if (valorMinimo>10){
+            valorMinimo-=0.1f;
+        }
+
+
+        yAxisLeft.setAxisMaximum(valorMaximo+0.2f);
+        yAxisRight.setAxisMaximum(valorMaximo+0.2f);
+        yAxisLeft.setAxisMinimum(valorMinimo);
+        yAxisRight.setAxisMinimum(valorMinimo);
+        valorMaximo=0;
+        valorMinimo=0;
+
+
 
     }
 

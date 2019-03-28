@@ -66,8 +66,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
-                    android:text="..."
                     android:backgroundTint="@color/secondaryColor"
+                    android:text="@string/seleccione_dia"
                     android:textColor="@color/color_custmo_marker"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -117,8 +117,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
-                    android:text="..."
                     android:backgroundTint="@color/secondaryColor"
+                    android:text="@string/seleccione_dia_semana"
                     android:textColor="@color/color_custmo_marker"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -132,8 +132,8 @@
                 android:orientation="vertical">
 
 
-                <com.github.mikephil.charting.charts.LineChart
-                    android:id="@+id/lineChart2"
+                <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/barChart2"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_marginStart="8dp"
@@ -189,7 +189,7 @@
                         android:layout_height="wrap_content"
                         android:layout_margin="8dp"
                         android:backgroundTint="@color/secondaryColor"
-                        android:text="..."
+                        android:text="@string/graficar"
                         android:textColor="@color/color_custmo_marker"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
