@@ -26,7 +26,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -103,6 +108,29 @@ public class IrradianciaFragment extends Fragment {
             entry1.add(new Entry(i,dato1));
         }
 
+        final Date[] date1 = {new Date(),new Date()};
+        final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        Collections.sort(datosTiempoRealList, new Comparator<DatosTiempoReal>() {
+            @Override
+            public int compare(DatosTiempoReal o1, DatosTiempoReal o2) {
+                try {
+                    date1[0] =dateFormat.parse(o1.getFechaActual1());
+                    date1[1] =dateFormat.parse(o2.getFechaActual1());
+                    if (date1[0].getTime() < date1[1].getTime()) {
+                        return -1;
+                    }
+                    if (date1[0].getTime() > date1[1].getTime()) {
+                        return 1;
+                    }
+                    return 0;
+
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    return 0;
+                }
+            }
+        });
+
         LineDataSet lineDataSet = new LineDataSet(entry1,getResources().getString(R.string.dato3));
         lineDataSet.setColor(getContext().getResources().getColor(R.color.colorGraficaPunto3));
         lineDataSet.setCircleColor(getContext().getResources().getColor(R.color.colorGraficaPunto3));
@@ -142,6 +170,30 @@ public class IrradianciaFragment extends Fragment {
     private void inputValuesRealTime() {
         entry1.clear();
         labelsChart.clear();
+
+        final Date[] date1 = {new Date(),new Date()};
+        final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        Collections.sort(datosTiempoRealList, new Comparator<DatosTiempoReal>() {
+            @Override
+            public int compare(DatosTiempoReal o1, DatosTiempoReal o2) {
+                try {
+                    date1[0] =dateFormat.parse(o1.getFechaActual1());
+                    date1[1] =dateFormat.parse(o2.getFechaActual1());
+                    if (date1[0].getTime() < date1[1].getTime()) {
+                        return -1;
+                    }
+                    if (date1[0].getTime() > date1[1].getTime()) {
+                        return 1;
+                    }
+                    return 0;
+
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    return 0;
+                }
+            }
+        });
+
         for (int i=0; i<datosTiempoRealList.size();i++){
             labelsChart.add(datosTiempoRealList.get(i).getHora());
             float dato=0;

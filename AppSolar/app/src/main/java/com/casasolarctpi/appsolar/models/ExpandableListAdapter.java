@@ -3,6 +3,7 @@ package com.casasolarctpi.appsolar.models;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.media.Image;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +20,7 @@ import java.util.List;
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
     private Context context;
     private String[] mListDataHeader;
-    private HashMap<String, String[]> mListDataChild;
+    private HashMap<String, ChildClass[]> mListDataChild;
     private OnChildClickListener onChildClickListener;
     public interface OnChildClickListener{
         void childClick(int groupId, int childId);
@@ -29,7 +30,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         this.onChildClickListener = onChildClickListener;
     }
 
-    public ExpandableListAdapter(Context context, String[] mListDataHeader, HashMap<String, String[]> mListDataChild) {
+    public ExpandableListAdapter(Context context, String[] mListDataHeader, HashMap<String, ChildClass[]> mListDataChild) {
         this.context = context;
         this.mListDataHeader = mListDataHeader;
         this.mListDataChild = mListDataChild;
@@ -88,7 +89,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public View getChildView(final int groupPosition, final int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-        final String childText = (String) getChild(groupPosition,childPosition);
+        ChildClass childClass = (ChildClass) getChild(groupPosition,childPosition);
+        final String childText = childClass.getName();
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.item_child,null);
@@ -99,15 +101,17 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         TextView txtItem= convertView.findViewById(R.id.txtItemChild);
         txtItem.setText(childText);
         ImageView imgChild = convertView.findViewById(R.id.imgChild);
-        if (Constants.GROUP_LIST[groupPosition].equals(Constants.GROUP_LIST[1])) {
-            if (Constants.CONOCENOS_LIST[childPosition].equals(Constants.CONOCENOS_LIST[0])){
-                imgChild.setBackground(context.getResources().getDrawable(R.drawable.ic_contacts));
+        try {
+            if (childClass.getImage()==0){
+                imgChild.setBackground(context.getResources().getDrawable(R.drawable.ic_link));
             }else {
-                imgChild.setBackground(context.getResources().getDrawable(R.drawable.ic_info));
+                imgChild.setBackground(context.getResources().getDrawable(childClass.getImage()));
             }
-        }else{
+
+        }catch (Exception ignored){
             imgChild.setBackground(context.getResources().getDrawable(R.drawable.ic_link));
         }
+
 
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override

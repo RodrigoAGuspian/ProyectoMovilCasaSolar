@@ -10,12 +10,13 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 
 import com.casasolarctpi.appsolar.R;
@@ -27,40 +28,36 @@ import com.casasolarctpi.appsolar.fragments.IndexFragment;
 import com.casasolarctpi.appsolar.fragments.IrradianciaFragment;
 import com.casasolarctpi.appsolar.fragments.PerfilFragment;
 import com.casasolarctpi.appsolar.fragments.TemperaturaFragment;
+import com.casasolarctpi.appsolar.models.ChildClass;
 import com.casasolarctpi.appsolar.models.Constants;
 import com.casasolarctpi.appsolar.models.ExpandableListAdapter;
-import com.casasolarctpi.appsolar.models.ItemMenu;
-import com.casasolarctpi.appsolar.models.ItemSubMenu;
-import com.casasolarctpi.appsolar.models.ListMenu;
-import com.casasolarctpi.appsolar.models.MenuEAdapter;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.thoughtbot.expandablerecyclerview.listeners.OnGroupClickListener;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Objects;
 
 public class MenuPrincipal extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, OnClickListener {
 
     //Declaración de variables
-    private ExpandableListView expListView;
-    private ExpandableListAdapter listAdapterExpandable;
+    private ExpandableListView expPagina, expConocenos, expConsultas;
+    private ExpandableListAdapter listAdapterExpandable, expaAdaperConsultas, expaAdapterConocenos;
     private String[] listDataHeader;
-    private HashMap<String, String []> listDataChild;
-    private String [] [] listChildren;
-    public ConstraintLayout contentViewMenu;
+    private HashMap<String, ChildClass[]> listDataChild, listaDataConsultas, listDataConocenos;
+    private ChildClass [] listChildrenPaginas;
+    private ChildClass [] listChildrenConocenos;
+    private ChildClass [] listChildrenConsultas;
+    public ConstraintLayout contentViewMenu, cLHome, cLHumedad, cLTemperatura, cLIrradiancia, cLPerfil, cLCerrarSesion;
     private  DrawerLayout drawer;
     public static DatabaseReference reference;
-    RecyclerView recyclerMenu;
     boolean bandera =true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu_principal);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -74,17 +71,14 @@ public class MenuPrincipal extends AppCompatActivity
         navigationView.setItemTextColor(ColorStateList.valueOf(getResources().getColor(R.color.primaryDarkColor)));
         inizialite();
         inizialiteFirebaseApp();
-        //inputListExpandable();
-        //createExpandableListView();
+        inputListExpandable();
+        createExpandableListView();
 
         if (bandera){
-            createRecyclerMenu();
             getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new IndexFragment()).commit();
             getSupportActionBar().setTitle(getResources().getString(R.string.inicio));
-            Log.e("asd","asdasdasd");
             bandera=false;
         }
-
 
 
         navigationView.setNavigationItemSelectedListener(this);
@@ -99,7 +93,46 @@ public class MenuPrincipal extends AppCompatActivity
         contentViewMenu= findViewById(R.id.contentViewMenu);
         //expListView = findViewById(R.id.expandable_list);
         drawer = findViewById(R.id.drawer_layout);
-        recyclerMenu = findViewById(R.id.recyclerMenu);
+        expPagina = findViewById(R.id.expaPaginas);
+        expConocenos = findViewById(R.id.expaConocenos);
+        expConsultas = findViewById(R.id.expaConsultas);
+        cLHome = findViewById(R.id.cLHome);
+        cLHumedad = findViewById(R.id.cLHumedad);
+        cLTemperatura = findViewById(R.id.cLTemperatura);
+        cLIrradiancia = findViewById(R.id.cLIrradiancia);
+        cLPerfil = findViewById(R.id.cLPerfil);
+        cLCerrarSesion = findViewById(R.id.cLCerrarSesion);
+
+        cLHome.setOnClickListener(this);
+        cLHumedad.setOnClickListener(this);
+        cLTemperatura.setOnClickListener(this);
+        cLIrradiancia.setOnClickListener(this);
+        cLPerfil.setOnClickListener(this);
+        cLCerrarSesion.setOnClickListener(this);
+
+        expPagina.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+                setListViewHeight(parent,groupPosition);
+                return false;
+            }
+        });
+
+        expConocenos.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+                setListViewHeight(parent,groupPosition);
+                return false;
+            }
+        });
+
+        expConsultas.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+                setListViewHeight(parent,groupPosition);
+                return false;
+            }
+        });
     }
     //Conexión entre la app y FirebaseApp ,activar persistencia de la base de datos de Firebase y referenciar la instacia de la base de datos
 
@@ -176,11 +209,29 @@ public class MenuPrincipal extends AppCompatActivity
     public void inputListExpandable(){
         listDataHeader = Constants.GROUP_LIST;
         listDataChild = new HashMap<>();
-        listChildren = Constants.CHILDREN_LISTS;
+        listDataConocenos = new HashMap<>();
 
-        for (int i=0; i<listDataHeader.length; i++){
-            listDataChild.put(listDataHeader[i],listChildren[i]);
+        listChildrenPaginas = new ChildClass[Constants.PAGES_LIST.length];
+        listChildrenConocenos = new ChildClass[Constants.CONOCENOS_LIST.length];
+
+        for (int i=0;i<listChildrenPaginas.length;i++){
+            listChildrenPaginas[i]= new ChildClass(Constants.PAGES_LIST[i],R.drawable.ic_link);
         }
+
+        listChildrenConocenos[0]= new ChildClass(Constants.CONOCENOS_LIST[0], R.drawable.ic_contacts);
+        listChildrenConocenos[1]= new ChildClass(Constants.CONOCENOS_LIST[0], R.drawable.ic_info);
+
+        listChildrenConsultas = new ChildClass[Constants.LIST_QUERY.length];
+
+        for (int i=0;i<listChildrenConsultas.length;i++){
+            listChildrenConsultas[i]= new ChildClass(Constants.LIST_QUERY[i],R.drawable.ic_file_search);
+        }
+
+        listDataChild.put(listDataHeader[0], listChildrenPaginas);
+
+        listaDataConsultas = new HashMap<>();
+        listaDataConsultas.put(getResources().getString(R.string.consultas),listChildrenConsultas);
+        listDataConocenos.put(getResources().getString(R.string.conocenos),listChildrenConocenos);
 
 
 
@@ -188,36 +239,70 @@ public class MenuPrincipal extends AppCompatActivity
     //Creación del ExpandableListView y agrego del click
 
     public void createExpandableListView(){
-        listAdapterExpandable = new ExpandableListAdapter(this,listDataHeader,listDataChild);
+        listAdapterExpandable = new ExpandableListAdapter(this,new String[]{getResources().getString(R.string.paginas)},listDataChild);
+
         listAdapterExpandable.setOnChildClickListener(new ExpandableListAdapter.OnChildClickListener() {
             @Override
             public void childClick(int groupId, int childId) {
                 Intent intent;
-                if (groupId==0){
-                    Uri uri = Uri.parse(Constants.LIST_LINKS_CONOCENOS[childId]);
-                    intent = new Intent(Intent.ACTION_VIEW, uri);
-                    startActivity(intent);
-
-
-                }else {
-                    switch (childId){
-                        case 0:
-                            getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new ContactanosFragment()).commit();
-                            break;
-                        case 1:
-                            getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new AcercaDeFragment()).commit();
-                            break;
-                    }
-                }
-                try {
-                    drawer.closeDrawer(GravityCompat.START);
-                }catch (Exception ignored){
-                    Log.e("Error en drawer",ignored.getMessage());
-                }
+                Uri uri = Uri.parse(Constants.LIST_LINKS_CONOCENOS[childId]);
+                intent = new Intent(Intent.ACTION_VIEW, uri);
+                startActivity(intent);
+                closeDrawer();
 
             }
         });
-        expListView.setAdapter(listAdapterExpandable);
+
+        expaAdapterConocenos = new ExpandableListAdapter(this, new String[]{getResources().getString(R.string.conocenos)},listDataConocenos);
+
+        expaAdapterConocenos.setOnChildClickListener(new ExpandableListAdapter.OnChildClickListener() {
+            @Override
+            public void childClick(int groupId, int childId) {
+                switch (childId){
+                    case 0:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new ContactanosFragment()).commit();
+                        break;
+                    case 1:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new AcercaDeFragment()).commit();
+                        break;
+                }
+            }
+        });
+
+        expaAdaperConsultas = new ExpandableListAdapter(this,new  String[] {getResources().getString(R.string.consultas)},listaDataConsultas);
+        expaAdaperConsultas.setOnChildClickListener(new ExpandableListAdapter.OnChildClickListener() {
+            @Override
+            public void childClick(int groupId, int childId) {
+                switch (childId){
+                    case 0:
+                        closeDrawer();
+                        break;
+
+                    case 1:
+                        closeDrawer();
+                        break;
+
+                    case 2:
+                        closeDrawer();
+                        break;
+
+                    case 3:
+                        closeDrawer();
+                        break;
+
+                    case 4:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu, new ConsultasFragment()).commit();
+                        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.humedad_temperatura);
+                        closeDrawer();
+                        break;
+                }
+            }
+        });
+
+        expConsultas.setAdapter(expaAdaperConsultas);
+        expPagina.setAdapter(listAdapterExpandable);
+        expConocenos.setAdapter(expaAdapterConocenos);
+
 
         for (int i=0; i<listAdapterExpandable.getGroupCount(); i++){
             //expListView.expandGroup(i); // esta linea de código es para expandir los menús
@@ -236,111 +321,84 @@ public class MenuPrincipal extends AppCompatActivity
 
     }
 
-    private void createRecyclerMenu() {
 
-        ListMenu listMenu = new ListMenu();
-        listMenu.inputList();
-        final List<ItemMenu> list = listMenu.getItemMenus();
-        recyclerMenu.setHasFixedSize(true);
-        recyclerMenu.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL,false));
-        MenuEAdapter adapter = new MenuEAdapter(list);
-        adapter.setmListener(new MenuEAdapter.OnClickListener() {
-            @Override
-            public void itemClick(String n) {
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.cLHome:
+                getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new IndexFragment()).commit();
+                Objects.requireNonNull(getSupportActionBar()).setTitle(getResources().getString(R.string.inicio));
+                closeDrawer();
+                break;
 
-                if (n.equals(getResources().getString(R.string.inicio))){
-                    getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new IndexFragment()).commit();
-                    getSupportActionBar().setTitle(getResources().getString(R.string.inicio));
-                    closeDrawer();
-                }
+            case R.id.cLHumedad:
+                getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new HumedadFragment()).commit();
+                Objects.requireNonNull(getSupportActionBar()).setTitle(getResources().getString(R.string.dato1));
+                closeDrawer();
+                break;
 
-                if (n.equals(getResources().getString(R.string.dato1))){
-                    getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new HumedadFragment()).commit();
-                    getSupportActionBar().setTitle(getResources().getString(R.string.dato1));
-                    closeDrawer();
-                }
+            case R.id.cLTemperatura:
+                getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new TemperaturaFragment()).commit();
+                Objects.requireNonNull(getSupportActionBar()).setTitle(getResources().getString(R.string.dato2));
+                closeDrawer();
+                break;
 
-                if (n.equals(getResources().getString(R.string.dato2))){
-                    getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new TemperaturaFragment()).commit();
-                    getSupportActionBar().setTitle(getResources().getString(R.string.dato2));
-                    closeDrawer();
-                }
+            case R.id.cLIrradiancia:
+                getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new IrradianciaFragment()).commit();
+                Objects.requireNonNull(getSupportActionBar()).setTitle(getResources().getString(R.string.dato3));
+                closeDrawer();
+                break;
 
-                if (n.equals(getResources().getString(R.string.dato3))){
-                    getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new IrradianciaFragment()).commit();
-                    getSupportActionBar().setTitle(getResources().getString(R.string.dato3));
-                    closeDrawer();
-                }
+            case R.id.cLPerfil:
+                getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new PerfilFragment()).commit();
+                Objects.requireNonNull(getSupportActionBar()).setTitle(getResources().getString(R.string.perfil));
+                closeDrawer();
+                break;
 
-                if (n.equals(getResources().getString(R.string.perfil))){
-                    getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new PerfilFragment()).commit();
-                    getSupportActionBar().setTitle(getResources().getString(R.string.perfil));
-                    closeDrawer();
-                }
+            case R.id.cLCerrarSesion:
+                closeDrawer();
+                break;
 
 
-            }
-        });
-        adapter.setmOnChildListener(new MenuEAdapter.OnChildListener() {
-            @Override
-            public void itemClick(String group, int child) {
-                if (group.equals(getResources().getString(R.string.consultas))){
-                    switch (child){
-                        case 0:
-                            closeDrawer();
-                            break;
-
-                        case 1:
-                            closeDrawer();
-                            break;
-
-                        case 2:
-                            closeDrawer();
-                            break;
-
-                        case 3:
-                            closeDrawer();
-                            break;
-
-                        case 4:
-                            getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu, new ConsultasFragment()).commit();
-                            getSupportActionBar().setTitle(R.string.consultas);
-                            closeDrawer();
-
-                            break;
-
-                    }
-                }
-
-                if (group.equals(getResources().getString(R.string.paginas))){
-
-                    Uri uri = Uri.parse(Constants.LIST_LINKS_CONOCENOS[child]);
-                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                    startActivity(intent);
-                }
-
-                if (group.equals(getResources().getString(R.string.conocenos))){
-
-                    switch (child){
-                        case 0:
-                            getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new ContactanosFragment()).commit();
-                            break;
-                        case 1:
-                            getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new AcercaDeFragment()).commit();
-                            break;
-                    }
-                    closeDrawer();
-                }
-
-
-            }
-        });
-
-        recyclerMenu.setAdapter(adapter);
-
-
+        }
     }
 
+
+    private void setListViewHeight(ExpandableListView listView,
+                                   int group) {
+        ExpandableListAdapter listAdapter = (ExpandableListAdapter) listView.getExpandableListAdapter();
+        int totalHeight = 0;
+        int desiredWidth = View.MeasureSpec.makeMeasureSpec(listView.getWidth(),
+                View.MeasureSpec.EXACTLY);
+        for (int i = 0; i < listAdapter.getGroupCount(); i++) {
+            View groupItem = listAdapter.getGroupView(i, false, null, listView);
+            groupItem.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
+
+            totalHeight += groupItem.getMeasuredHeight();
+
+            if (((listView.isGroupExpanded(i)) && (i != group))
+                    || ((!listView.isGroupExpanded(i)) && (i == group))) {
+                for (int j = 0; j < listAdapter.getChildrenCount(i); j++) {
+                    View listItem = listAdapter.getChildView(i, j, false, null,
+                            listView);
+                    listItem.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
+
+                    totalHeight += listItem.getMeasuredHeight();
+
+                }
+            }
+        }
+
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        int height = totalHeight
+                + (listView.getDividerHeight() * (listAdapter.getGroupCount() - 1));
+        if (height < 10)
+            height = 200;
+        params.height = height;
+        listView.setLayoutParams(params);
+        listView.requestLayout();
+
+    }
 
 
 }

@@ -149,19 +149,42 @@ public class IndexFragment extends Fragment {
             entries1.add(new Entry(i, dato2));
             entries2.add(new Entry(i, dato3));
         }
+        final Date[] date1 = {new Date(),new Date()};
+        final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        Collections.sort(datosTiempoRealList, new Comparator<DatosTiempoReal>() {
+            @Override
+            public int compare(DatosTiempoReal o1, DatosTiempoReal o2) {
+                try {
+                    date1[0] =dateFormat.parse(o1.getFechaActual1());
+                    date1[1] =dateFormat.parse(o2.getFechaActual1());
+                    if (date1[0].getTime() < date1[1].getTime()) {
+                        return -1;
+                    }
+                    if (date1[0].getTime() > date1[1].getTime()) {
+                        return 1;
+                    }
+                    return 0;
+
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    return 0;
+                }
+            }
+        });
+
 
         LineDataSet lineDataSet = new LineDataSet(entries, getResources().getString(R.string.dato1));
         LineDataSet lineDataSet1 = new LineDataSet(entries1, getResources().getString(R.string.dato2));
         LineDataSet lineDataSet2 = new LineDataSet(entries2, getResources().getString(R.string.dato3));
 
 
-        lineDataSet.setColor(getContext().getResources().getColor(R.color.colorGraficaPunto1));
-        lineDataSet1.setColor(getContext().getResources().getColor(R.color.colorGraficaPunto2));
-        lineDataSet2.setColor(getContext().getResources().getColor(R.color.colorGraficaPunto3));
+        lineDataSet.setColor(getResources().getColor(R.color.colorGraficaPunto1));
+        lineDataSet1.setColor(getResources().getColor(R.color.colorGraficaPunto2));
+        lineDataSet2.setColor(getResources().getColor(R.color.colorGraficaPunto3));
 
 
-        lineDataSet.setValueTextColor(getContext().getResources().getColor(R.color.colorGraficaLinea1));
-        lineDataSet1.setValueTextColor(getContext().getResources().getColor(R.color.colorGraficaLinea2));
+        lineDataSet.setValueTextColor(getResources().getColor(R.color.colorGraficaLinea1));
+        lineDataSet1.setValueTextColor(getResources().getColor(R.color.colorGraficaLinea2));
 
         lineDataSet.setDrawCircles(false);
         lineDataSet1.setDrawCircles(false);

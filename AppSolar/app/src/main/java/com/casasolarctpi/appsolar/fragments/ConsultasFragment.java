@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -62,14 +63,16 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.jaredrummler.materialspinner.MaterialSpinner.*;
+
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ConsultasFragment extends Fragment implements OnClickListener, OnDateSetListener {
+public class ConsultasFragment extends Fragment implements OnClickListener, OnDateSetListener, OnItemSelectedListener {
     View view;
     Button btnConsulta1, btnConsulta2, btnConsulta3;
-    BarChart barChart1, barChart2;
-    LineChart lineChart1;
+    BarChart barChart1;
+    LineChart lineChart1, lineChart2;
     EditText txtDate1, txtDate2;
     MaterialSpinner mSMes;
     NumberPicker nPAnio;
@@ -79,12 +82,14 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
     ProgressBar pBConsultas;
     int mode;
     private List<ILineDataSet> dataSets = new ArrayList<>();
+    private List<ILineDataSet> dataSetsM = new ArrayList<>();
     private XAxis xAxis;
     public static List<String> labelsChart = new ArrayList<>();
     final List<DatosCompletos>[] datosCompletosSemana = new List[7];
+    List<DatosCompletos>[] datosCompletosMes = new List[31];
     List<BarEntry> entriesBarWeek = new ArrayList<>();
     List<BarEntry> entriesBarWeek1 = new ArrayList<>();
-
+    int month, yearM, numDias;
 
     public ConsultasFragment() {
         // Required empty public constructor
@@ -131,12 +136,12 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         btnConsulta3.setOnClickListener(this);
 
         lineChart1 = view.findViewById(R.id.lineChart1);
+        lineChart2 = view.findViewById(R.id.lineChart2);
         barChart1 = view.findViewById(R.id.barChart1);
-        barChart2 = view.findViewById(R.id.barChart2);
 
         lineChart1.setVisibility(View.INVISIBLE);
+        lineChart2.setVisibility(View.INVISIBLE);
         barChart1.setVisibility(View.INVISIBLE);
-        barChart2.setVisibility(View.INVISIBLE);
 
         txtDate1 = view.findViewById(R.id.txtConsulta1);
         txtDate2 = view.findViewById(R.id.txtConsulta2);
@@ -212,6 +217,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
     private void showChartDay(List<DatosCompletos> datosCompletosList) {
         List<Entry> entries = new ArrayList<>();
         List<Entry> entries1 = new ArrayList<>();
+        lineChart1.clearAnimation();
         lineChart1.clear();
         dataSets.clear();
         DatosCompletos datosCompletos;
@@ -240,11 +246,11 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
             LineDataSet lineDataSet = new LineDataSet(entries, getResources().getString(R.string.dato1));
             LineDataSet lineDataSet1 = new LineDataSet(entries1, getResources().getString(R.string.dato2));
 
-            lineDataSet.setColor(getContext().getResources().getColor(R.color.colorGraficaPunto1));
-            lineDataSet1.setColor(getContext().getResources().getColor(R.color.colorGraficaPunto2));
+            lineDataSet.setColor(getResources().getColor(R.color.colorGraficaPunto1));
+            lineDataSet1.setColor(getResources().getColor(R.color.colorGraficaPunto2));
 
-            lineDataSet.setValueTextColor(getContext().getResources().getColor(R.color.colorGraficaLinea1));
-            lineDataSet1.setValueTextColor(getContext().getResources().getColor(R.color.colorGraficaLinea2));
+            lineDataSet.setValueTextColor(getResources().getColor(R.color.colorGraficaLinea1));
+            lineDataSet1.setValueTextColor(getResources().getColor(R.color.colorGraficaLinea2));
 
             lineDataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
             lineDataSet1.setMode(LineDataSet.Mode.CUBIC_BEZIER);
@@ -282,47 +288,6 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         }
         pBConsultas.setVisibility(View.INVISIBLE);
 
-    }
-
-    private void searchDate(Date primerDia){
-        Calendar tmpCalendar = new GregorianCalendar();
-        tmpCalendar.setTime(primerDia);
-        Date tmpDate = tmpCalendar.getTime();
-        int realMonth;
-        int dia;
-        int anio;
-
-        for (int i=0; i<7;i++){
-            realMonth=tmpDate.getMonth()+1;
-            dia = tmpCalendar.get(Calendar.DAY_OF_MONTH);
-            anio = tmpCalendar.get(Calendar.YEAR);
-            getDataDayOFFireBaseWeek(anio,realMonth,dia,i);
-            tmpCalendar.add(Calendar.DAY_OF_MONTH,1);
-            tmpDate=tmpCalendar.getTime();
-
-        }
-
-    }
-
-    private void getDataDayOFFireBaseWeek(int year, int month, int dayOfMonth,final int contador){
-
-        DatabaseReference datosDia = MenuPrincipal.reference.child("datos").child("y"+year).child("m"+month).child("d"+dayOfMonth);
-        datosDia.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                GenericTypeIndicator<ArrayList<DatosCompletos>> t = new GenericTypeIndicator<ArrayList<DatosCompletos>>() {};
-                datosCompletosSemana[contador] = dataSnapshot.getValue(t);
-                if (contador==6){
-                    showChartWeek();
-
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
     }
 
     public void showDatePickerWeekDialog(){
@@ -398,11 +363,52 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
     }
 
+    private void searchDate(Date primerDia){
+        Calendar tmpCalendar = new GregorianCalendar();
+        tmpCalendar.setTime(primerDia);
+        Date tmpDate = tmpCalendar.getTime();
+        int realMonth;
+        int dia;
+        int anio;
+
+        for (int i=0; i<7;i++){
+            realMonth=tmpDate.getMonth()+1;
+            dia = tmpCalendar.get(Calendar.DAY_OF_MONTH);
+            anio = tmpCalendar.get(Calendar.YEAR);
+            getDataDayOFFireBaseWeek(anio,realMonth,dia,i);
+            tmpCalendar.add(Calendar.DAY_OF_MONTH,1);
+            tmpDate=tmpCalendar.getTime();
+
+        }
+
+    }
+
+    private void getDataDayOFFireBaseWeek(int year, int month, int dayOfMonth,final int contador){
+
+        DatabaseReference datosDia = MenuPrincipal.reference.child("datos").child("y"+year).child("m"+month).child("d"+dayOfMonth);
+        datosDia.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                GenericTypeIndicator<ArrayList<DatosCompletos>> t = new GenericTypeIndicator<ArrayList<DatosCompletos>>() {};
+                datosCompletosSemana[contador] = dataSnapshot.getValue(t);
+                if (contador==6){
+                    showChartWeek();
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     private void showChartWeek() {
         entriesBarWeek = new ArrayList<>();
         entriesBarWeek1 = new ArrayList<>();
-        barChart1.clear();
         barChart1.clearAnimation();
+        barChart1.clear();
 
 
         for (int i=0; i<7;i++){
@@ -412,10 +418,10 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
         BarDataSet barDataSet = new BarDataSet(entriesBarWeek,getResources().getString(R.string.dato1));
         BarDataSet barDataSet1 = new BarDataSet(entriesBarWeek1,getResources().getString(R.string.dato2));
-        barDataSet.setColor(getContext().getResources().getColor(R.color.colorGraficaPunto1));
-        barDataSet1.setColor(getContext().getResources().getColor(R.color.colorGraficaPunto2));
-        barDataSet.setBarShadowColor(getContext().getResources().getColor(R.color.colorGraficaLinea1));
-        barDataSet1.setBarShadowColor(getContext().getResources().getColor(R.color.colorGraficaLinea2));
+        barDataSet.setColor(getResources().getColor(R.color.colorGraficaPunto1));
+        barDataSet1.setColor(getResources().getColor(R.color.colorGraficaPunto2));
+        barDataSet.setBarShadowColor(getResources().getColor(R.color.colorGraficaLinea1));
+        barDataSet1.setBarShadowColor(getResources().getColor(R.color.colorGraficaLinea2));
         List<IBarDataSet> dataBarSets = new ArrayList<>();
         dataBarSets.add(barDataSet);
         dataBarSets.add(barDataSet1);
@@ -439,6 +445,141 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         yAxisRight.setAxisMinimum(0);
         barChart1.setVisibility(View.VISIBLE);
         barChart1.invalidate(); // refresh
+
+
+    }
+
+    private void getDataMonth() {
+        lineChart2.setVisibility(INVISIBLE);
+        pBConsultas.setVisibility(View.VISIBLE);
+        yearM = nPAnio.getValue();
+        month = mSMes.getSelectedIndex();
+        switch(month){
+            case 0:  // Enero
+            case 2:  // Marzo
+            case 4:  // Mayo
+            case 6:  // Julio
+            case 7:  // Agosto
+            case 9:  // Octubre
+            case 11: // Diciembre
+                numDias=31;
+                break;
+            case 3:  // Abril
+            case 5:  // Junio
+            case 8:  // Septiembre
+            case 10: // Noviembre
+                numDias=30;
+                break;
+            case 1:  // Febrero
+                if ( ((yearM%100 == 0) && (yearM%400 == 0)) ||
+                        ((yearM%100 != 0) && (yearM%  4 == 0))   )
+                    numDias=29;
+                else
+                    numDias=28;
+            default:
+                Log.e("asd","a"+numDias);
+        }
+
+        int realMonth= month+1;
+        datosCompletosMes = new List[numDias];
+
+
+        for (int i=0; i<numDias;i++){
+            getDataDayOFFireBaseDay(yearM,realMonth,i);
+
+        }
+
+    }
+
+    private void getDataDayOFFireBaseDay(int yearM, int realMonth, final int i) {
+        final int dias = i+1;
+        DatabaseReference datosDia = MenuPrincipal.reference.child("datos").child("y"+yearM).child("m"+realMonth).child("d"+dias);
+        datosDia.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                GenericTypeIndicator<ArrayList<DatosCompletos>> t = new GenericTypeIndicator<ArrayList<DatosCompletos>>() {};
+                datosCompletosMes[i] = dataSnapshot.getValue(t);
+                if (i==numDias-1){
+                    try {
+                        showChartMonth();
+
+                    }catch (Exception e){
+
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
+    }
+
+    public void showChartMonth(){
+        List<Entry> entry1 = new ArrayList<>();
+        List<Entry> entry2 = new ArrayList<>();
+        lineChart2.clearAnimation();
+        lineChart2.clear();
+        dataSetsM.clear();
+
+        List<String> labelC = new ArrayList<>();
+        XAxis xAxis1;
+        labelC.add(" ");
+        for (int i=0; i<datosCompletosMes.length;i++){
+            entry1.add(new Entry(i+1,promedioDia(datosCompletosMes[i],0)));
+            entry2.add(new Entry(i+1,promedioDia(datosCompletosMes[i],1)));
+            labelC.add(" ");
+        }
+
+        if (entry1.size()!=0) {
+
+
+            LineDataSet lineDataSet = new LineDataSet(entry1, getResources().getString(R.string.dato1));
+            LineDataSet lineDataSet1 = new LineDataSet(entry2, getResources().getString(R.string.dato2));
+
+            lineDataSet.setColor(getResources().getColor(R.color.colorGraficaPunto1));
+            lineDataSet1.setColor(getResources().getColor(R.color.colorGraficaPunto2));
+
+            lineDataSet.setValueTextColor(getResources().getColor(R.color.colorGraficaLinea1));
+            lineDataSet1.setValueTextColor(getResources().getColor(R.color.colorGraficaLinea2));
+
+            lineDataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+            lineDataSet1.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+
+            lineDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
+            lineDataSet1.setAxisDependency(YAxis.AxisDependency.RIGHT);
+
+            lineDataSet.setDrawCircles(false);
+            lineDataSet1.setDrawCircles(false);
+            lineDataSet.setFormSize(10f);
+            lineDataSet1.setFormSize(10f);
+
+            dataSetsM.add(lineDataSet);
+            dataSetsM.add(lineDataSet1);
+            LineData data = new LineData(dataSetsM);
+            data.setDrawValues(false);
+            lineChart2.setData(data);
+            Description description = new Description();
+            description.setText(" ");
+            xAxis1 = lineChart2.getXAxis();
+            xAxis1.setLabelRotationAngle(-10f);
+            xAxis1.setPosition(XAxis.XAxisPosition.BOTTOM);
+            lineChart2.setDescription(description);
+            lineChart2.setDrawMarkers(true);
+            CustomMarkerView customMarkerView = new CustomMarkerView(getContext(), R.layout.item_custom_marker, labelC);
+            lineChart2.setMarker(customMarkerView);
+            lineChart2.setTouchEnabled(true);
+            lineChart2.setVisibility(View.VISIBLE);
+            lineChart2.invalidate();
+
+
+        }else {
+            Toast.makeText(getContext(), R.string.no_hay_datos, Toast.LENGTH_SHORT).show();
+        }
+        pBConsultas.setVisibility(View.INVISIBLE);
 
 
     }
@@ -491,7 +632,8 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
     }
 
-    public void showChartMonth(){
+    @Override
+    public void onItemSelected(MaterialSpinner view, int position, long id, Object item) {
 
     }
 
@@ -511,9 +653,8 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
             case R.id.btnConsulta3:
                 mode=3;
-                showChartMonth();
+                getDataMonth();
                 break;
         }
     }
-
 }

@@ -24,6 +24,13 @@ public class Constants {
     //Lista de los links de contáctanos
     public static final String [] LIST_LINKS_CONOCENOS={"http://www.sena.edu.co/es-co/Paginas/default.aspx","http://www.sena.edu.co/es-co/Paginas/default.aspx","https://ctpisenacauca.blogspot.com/","http://www.sena.edu.co/es-co/formacion/Paginas/tecnologia-innovacion.aspx"};
 
+    //Lista de consultas
+    public static final String [] LIST_QUERY={Splash.context.getResources().getString(R.string.irradiancia_humedad),
+            Splash.context.getResources().getString(R.string.irradiancia_corriente),
+            Splash.context.getResources().getString(R.string.irradiancia_voltaje),
+            Splash.context.getResources().getString(R.string.irradiancia_temperatura),
+            Splash.context.getResources().getString(R.string.humedad_temperatura)};
+
     //Lista de mese del año
     public static final String [] MESES={Splash.context.getString(R.string.enero),Splash.context.getString(R.string.febrero),Splash.context.getString(R.string.marzo),Splash.context.getString(R.string.abril),Splash.context.getString(R.string.mayo),
             Splash.context.getString(R.string.junio),Splash.context.getString(R.string.julio),Splash.context.getString(R.string.agosto),Splash.context.getString(R.string.septiembre),Splash.context.getString(R.string.octubre),Splash.context.getString(R.string.noviembre),Splash.context.getString(R.string.diciembre)};
