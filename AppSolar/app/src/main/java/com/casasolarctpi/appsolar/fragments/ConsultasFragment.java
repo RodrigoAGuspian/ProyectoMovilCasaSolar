@@ -150,7 +150,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                 yAxisMax1=1000;
                 yAxisMax2=50;
                 yAxisMin1=0;
-                yAxisMin2=-1;
+                yAxisMin2=0;
 
                 modo1=2;
                 modo2=1;
@@ -170,7 +170,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                 yAxisMax1=120;
                 yAxisMax2=50;
                 yAxisMin1=0;
-                yAxisMin2=-1;
+                yAxisMin2=0;
 
                 modo1=0;
                 modo2=1;
@@ -524,10 +524,16 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         barDataSet1.setColor(colorDato2);
         barDataSet.setBarShadowColor(colorDatoTexto1);
         barDataSet1.setBarShadowColor(colorDatoTexto2);
+
+        barDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
+        barDataSet1.setAxisDependency(YAxis.AxisDependency.RIGHT);
+
         List<IBarDataSet> dataBarSets = new ArrayList<>();
         dataBarSets.add(barDataSet);
         dataBarSets.add(barDataSet1);
         BarData data = new BarData(barDataSet,barDataSet1);
+        Description description = new Description();
+        description.setText(" ");
         data.setBarWidth(0.48f); // set custom bar width
         barChart1.setData(data);
         barChart1.groupBars(0, 0.04f, 0f);
@@ -546,11 +552,9 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         yAxisLeft.setAxisMaximum(yAxisMax1);
         yAxisLeft.setAxisMinimum(yAxisMin1);
         yAxisRight.setAxisMaximum(yAxisMax2);
-
-        if (yAxisMin2>=0){
-            yAxisRight.setAxisMinimum(yAxisMin2);
-        }
+        yAxisRight.setAxisMinimum(yAxisMin2);
         barChart1.setVisibility(View.VISIBLE);
+        barChart1.setDescription(description);
         barChart1.invalidate(); // refresh
 
 
@@ -637,7 +641,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         for (int i=0; i<datosCompletosMes.length;i++){
             entry1.add(new BarEntry(i+1,promedioDia(datosCompletosMes[i],modo1)));
             entry2.add(new BarEntry(i+1,promedioDia(datosCompletosMes[i],modo2)));
-            labelC.add(" ");
+            labelC.add(Integer.toString(i+1));
         }
 
         if (entry1.size()!=0) {
@@ -668,18 +672,15 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
             xAxis1.setCenterAxisLabels(true);
             xAxis1.setLabelRotationAngle(-10f);
             xAxis1.setPosition(XAxis.XAxisPosition.BOTTOM);
+            xAxis1.setValueFormatter(new IndexAxisValueFormatter(labelC));
 
             YAxis yAxisLeft = barChart2.getAxisLeft();
             YAxis yAxisRight = barChart2.getAxisRight();
             yAxisLeft.setAxisMaximum(yAxisMax1);
             yAxisLeft.setAxisMinimum(yAxisMin1);
             yAxisRight.setAxisMaximum(yAxisMax2);
-            if (yAxisMin2>=0){
-                yAxisRight.setAxisMinimum(yAxisMin2);
-            }else if (yAxisMin2==-1){
-                yAxisRight.setAxisMinimum(yAxisMin2);
-            }
-
+            yAxisRight.setAxisMinimum(yAxisMin2);
+            yAxisRight.setAxisMinimum(yAxisMin2);
 
             barChart2.setDescription(description);
             barChart2.groupBars(1, 0.04f, 0f);
@@ -698,13 +699,13 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
     private float promedioDia(List<DatosCompletos> datosFiltrado, int modo) {
         float acumulador=0;
-
         switch (modo){
             case 0:
                 try {
                     for (int i=0;i<datosFiltrado.size();i++){
                         try {
                             acumulador+=Float.parseFloat(datosFiltrado.get(i).getHumedad());
+
                         }catch (Exception ignore){
 
                         }
@@ -722,6 +723,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                     for (int i=0;i<datosFiltrado.size();i++){
                         try {
                             acumulador+=Float.parseFloat(datosFiltrado.get(i).getTemperatura());
+
                         }catch (Exception ignore){
 
                         }
@@ -733,7 +735,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
                 break;
 
-            case 3:
+            case 2:
 
                 try {
                     for (int i=0;i<datosFiltrado.size();i++){

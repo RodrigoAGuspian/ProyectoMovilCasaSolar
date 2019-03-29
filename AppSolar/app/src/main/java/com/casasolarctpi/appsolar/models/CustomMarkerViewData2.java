@@ -69,7 +69,7 @@ public class CustomMarkerViewData2 extends MarkerView {
         int tmp =getWidth();
         posX += getOffset().getX();
         // AVOID OFFSCREEN
-        posX=0;
+        posX=1;
         posY=0;
         canvas.translate(posX, posY);
         draw(canvas);

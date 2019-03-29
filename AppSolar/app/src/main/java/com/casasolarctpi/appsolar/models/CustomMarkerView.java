@@ -75,7 +75,7 @@ public class CustomMarkerView extends MarkerView {
 
         // AVOID OFFSCREEN
 
-        posX=0;
+        posX=1;
         posY=0;
 
         canvas.translate(posX, posY);

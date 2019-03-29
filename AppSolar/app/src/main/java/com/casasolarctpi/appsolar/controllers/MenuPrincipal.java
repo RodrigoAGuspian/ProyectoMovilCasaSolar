@@ -219,7 +219,7 @@ public class MenuPrincipal extends AppCompatActivity
         }
 
         listChildrenConocenos[0]= new ChildClass(Constants.CONOCENOS_LIST[0], R.drawable.ic_contacts);
-        listChildrenConocenos[1]= new ChildClass(Constants.CONOCENOS_LIST[0], R.drawable.ic_info);
+        listChildrenConocenos[1]= new ChildClass(Constants.CONOCENOS_LIST[1], R.drawable.ic_info);
 
         listChildrenConsultas = new ChildClass[Constants.LIST_QUERY.length];
 
