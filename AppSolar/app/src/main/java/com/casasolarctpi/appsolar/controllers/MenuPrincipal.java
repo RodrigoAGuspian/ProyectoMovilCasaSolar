@@ -18,16 +18,14 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
+import android.widget.TextView;
 
 import com.casasolarctpi.appsolar.R;
-import com.casasolarctpi.appsolar.fragments.AcercaDeFragment;
 import com.casasolarctpi.appsolar.fragments.ConsultasFragment;
 import com.casasolarctpi.appsolar.fragments.ContactanosFragment;
-import com.casasolarctpi.appsolar.fragments.HumedadFragment;
 import com.casasolarctpi.appsolar.fragments.IndexFragment;
-import com.casasolarctpi.appsolar.fragments.IrradianciaFragment;
 import com.casasolarctpi.appsolar.fragments.PerfilFragment;
-import com.casasolarctpi.appsolar.fragments.TemperaturaFragment;
+import com.casasolarctpi.appsolar.fragments.TiempoRealFragment;
 import com.casasolarctpi.appsolar.models.ChildClass;
 import com.casasolarctpi.appsolar.models.Constants;
 import com.casasolarctpi.appsolar.models.ExpandableListAdapter;
@@ -42,14 +40,14 @@ public class MenuPrincipal extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnClickListener {
 
     //Declaración de variables
-    private ExpandableListView expPagina, expConocenos, expConsultas;
-    private ExpandableListAdapter listAdapterExpandable, expaAdaperConsultas, expaAdapterConocenos;
+    private ExpandableListView expPagina, expConsultas;
+    private ExpandableListAdapter listAdapterExpandable, expaAdaperConsultas;
     private String[] listDataHeader;
-    private HashMap<String, ChildClass[]> listDataChild, listaDataConsultas, listDataConocenos;
+    private TextView txtTitle;
+    private HashMap<String, ChildClass[]> listDataChild, listaDataConsultas;
     private ChildClass [] listChildrenPaginas;
-    private ChildClass [] listChildrenConocenos;
     private ChildClass [] listChildrenConsultas;
-    public ConstraintLayout contentViewMenu, cLHome, cLHumedad, cLTemperatura, cLIrradiancia, cLPerfil, cLCerrarSesion;
+    public ConstraintLayout contentViewMenu, cLHome, cLHumedad, cLTemperatura, cLIrradiancia, cLContactanos, cLPerfil, cLCerrarSesion;
     private  DrawerLayout drawer;
     public static DatabaseReference reference;
     boolean bandera =true;
@@ -77,6 +75,7 @@ public class MenuPrincipal extends AppCompatActivity
         if (bandera){
             getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new IndexFragment()).commit();
             getSupportActionBar().setTitle(getResources().getString(R.string.inicio));
+            txtTitle.setText(getResources().getString(R.string.inicio));
             bandera=false;
         }
 
@@ -92,14 +91,15 @@ public class MenuPrincipal extends AppCompatActivity
     private void inizialite() {
         contentViewMenu= findViewById(R.id.contentViewMenu);
         //expListView = findViewById(R.id.expandable_list);
+        txtTitle = findViewById(R.id.txtTitle);
         drawer = findViewById(R.id.drawer_layout);
         expPagina = findViewById(R.id.expaPaginas);
-        expConocenos = findViewById(R.id.expaConocenos);
         expConsultas = findViewById(R.id.expaConsultas);
         cLHome = findViewById(R.id.cLHome);
         cLHumedad = findViewById(R.id.cLHumedad);
         cLTemperatura = findViewById(R.id.cLTemperatura);
         cLIrradiancia = findViewById(R.id.cLIrradiancia);
+        cLContactanos = findViewById(R.id.cLContactanos);
         cLPerfil = findViewById(R.id.cLPerfil);
         cLCerrarSesion = findViewById(R.id.cLCerrarSesion);
 
@@ -107,6 +107,7 @@ public class MenuPrincipal extends AppCompatActivity
         cLHumedad.setOnClickListener(this);
         cLTemperatura.setOnClickListener(this);
         cLIrradiancia.setOnClickListener(this);
+        cLContactanos.setOnClickListener(this);
         cLPerfil.setOnClickListener(this);
         cLCerrarSesion.setOnClickListener(this);
 
@@ -118,13 +119,7 @@ public class MenuPrincipal extends AppCompatActivity
             }
         });
 
-        expConocenos.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-            @Override
-            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-                setListViewHeight(parent,groupPosition);
-                return false;
-            }
-        });
+
 
         expConsultas.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
             @Override
@@ -209,17 +204,12 @@ public class MenuPrincipal extends AppCompatActivity
     public void inputListExpandable(){
         listDataHeader = Constants.GROUP_LIST;
         listDataChild = new HashMap<>();
-        listDataConocenos = new HashMap<>();
-
         listChildrenPaginas = new ChildClass[Constants.PAGES_LIST.length];
-        listChildrenConocenos = new ChildClass[Constants.CONOCENOS_LIST.length];
 
         for (int i=0;i<listChildrenPaginas.length;i++){
             listChildrenPaginas[i]= new ChildClass(Constants.PAGES_LIST[i],R.drawable.ic_link);
         }
 
-        listChildrenConocenos[0]= new ChildClass(Constants.CONOCENOS_LIST[0], R.drawable.ic_contacts);
-        listChildrenConocenos[1]= new ChildClass(Constants.CONOCENOS_LIST[1], R.drawable.ic_info);
 
         listChildrenConsultas = new ChildClass[Constants.LIST_QUERY.length];
 
@@ -231,7 +221,6 @@ public class MenuPrincipal extends AppCompatActivity
 
         listaDataConsultas = new HashMap<>();
         listaDataConsultas.put(getResources().getString(R.string.consultas),listChildrenConsultas);
-        listDataConocenos.put(getResources().getString(R.string.conocenos),listChildrenConocenos);
 
 
 
@@ -253,21 +242,7 @@ public class MenuPrincipal extends AppCompatActivity
             }
         });
 
-        expaAdapterConocenos = new ExpandableListAdapter(this, new String[]{getResources().getString(R.string.conocenos)},listDataConocenos);
 
-        expaAdapterConocenos.setOnChildClickListener(new ExpandableListAdapter.OnChildClickListener() {
-            @Override
-            public void childClick(int groupId, int childId) {
-                switch (childId){
-                    case 0:
-                        getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new ContactanosFragment()).commit();
-                        break;
-                    case 1:
-                        getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new AcercaDeFragment()).commit();
-                        break;
-                }
-            }
-        });
 
         expaAdaperConsultas = new ExpandableListAdapter(this,new  String[] {getResources().getString(R.string.consultas)},listaDataConsultas);
         expaAdaperConsultas.setOnChildClickListener(new ExpandableListAdapter.OnChildClickListener() {
@@ -277,7 +252,8 @@ public class MenuPrincipal extends AppCompatActivity
                 switch (childId){
                     case 0:
                         getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu, new ConsultasFragment()).commit();
-                        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.irradiancia_temperatura);
+                        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.irradiancia_humedad);
+                        txtTitle.setText(getResources().getString(R.string.irradiancia_humedad));
                         closeDrawer();
                         break;
 
@@ -292,12 +268,14 @@ public class MenuPrincipal extends AppCompatActivity
                     case 3:
                         getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu, new ConsultasFragment()).commit();
                         Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.irradiancia_temperatura);
+                        txtTitle.setText(getResources().getString(R.string.irradiancia_temperatura  ));
                         closeDrawer();
                         break;
 
                     case 4:
                         getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu, new ConsultasFragment()).commit();
                         Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.humedad_temperatura);
+                        txtTitle.setText(getResources().getString(R.string.humedad_temperatura));
                         closeDrawer();
                         break;
                 }
@@ -306,8 +284,6 @@ public class MenuPrincipal extends AppCompatActivity
 
         expConsultas.setAdapter(expaAdaperConsultas);
         expPagina.setAdapter(listAdapterExpandable);
-        expConocenos.setAdapter(expaAdapterConocenos);
-
 
         for (int i=0; i<listAdapterExpandable.getGroupCount(); i++){
             //expListView.expandGroup(i); // esta linea de código es para expandir los menús
@@ -333,30 +309,71 @@ public class MenuPrincipal extends AppCompatActivity
             case R.id.cLHome:
                 getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new IndexFragment()).commit();
                 Objects.requireNonNull(getSupportActionBar()).setTitle(getResources().getString(R.string.inicio));
+                txtTitle.setText(getResources().getString(R.string.inicio));
                 closeDrawer();
                 break;
 
             case R.id.cLHumedad:
-                getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new HumedadFragment()).commit();
+                TiempoRealFragment.modoGraficar=0;
+
+                getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new TiempoRealFragment()).commit();
                 Objects.requireNonNull(getSupportActionBar()).setTitle(getResources().getString(R.string.dato1));
+                txtTitle.setText(getResources().getString(R.string.dato1));
+                try{
+                    TiempoRealFragment.tiempoRealChart.clear();
+                    TiempoRealFragment.entry1.clear();
+                    TiempoRealFragment.tiempoRealChart.setVisibility(View.INVISIBLE);
+
+                }catch (Exception ignored){
+
+                }
                 closeDrawer();
                 break;
 
             case R.id.cLTemperatura:
-                getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new TemperaturaFragment()).commit();
+                TiempoRealFragment.modoGraficar=1;
+                getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new TiempoRealFragment()).commit();
                 Objects.requireNonNull(getSupportActionBar()).setTitle(getResources().getString(R.string.dato2));
+                txtTitle.setText(getResources().getString(R.string.dato2));
+                try{
+                    TiempoRealFragment.tiempoRealChart.clear();
+                    TiempoRealFragment.entry1.clear();
+                    TiempoRealFragment.tiempoRealChart.setVisibility(View.INVISIBLE);
+
+
+                }catch (Exception ignored) {
+
+                }
                 closeDrawer();
                 break;
 
             case R.id.cLIrradiancia:
-                getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new IrradianciaFragment()).commit();
+                TiempoRealFragment.modoGraficar=2;
+                getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new TiempoRealFragment()).commit();
                 Objects.requireNonNull(getSupportActionBar()).setTitle(getResources().getString(R.string.dato3));
+                txtTitle.setText(getResources().getString(R.string.dato3));
+                try{
+                    TiempoRealFragment.tiempoRealChart.clear();
+                    TiempoRealFragment.entry1.clear();
+                    TiempoRealFragment.tiempoRealChart.setVisibility(View.INVISIBLE);
+
+                }catch (Exception ignored){
+
+                }
+                closeDrawer();
+                break;
+
+            case R.id.cLContactanos:
+                getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new ContactanosFragment()).commit();
+                Objects.requireNonNull(getSupportActionBar()).setTitle(getResources().getString(R.string.contactanos));
+                txtTitle.setText(getResources().getString(R.string.contactanos));
                 closeDrawer();
                 break;
 
             case R.id.cLPerfil:
                 getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new PerfilFragment()).commit();
                 Objects.requireNonNull(getSupportActionBar()).setTitle(getResources().getString(R.string.perfil));
+                txtTitle.setText(getResources().getString(R.string.perfil));
                 closeDrawer();
                 break;
 

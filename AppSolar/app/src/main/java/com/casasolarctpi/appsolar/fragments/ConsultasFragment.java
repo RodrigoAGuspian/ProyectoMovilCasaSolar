@@ -5,12 +5,8 @@ import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.app.Dialog;
-import android.app.DownloadManager;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,17 +19,14 @@ import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.ProgressBar;
 import android.widget.TabHost;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.casasolarctpi.appsolar.R;
 import com.casasolarctpi.appsolar.controllers.MenuPrincipal;
 import com.casasolarctpi.appsolar.models.Constants;
-import com.casasolarctpi.appsolar.models.CustomMarkerView;
-import com.casasolarctpi.appsolar.models.CustomMarkerViewData1;
 import com.casasolarctpi.appsolar.models.CustomMarkerViewData2;
-import com.casasolarctpi.appsolar.models.DatoSemana;
 import com.casasolarctpi.appsolar.models.DatosCompletos;
-import com.casasolarctpi.appsolar.models.DatosTH;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
@@ -52,7 +45,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.GenericTypeIndicator;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.jaredrummler.materialspinner.MaterialSpinner;
 
@@ -62,10 +54,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
 
-import static com.jaredrummler.materialspinner.MaterialSpinner.*;
+import static android.view.View.VISIBLE;
+import static com.jaredrummler.materialspinner.MaterialSpinner.INVISIBLE;
+import static com.jaredrummler.materialspinner.MaterialSpinner.OnItemSelectedListener;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -92,6 +85,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
     List<BarEntry> entriesBarWeek1 = new ArrayList<>();
     int month, yearM, numDias;
     public static int modoGraficar=0;
+    TextView txtTituloGrafica1, txtTituloGrafica2, txtTituloGrafica3;
 
     String datoInfo1;
     String datoInfo2;
@@ -135,6 +129,10 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                 modo1=2;
                 modo2=0;
 
+                txtTituloGrafica1.setText(R.string.titulo_irradiancia_humedad);
+                txtTituloGrafica2.setText(R.string.titulo_irradiancia_humedad);
+                txtTituloGrafica3.setText(R.string.titulo_irradiancia_humedad);
+
                 break;
 
             case 3:
@@ -155,8 +153,11 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                 modo1=2;
                 modo2=1;
 
-                break;
+                txtTituloGrafica1.setText(R.string.titulo_irradiancia_temperatura);
+                txtTituloGrafica2.setText(R.string.titulo_irradiancia_humedad);
+                txtTituloGrafica3.setText(R.string.titulo_irradiancia_humedad);
 
+                break;
             case 4:
                 datoInfo1 = getResources().getString(R.string.dato1);
                 datoInfo2 = getResources().getString(R.string.dato2);
@@ -174,6 +175,10 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
                 modo1=0;
                 modo2=1;
+
+                txtTituloGrafica1.setText(R.string.titulo_irradiancia_humedad);
+                txtTituloGrafica2.setText(R.string.titulo_irradiancia_humedad);
+                txtTituloGrafica3.setText(R.string.titulo_humedad_temperatura);
 
                 break;
 
@@ -215,9 +220,9 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         barChart1 = view.findViewById(R.id.barChart1);
         barChart2 = view.findViewById(R.id.barChart2);
 
-        lineChart1.setVisibility(View.INVISIBLE);
-        barChart1.setVisibility(View.INVISIBLE);
-        barChart2.setVisibility(View.INVISIBLE);
+        lineChart1.setVisibility(INVISIBLE);
+        barChart1.setVisibility(INVISIBLE);
+        barChart2.setVisibility(INVISIBLE);
 
         txtDate1 = view.findViewById(R.id.txtConsulta1);
         txtDate2 = view.findViewById(R.id.txtConsulta2);
@@ -225,7 +230,15 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         mSMes = view.findViewById(R.id.spinnerMes);
         nPAnio = view.findViewById(R.id.nPAnio);
 
+        txtTituloGrafica1 = view.findViewById(R.id.txtTituloChart);
+        txtTituloGrafica2 = view.findViewById(R.id.txtTituloChart1);
+        txtTituloGrafica3 = view.findViewById(R.id.txtTituloChart2);
+
         pBConsultas = view.findViewById(R.id.pBConsultas);
+
+        txtTituloGrafica1.setVisibility(INVISIBLE);
+        txtTituloGrafica2.setVisibility(INVISIBLE);
+        txtTituloGrafica3.setVisibility(INVISIBLE);
 
 
     }
@@ -278,7 +291,8 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
         switch (mode) {
             case 1:
-                pBConsultas.setVisibility(View.VISIBLE);
+                txtTituloGrafica1.setVisibility(INVISIBLE);
+                pBConsultas.setVisibility(VISIBLE);
                 int realMonth = month + 1;
                 fechaATexto = dayOfMonth + "-" + realMonth + "-" + year;
                 Calendar calendar = new GregorianCalendar(year,month,dayOfMonth);
@@ -298,14 +312,24 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         dataSets.clear();
         DatosCompletos datosCompletos;
         labelsChart = new ArrayList<>();
+
+        txtTituloGrafica1.setVisibility(VISIBLE);
+        float dato1;
         if (datosCompletosList!=null) {
             for (int i = 0; i < datosCompletosList.size(); i++) {
                 datosCompletos = datosCompletosList.get(i);
                 labelsChart.add(datosCompletos.getHora());
                 try {
+                    dato1=Float.parseFloat(datosCompletos.getIrradiancia());
+
+                }catch (Exception ignore){
+                    dato1=0;
+                }
+
+                try {
                     switch (modoGraficar){
                         case 0:
-                            entries.add(new Entry(i, Float.parseFloat(datosCompletos.getIrradiancia())));
+                            entries.add(new Entry(i,dato1));
                             entries1.add(new Entry(i, Float.parseFloat(datosCompletos.getHumedad())));
                             break;
                         case 1:
@@ -320,7 +344,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
                         case 3:
 
-                            entries.add(new Entry(i, Float.parseFloat(datosCompletos.getIrradiancia())));
+                            entries.add(new Entry(i, dato1));
                             entries1.add(new Entry(i, Float.parseFloat(datosCompletos.getTemperatura())));
                             break;
                         case 4:
@@ -379,20 +403,24 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
             lineChart1.setDescription(description);
             lineChart1.setDrawMarkers(true);
             CustomMarkerViewData2 customMarkerView = new CustomMarkerViewData2(getContext(),R.layout.item_custom_marker,labelsChart,datoInfo1,datoInfo2,colorDato1,colorDato2);
+            customMarkerView.setSizeList(labelsChart.size());
             lineChart1.setMarker(customMarkerView);
             lineChart1.setTouchEnabled(true);
-            lineChart1.setVisibility(View.VISIBLE);
+            lineChart1.setVisibility(VISIBLE);
+            btnConsulta1.setEnabled(true);
             lineChart1.invalidate();
 
 
         }else {
             Toast.makeText(getContext(), R.string.no_hay_datos, Toast.LENGTH_SHORT).show();
         }
+        btnConsulta1.setEnabled(true);
         pBConsultas.setVisibility(View.INVISIBLE);
 
     }
 
     public void showDatePickerWeekDialog(){
+
         Toast.makeText(getContext(), R.string.mensaje_week, Toast.LENGTH_SHORT).show();
         dialog = new Dialog(getContext());
         dialog.setContentView(R.layout.item_select_week);
@@ -405,8 +433,9 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
             @SuppressLint("SetTextI18n")
             @Override
             public void onClick(View v) {
+                pBConsultas.setVisibility(VISIBLE);
                 int mes = datePicker.getMonth()+1;
-
+                txtTituloGrafica2.setVisibility(INVISIBLE);
                 String fecha1 = datePicker.getDayOfMonth()+"-"+mes+"-"+datePicker.getYear();
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
@@ -511,7 +540,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         entriesBarWeek1 = new ArrayList<>();
         barChart1.clearAnimation();
         barChart1.clear();
-
+        txtTituloGrafica2.setVisibility(VISIBLE);
 
         for (int i=0; i<7;i++){
             entriesBarWeek.add(new BarEntry(i,promedioDia(datosCompletosSemana[i],modo1)));
@@ -553,16 +582,18 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         yAxisLeft.setAxisMinimum(yAxisMin1);
         yAxisRight.setAxisMaximum(yAxisMax2);
         yAxisRight.setAxisMinimum(yAxisMin2);
-        barChart1.setVisibility(View.VISIBLE);
+        barChart1.setVisibility(VISIBLE);
         barChart1.setDescription(description);
+        pBConsultas.setVisibility(INVISIBLE);
+        btnConsulta2.setEnabled(true);
         barChart1.invalidate(); // refresh
 
 
     }
 
     private void getDataMonth() {
+        pBConsultas.setVisibility(VISIBLE);
         barChart2.setVisibility(INVISIBLE);
-        pBConsultas.setVisibility(View.VISIBLE);
         yearM = nPAnio.getValue();
         month = mSMes.getSelectedIndex();
         switch(month){
@@ -609,7 +640,11 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 GenericTypeIndicator<ArrayList<DatosCompletos>> t = new GenericTypeIndicator<ArrayList<DatosCompletos>>() {};
-                datosCompletosMes[i] = dataSnapshot.getValue(t);
+                try {
+                    datosCompletosMes[i] = dataSnapshot.getValue(t);
+                }catch (Exception ignored){
+
+                }
                 if (i==numDias-1){
                     try {
                         showChartMonth();
@@ -622,7 +657,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                Toast.makeText(getContext(), "No hay conexión a internet", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -634,7 +669,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         List<BarEntry> entry2 = new ArrayList<>();
         barChart2.clearAnimation();
         barChart2.clear();
-
+        txtTituloGrafica3.setVisibility(VISIBLE);
         List<String> labelC = new ArrayList<>();
         XAxis xAxis1;
         labelC.add(" ");
@@ -673,6 +708,8 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
             xAxis1.setLabelRotationAngle(-10f);
             xAxis1.setPosition(XAxis.XAxisPosition.BOTTOM);
             xAxis1.setValueFormatter(new IndexAxisValueFormatter(labelC));
+            xAxis1.setAxisMaximum(datosCompletosMes.length);
+            xAxis1.setLabelCount(2,true);
 
             YAxis yAxisLeft = barChart2.getAxisLeft();
             YAxis yAxisRight = barChart2.getAxisRight();
@@ -685,13 +722,14 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
             barChart2.setDescription(description);
             barChart2.groupBars(1, 0.04f, 0f);
             barChart2.setTouchEnabled(true);
-            barChart2.setVisibility(View.VISIBLE);
+            barChart2.setVisibility(VISIBLE);
             barChart2.invalidate();
 
 
         }else {
             Toast.makeText(getContext(), R.string.no_hay_datos, Toast.LENGTH_SHORT).show();
         }
+        btnConsulta3.setEnabled(true);
         pBConsultas.setVisibility(View.INVISIBLE);
 
 
@@ -774,17 +812,21 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
             case R.id.btnConsulta1:
                 mode=1;
                 showDatePickerDialog();
+                btnConsulta1.setEnabled(false);
                 break;
 
             case R.id.btnConsulta2:
                 mode=2;
                 showDatePickerWeekDialog();
+                btnConsulta2.setEnabled(false);
                 break;
 
 
             case R.id.btnConsulta3:
+                txtTituloGrafica3.setVisibility(INVISIBLE);
                 mode=3;
                 getDataMonth();
+                btnConsulta3.setEnabled(false);
                 break;
         }
     }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AppSolar</string>
+    <string name="app_name">ProSolar-CTPI 1.0</string>
     <string name="title_activity_menu_principal">MenuPrincipal</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -8,7 +8,7 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
     <string name="iniciar_sesion">Iniciar Sesión</string>
-    <string name="ingrese_usuario">Ingrese su nombre de usuario</string>
+    <string name="ingrese_usuario">Ingrese su correo electrónico</string>
     <string name="ingrese_contrasena">Ingrese su contraseña</string>
 
     <!-- TODO: Remove or change this placeholder text -->
@@ -34,6 +34,10 @@
     <string name="dato1">Humedad (%H)</string>
     <string name="dato2">Temperatura (°C)</string>
     <string name="dato3">Irradiancia (W/m²)</string>
+    <string name="titulo_dato1">Humedad (%H) vs Tiempo</string>
+    <string name="titulo_dato2">Temperatura (°C) vs Tiempo</string>
+    <string name="titulo_dato3">Irradiancia (W/m²) vs Tiempo</string>
+
     <string name="innovaTec">InnovaTec</string>
     <string name="mensaje_week">Por favor seleccione un día (esta selección tomará toda la semana de dicho día)</string>
     <string name="a">a</string>
@@ -68,10 +72,27 @@
     <string name="irradiancia_corriente">Irradiancia y Corriente</string>
     <string name="irradiancia_voltaje">Irradiancia y Voltaje</string>
     <string name="irradiancia_temperatura">Irradiancia y Temperatura</string>
-    <string name="humedad_temperatura">Humedad y temperatura</string>
+    <string name="humedad_temperatura">Humedad y Temperatura</string>
     <string name="seleccione_dia">Seleccione dia</string>
     <string name="seleccione_dia_semana">Seleccione el dia de la semana</string>
     <string name="graficar">Graficar</string>
+    <string name="mensaje">Contacto: romontano@misena.edu.co</string>
+
+    <string name="titulo_irradiancia_humedad">Irradiancia(W/m²), Humedad(%H) vs Tiempo </string>
+    <string name="titulo_irradiancia_corriente">Irradiancia(W/m²), Corriente vs Tiempo </string>
+    <string name="titulo_irradiancia_voltaje">Irradiancia(W/m²), Voltaje vs Tiempo </string>
+    <string name="titulo_irradiancia_temperatura">Irradiancia(W/m²), Temperatura(°C) vs Tiempo </string>
+    <string name="titulo_humedad_temperatura">Humedad(%H), Temperatura (°C) vs Tiempo </string>
+    <string name="mensaje_contactanos">Grupo de investigación INNOVATEC-CTPI\nCentro de teleinformática y producción Industrial del SENA regional Cauca\nLínea de investigación en energías renovables y eficiencia energética\n\nInvestigador Líder: Rodrigo Montaño F.\n\nContacto 1: romontano@misena.edu.co\n\nContacto 2: solarctpi@gmail.com
+        \n\nSemillero de investigación en energías renovables y eficiencia energética SEINEREE\n\nUbicación: Popayán-Cauca, Casa Solar</string>
+    <string name="link_googlemaps">https://goo.gl/maps/oj9YJjY5JZN2</string>
+    <string name="crear_cuenta">Crear Cuenta</string>
+    <string name="este_valor_requerido">Este campo es requerido.</string>
+    <string name="el_usuario_no_registrado">El usuario no está registrado</string>
+    <string name="registro_usuario">Registro de Usuario</string>
+    <string name="registrar">Registrar</string>
+    <string name="ingrese_de_nuevo_contrasena">Ingrese de nuevo su contraseña</string>
+    <string name="ayuda">Ayuda</string>
 
 
 </resources>

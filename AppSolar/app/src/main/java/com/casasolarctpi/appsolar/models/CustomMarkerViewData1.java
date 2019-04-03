@@ -2,6 +2,7 @@ package com.casasolarctpi.appsolar.models;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.casasolarctpi.appsolar.R;
@@ -17,6 +18,18 @@ public class CustomMarkerViewData1 extends MarkerView {
     private int colorDelDato = 0;
     private String tipoDelDato = "";
     private List<String> labelsChart;
+
+    private MPPointF mOffset;
+    private float sizeList;
+    private float getX1;
+
+    public float getSizeList() {
+        return sizeList;
+    }
+
+    public void setSizeList(float sizeList) {
+        this.sizeList = sizeList;
+    }
 
     public void setColorDelDato(int colorDelDato) {
         this.colorDelDato = colorDelDato;
@@ -43,6 +56,7 @@ public class CustomMarkerViewData1 extends MarkerView {
     @Override
     public void refreshContent(Entry e, Highlight highlight) {
         super.refreshContent(e, highlight);
+        getX1=e.getX();
         txtCustomMarker1.setText(getResources().getString(R.string.hora)+": "+ labelsChart.get((int) e.getX()));
         txtCustomMarker2.setText(tipoDelDato+": " + e.getY());
         txtCustomMarker2.setTextColor(colorDelDato);
@@ -50,22 +64,14 @@ public class CustomMarkerViewData1 extends MarkerView {
     }
 
     @Override
-    public MPPointF getOffsetForDrawingAtPoint(float posX, float posY) {
-        return super.getOffsetForDrawingAtPoint(posX, posY);
-    }
-
-    @Override
-    public void draw(Canvas canvas, float posX, float posY) {
-        int tmp =getWidth();
-        posX += getOffset().getX();
-        // AVOID OFFSCREEN
-        posX=1;
-        posY=0;
-        canvas.translate(posX, posY);
-        draw(canvas);
-        canvas.translate(-posX, -posY);
-
-        super.draw(canvas, posX, posY);
+    public MPPointF getOffset() {
+        mOffset = new MPPointF((float) -(getWidth() / 2.2), -getHeight());
+        float resta = getSizeList()-getX1;
+        float tmp1 = (resta*100)/getSizeList();
+        if (tmp1<12) {
+            mOffset = new MPPointF((float) -(getWidth() / 1.3), -getHeight());
+        }
+        return mOffset;
     }
 
 }

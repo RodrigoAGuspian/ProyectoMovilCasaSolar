@@ -14,6 +14,8 @@ import android.widget.ImageView;
 
 import com.casasolarctpi.appsolar.R;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -21,6 +23,7 @@ import java.util.TimerTask;
 public class Splash extends AppCompatActivity {
     ImageView imageView;
     public static Context context;
+    private FirebaseAuth mAuth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,6 +32,7 @@ public class Splash extends AppCompatActivity {
         context = this;
         FirebaseApp.initializeApp(this);
         imageView = findViewById(R.id.imgSplash);
+        inizialiteFirebase();
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
@@ -65,9 +69,9 @@ public class Splash extends AppCompatActivity {
                 public void onAnimationEnd(Animator animation) {
                     imageView.setVisibility(View.INVISIBLE);
                     super.onAnimationEnd(animation);
-                    Intent intent = new Intent(Splash.this,LoginActivity.class);
-                    startActivity(intent);
-                    finish();
+
+                    FirebaseUser currentUser = mAuth.getCurrentUser();
+                    updateUI(currentUser);
                 }
             });
 
@@ -77,9 +81,7 @@ public class Splash extends AppCompatActivity {
             TimerTask timerTask = new TimerTask() {
                 @Override
                 public void run() {
-                    Intent intent = new Intent(Splash.this,LoginActivity.class);
-                    startActivity(intent);
-                    finish();
+
                 }
             };
             new Timer().schedule(timerTask,2000);
@@ -87,5 +89,32 @@ public class Splash extends AppCompatActivity {
 
 
     }
+
+    private void inizialiteFirebase() {
+        mAuth = FirebaseAuth.getInstance();
+
+    }
+
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        updateUI(currentUser);
+    }
+
+
+    private void updateUI(FirebaseUser user) {
+        if (user != null) {
+            Intent intent = new Intent(Splash.this,MenuPrincipal.class);
+            startActivity(intent);
+            finish();
+
+        } else {
+            Intent intent = new Intent(Splash.this,LoginActivity.class);
+            startActivity(intent);
+            finish();
+        }
+    }
+
 
 }
