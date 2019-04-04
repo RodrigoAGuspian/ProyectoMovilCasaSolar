@@ -194,7 +194,6 @@
                         app:layout_constraintEnd_toStartOf="@+id/nPAnio"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:ms_background_color="@color/cardview_light_background"
                         app:ms_text_color="@color/colorMenu" />
 
 

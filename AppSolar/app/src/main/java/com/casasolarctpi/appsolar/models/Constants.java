@@ -42,6 +42,10 @@ public class Constants {
     //Días de la semana
     public static final String [] DIAS_DE_LA_SEMANA = {Splash.context.getString(R.string.domingo),Splash.context.getString(R.string.lunes),Splash.context.getString(R.string.martes),Splash.context.getString(R.string.miercoles), Splash.context.getString(R.string.jueves),Splash.context.getString(R.string.viernes),Splash.context.getString(R.string.sabado)};
 
+    //Lista de tipos de uso
+    public static final String [] LIST_TIPO_DE_USO = {Splash.context.getString(R.string.academico),Splash.context.getString(R.string.empresarial),Splash.context.getString(R.string.comercial),Splash.context.getString(R.string.otro)};
+
+
 
 
 }

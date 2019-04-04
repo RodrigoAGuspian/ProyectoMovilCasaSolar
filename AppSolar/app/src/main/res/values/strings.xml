@@ -93,6 +93,15 @@
     <string name="registrar">Registrar</string>
     <string name="ingrese_de_nuevo_contrasena">Ingrese de nuevo su contraseña</string>
     <string name="ayuda">Ayuda</string>
+    <string name="institucion">Institución</string>
+    <string name="pais">País</string>
+    <string name="departamento">Departamento</string>
+    <string name="ciudad">Ciudad</string>
+    <string name="tipo_uso">Tipo de uso</string>
+    <string name="academico">Académido</string>
+    <string name="empresarial">Empresarial</string>
+    <string name="comercial">Comercial</string>
+    <string name="otro">Otro</string>
 
 
 </resources>
