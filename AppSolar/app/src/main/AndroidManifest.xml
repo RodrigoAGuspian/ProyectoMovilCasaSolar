@@ -11,7 +11,7 @@
         android:roundIcon="@drawable/icon_innovatec"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".controllers.RegistroActivity"></activity>
+        <activity android:name=".controllers.LoginActivity"></activity>
         <activity
             android:name=".controllers.Splash"
             android:configChanges="screenSize|orientation|keyboardHidden">
@@ -25,8 +25,9 @@
             android:name=".controllers.MenuPrincipal"
             android:configChanges="screenSize|orientation|keyboardHidden"
             android:label="@string/title_activity_menu_principal"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".controllers.LoginActivity" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="landscape"/>
+        <activity android:name=".controllers.RegistroActivity" />
     </application>
 
 </manifest>

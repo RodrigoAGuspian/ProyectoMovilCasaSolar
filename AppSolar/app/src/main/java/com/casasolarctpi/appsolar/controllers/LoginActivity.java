@@ -11,7 +11,6 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import com.casasolarctpi.appsolar.R;
 import com.casasolarctpi.appsolar.models.Constants;
 import com.google.android.gms.tasks.OnCompleteListener;
