@@ -47,6 +47,7 @@ public class LoginActivity extends AppCompatActivity {
         txtContrasena = findViewById(R.id.txtContrasena);
         findViewById(R.id.pbLogin).setVisibility(View.INVISIBLE);
     }
+    
 
     private void inizialiteFirebase() {
         mAuth = FirebaseAuth.getInstance();
