@@ -2,6 +2,7 @@ package com.casasolarctpi.appsolar.models;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.casasolarctpi.appsolar.R;
@@ -19,8 +20,18 @@ public class CustomMarkerViewData2 extends MarkerView {
     private String dato1, dato2;
     private int color1, color2;
 
+    private MPPointF mOffset;
+    private float sizeList;
+    private float getX1;
 
 
+    public float getSizeList() {
+        return sizeList;
+    }
+
+    public void setSizeList(float sizeList) {
+        this.sizeList = sizeList;
+    }
 
     /**
      * Constructor. Sets up the MarkerView with a custom layout resource.
@@ -43,7 +54,7 @@ public class CustomMarkerViewData2 extends MarkerView {
     @Override
     public void refreshContent(Entry e, Highlight highlight) {
         super.refreshContent(e, highlight);
-
+        getX1=e.getX();
         switch (highlight.getDataSetIndex() ) {
             case 0:
                 txtCustomMarker1.setText(getResources().getString(R.string.hora) + ": " + labelsChart.get((int) e.getX()));
@@ -60,22 +71,14 @@ public class CustomMarkerViewData2 extends MarkerView {
     }
 
     @Override
-    public MPPointF getOffsetForDrawingAtPoint(float posX, float posY) {
-        return super.getOffsetForDrawingAtPoint(posX, posY);
+    public MPPointF getOffset() {
+        mOffset = new MPPointF((float) -(getWidth() / 2.2), -getHeight());
+        float resta = getSizeList()-getX1;
+        float tmp1 = (resta*100)/getSizeList();
+        Log.e("tmp",tmp1 + ";"+resta+";"+getSizeList()+";"+getX1);
+        if (tmp1<12) {
+            mOffset = new MPPointF((float) -(getWidth() / 1.3), -getHeight());
+        }
+        return mOffset;
     }
-
-    @Override
-    public void draw(Canvas canvas, float posX, float posY) {
-        int tmp =getWidth();
-        posX += getOffset().getX();
-        // AVOID OFFSCREEN
-        posX=1;
-        posY=0;
-        canvas.translate(posX, posY);
-        draw(canvas);
-        canvas.translate(-posX, -posY);
-
-        super.draw(canvas, posX, posY);
-    }
-
 }

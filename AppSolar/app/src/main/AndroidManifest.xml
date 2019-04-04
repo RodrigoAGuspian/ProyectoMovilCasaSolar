@@ -23,10 +23,13 @@
             android:name=".controllers.MenuPrincipal"
             android:configChanges="screenSize|orientation"
             android:label="@string/title_activity_menu_principal"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="landscape"/>
         <activity
             android:name=".controllers.LoginActivity"
-            android:configChanges="screenSize|orientation" />
+            android:configChanges="screenSize|orientation|keyboardHidden" />
+        <activity android:name=".controllers.RegistroActivity"
+            android:configChanges="screenSize|orientation|keyboardHidden"/>
 
     </application>
 

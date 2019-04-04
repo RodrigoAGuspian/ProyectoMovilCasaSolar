@@ -9,11 +9,12 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.Window;
-import android.view.animation.Animation;
 import android.widget.ImageView;
 
 import com.casasolarctpi.appsolar.R;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -21,6 +22,9 @@ import java.util.TimerTask;
 public class Splash extends AppCompatActivity {
     ImageView imageView;
     public static Context context;
+    private FirebaseAuth mAuth;
+    boolean bandera = true;
+    int valor =0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,13 +33,33 @@ public class Splash extends AppCompatActivity {
         context = this;
         FirebaseApp.initializeApp(this);
         imageView = findViewById(R.id.imgSplash);
-        TimerTask timerTask = new TimerTask() {
+        imageView.setVisibility(View.INVISIBLE);
+        inizialiteFirebase();
+        bandera= true;
+        valor=0;
+        new Thread(new Runnable() {
             @Override
             public void run() {
-                animationSplash();
+                while (bandera){
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            valor++;
+                            if (valor==2){
+                                animationSplash();
+                                bandera=false;
+                            }
+
+                        }
+                    });
+                }
             }
-        };
-        new Timer().schedule(timerTask,200);
+        }).start();
 
 
     }
@@ -48,6 +72,12 @@ public class Splash extends AppCompatActivity {
             animator1.setDuration(800);
             animator.addListener(new AnimatorListenerAdapter() {
                 @Override
+                public void onAnimationStart(Animator animation) {
+                    super.onAnimationStart(animation);
+                    imageView.setVisibility(View.VISIBLE);
+                }
+
+                @Override
                 public void onAnimationEnd(Animator animation) {
                     super.onAnimationEnd(animation);
                     animator1.start();
@@ -57,7 +87,6 @@ public class Splash extends AppCompatActivity {
             animator1.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationStart(Animator animation) {
-
                     super.onAnimationStart(animation);
                 }
 
@@ -65,9 +94,9 @@ public class Splash extends AppCompatActivity {
                 public void onAnimationEnd(Animator animation) {
                     imageView.setVisibility(View.INVISIBLE);
                     super.onAnimationEnd(animation);
-                    Intent intent = new Intent(Splash.this,LoginActivity.class);
-                    startActivity(intent);
-                    finish();
+
+                    FirebaseUser currentUser = mAuth.getCurrentUser();
+                    updateUI(currentUser);
                 }
             });
 
@@ -77,15 +106,39 @@ public class Splash extends AppCompatActivity {
             TimerTask timerTask = new TimerTask() {
                 @Override
                 public void run() {
-                    Intent intent = new Intent(Splash.this,LoginActivity.class);
-                    startActivity(intent);
-                    finish();
+                    imageView.setVisibility(View.VISIBLE);
+                    FirebaseUser currentUser = mAuth.getCurrentUser();
+                    updateUI(currentUser);
                 }
             };
-            new Timer().schedule(timerTask,2000);
+            new Timer().schedule(timerTask,1000);
         }
 
 
     }
+
+    private void inizialiteFirebase() {
+        mAuth = FirebaseAuth.getInstance();
+
+    }
+
+    public void onStart() {
+        super.onStart();
+    }
+
+
+    private void updateUI(FirebaseUser user) {
+        if (user != null) {
+            Intent intent = new Intent(Splash.this,MenuPrincipal.class);
+            startActivity(intent);
+            finish();
+
+        } else {
+            Intent intent = new Intent(Splash.this,LoginActivity.class);
+            startActivity(intent);
+            finish();
+        }
+    }
+
 
 }
