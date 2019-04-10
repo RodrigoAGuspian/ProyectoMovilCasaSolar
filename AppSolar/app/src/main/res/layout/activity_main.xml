@@ -13,7 +13,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="32dp"
-        android:textColorHint="@color/colorAccent1"
+        android:textColorHint="@color/colorPrimary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView">
@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:hint="@string/ingrese_usuario"
             android:inputType="textEmailAddress"
-            android:textColorHint="@color/colorPrimaryDark" />
+            android:textColorHint="@color/colorPrimary" />
     </android.support.design.widget.TextInputLayout>
 
     <ImageView
@@ -46,7 +46,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
         android:layout_marginEnd="32dp"
-        android:textColorHint="@color/colorAccent1"
+        android:textColorHint="@color/colorPrimary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout">
@@ -57,7 +57,7 @@
             android:layout_height="wrap_content"
             android:hint="@string/ingrese_contrasena"
             android:inputType="textPassword"
-            android:textColorHint="@color/colorPrimaryDark" />
+            android:textColorHint="@color/colorPrimary" />
     </android.support.design.widget.TextInputLayout>
 
     <Button

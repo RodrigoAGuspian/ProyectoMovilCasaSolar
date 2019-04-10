@@ -13,15 +13,17 @@ import com.github.mikephil.charting.utils.MPPointF;
 
 import java.util.List;
 
-public class CustomMarkerViewData1 extends MarkerView {
+public class CustomMarkerViewDataMonth extends MarkerView {
     private TextView txtCustomMarker1, txtCustomMarker2;
-    private int colorDelDato = 0;
-    private String tipoDelDato = "";
     private List<String> labelsChart;
+
+    private String dato1, dato2;
+    private int color1, color2;
 
     private MPPointF mOffset;
     private float sizeList;
     private float getX1;
+
 
     public float getSizeList() {
         return sizeList;
@@ -31,14 +33,6 @@ public class CustomMarkerViewData1 extends MarkerView {
         this.sizeList = sizeList;
     }
 
-    public void setColorDelDato(int colorDelDato) {
-        this.colorDelDato = colorDelDato;
-    }
-
-    public void setTipoDelDato(String tipoDelDato) {
-        this.tipoDelDato = tipoDelDato;
-    }
-
     /**
      * Constructor. Sets up the MarkerView with a custom layout resource.
      *
@@ -46,9 +40,13 @@ public class CustomMarkerViewData1 extends MarkerView {
      * @param layoutResource the layout resource to use for the MarkerView
      */
 
-    public CustomMarkerViewData1(Context context, int layoutResource, List<String> labelsChart) {
+    public CustomMarkerViewDataMonth(Context context, int layoutResource, List<String> labelsChart, String dato1, String dato2, int color1, int color2) {
         super(context, layoutResource);
         this.labelsChart = labelsChart;
+        this.dato1 = dato1;
+        this.dato2 = dato2;
+        this.color1 = color1;
+        this.color2 = color2;
         txtCustomMarker1 = findViewById(R.id.txtCustomMarker1);
         txtCustomMarker2 = findViewById(R.id.txtCustomMarker2);
     }
@@ -57,21 +55,29 @@ public class CustomMarkerViewData1 extends MarkerView {
     public void refreshContent(Entry e, Highlight highlight) {
         super.refreshContent(e, highlight);
         getX1=e.getX();
-        txtCustomMarker1.setText(getResources().getString(R.string.hora)+": "+ labelsChart.get((int) e.getX()));
-        txtCustomMarker2.setText(tipoDelDato+": " + e.getY());
-        txtCustomMarker2.setTextColor(colorDelDato);
+        switch (highlight.getDataSetIndex() ) {
+            case 0:
+                txtCustomMarker1.setText(getResources().getString(R.string.dia) + ": " + labelsChart.get((int) e.getX()));
+                txtCustomMarker2.setText(dato1 + ": " + e.getY());
+                break;
+            case 1:
+                txtCustomMarker1.setText(getResources().getString(R.string.dia) + ": " + labelsChart.get((int) e.getX()));
+                txtCustomMarker2.setText(dato2 + ": " + e.getY());
+                break;
+        }
 
     }
 
     @Override
-    public MPPointF getOffset() {
-        mOffset = new MPPointF((float) -(getWidth() / 2.2), -getHeight());
-        float resta = getSizeList()-getX1;
-        float tmp1 = (resta*100)/getSizeList();
-        if (tmp1<12) {
-            mOffset = new MPPointF((float) -(getWidth() / 1.2), -getHeight());
-        }
-        return mOffset;
+    public void draw(Canvas canvas, float posX, float posY) {
+        posX= 80;
+        Log.e("x",Float.toString(posX));
+        posY=0;
+        canvas.translate(posX, posY);
+        draw(canvas);
+        canvas.translate(-posX, -posY);
+
+        super.draw(canvas, posX, posY);
     }
 
 

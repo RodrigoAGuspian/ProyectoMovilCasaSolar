@@ -16,7 +16,6 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:elevation="15dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -31,19 +30,13 @@
         android:layout_marginBottom="8dp"
         android:background="@drawable/ic_arrow_down"
         android:backgroundTint="@color/colorMenu"
+        android:elevation="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0" />
+    
 
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
@@ -89,6 +82,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/cardView2">
@@ -96,7 +91,7 @@
 
                 <android.support.constraint.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginBottom="8dp"
@@ -107,7 +102,7 @@
 
                     <android.support.design.widget.TextInputLayout
                         android:id="@+id/textInputLayout10"
-                        android:layout_width="300dp"
+                        android:layout_width="340dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginTop="16dp"
@@ -126,17 +121,70 @@
                             android:textColorHint="@color/colorAccent" />
                     </android.support.design.widget.TextInputLayout>
 
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/textInputLayout11"
+                        android:layout_width="340dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/textInputLayout10">
+
+                        <android.support.design.widget.TextInputEditText
+                            android:id="@+id/txtContrasena1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/ingrese_contrasena_r"
+                            android:inputType="textPassword"
+                            android:textColor="@color/colorMenu"
+                            android:textColorHint="@color/colorAccent" />
+                    </android.support.design.widget.TextInputLayout>
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/textInputLayout12"
+                        android:layout_width="340dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/textInputLayout11">
+
+                        <android.support.design.widget.TextInputEditText
+                            android:id="@+id/txtContrasena2"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/ingrese_de_nuevo_contrasena"
+                            android:inputType="textPassword"
+                            android:textColor="@color/colorMenu"
+                            android:textColorHint="@color/colorAccent" />
+                    </android.support.design.widget.TextInputLayout>
+
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/textInputLayout3"
+                        android:layout_width="340dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/textInputLayout12" />
 
                     <android.support.design.widget.TextInputLayout
                         android:id="@+id/textInputLayout4"
-                        android:layout_width="300dp"
+                        android:layout_width="340dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_marginTop="8dp"
                         android:layout_marginEnd="16dp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/textInputLayout10">
+                        app:layout_constraintTop_toBottomOf="@+id/textInputLayout3">
 
                         <android.support.design.widget.TextInputEditText
                             android:id="@+id/txtPrimerN"
@@ -148,7 +196,7 @@
 
                     <android.support.design.widget.TextInputLayout
                         android:id="@+id/textInputLayout5"
-                        android:layout_width="300dp"
+                        android:layout_width="340dp"
                         android:layout_height="57dp"
                         android:layout_marginStart="8dp"
                         android:layout_marginTop="8dp"
@@ -167,7 +215,7 @@
 
                     <android.support.design.widget.TextInputLayout
                         android:id="@+id/textInputLayout6"
-                        android:layout_width="300dp"
+                        android:layout_width="340dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginTop="8dp"
@@ -186,7 +234,7 @@
 
                     <android.support.design.widget.TextInputLayout
                         android:id="@+id/textInputLayout7"
-                        android:layout_width="300dp"
+                        android:layout_width="340dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginTop="8dp"
@@ -205,7 +253,7 @@
 
                     <android.support.design.widget.TextInputLayout
                         android:id="@+id/textInputLayout13"
-                        android:layout_width="300dp"
+                        android:layout_width="340dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginTop="8dp"
@@ -224,7 +272,7 @@
 
                     <android.support.design.widget.TextInputLayout
                         android:id="@+id/textInputLayout14"
-                        android:layout_width="300dp"
+                        android:layout_width="340dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginTop="8dp"
@@ -243,7 +291,7 @@
 
                     <android.support.design.widget.TextInputLayout
                         android:id="@+id/textInputLayout15"
-                        android:layout_width="300dp"
+                        android:layout_width="340dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginTop="8dp"
@@ -262,7 +310,7 @@
 
                     <android.support.design.widget.TextInputLayout
                         android:id="@+id/textInputLayout16"
-                        android:layout_width="300dp"
+                        android:layout_width="340dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginTop="8dp"
@@ -281,7 +329,7 @@
 
                     <com.jaredrummler.materialspinner.MaterialSpinner
                         android:id="@+id/msTipoDeUso"
-                        android:layout_width="300dp"
+                        android:layout_width="340dp"
                         android:layout_height="0dp"
                         android:layout_margin="8dp"
                         android:layout_marginStart="8dp"
@@ -299,15 +347,17 @@
                         app:ms_text_color="@color/colorMenu" />
 
                     <Button
-                        android:id="@+id/btnActualizar"
+                        android:id="@+id/button2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginTop="8dp"
                         android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="8dp"
                         android:backgroundTint="@color/colorPrimaryDark"
                         android:text="@string/actualizar"
                         android:textColor="@color/color_custmo_marker"
+                        app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/textInputLayout16" />
@@ -332,5 +382,4 @@
 
         </android.support.constraint.ConstraintLayout>
 
-    </ScrollView>
 </android.support.constraint.ConstraintLayout>

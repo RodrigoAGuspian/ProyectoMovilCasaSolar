@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TabHost xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/tabHost"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tabHost"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragments.ConsultasFragment">
@@ -16,7 +16,7 @@
         <TabWidget
             android:id="@android:id/tabs"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="30dp" />
 
         <FrameLayout
             android:id="@android:id/tabcontent"
@@ -43,16 +43,15 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/txtConsulta1" />
 
-                <EditText
+                <TextView
                     android:id="@+id/txtConsulta1"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="40dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
-                    android:editable="false"
-                    android:ems="10"
-                    android:inputType="date"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/colorMenu"
                     app:layout_constraintEnd_toStartOf="@+id/btnConsulta1"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -60,10 +59,11 @@
                 <Button
                     android:id="@+id/btnConsulta1"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="40dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
                     android:backgroundTint="@color/secondaryColor"
+                    android:gravity="center_vertical"
                     android:text="@string/seleccione_dia"
                     android:textColor="@color/color_custmo_marker"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -107,16 +107,15 @@
                     app:layout_constraintTop_toBottomOf="@+id/txtConsulta2"
                     app:layout_constraintVertical_bias="0.0" />
 
-                <EditText
+                <TextView
                     android:id="@+id/txtConsulta2"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="40dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
-                    android:editable="false"
-                    android:ems="10"
-                    android:inputType="date"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/colorMenu"
                     app:layout_constraintEnd_toStartOf="@+id/btnConsulta2"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -124,7 +123,7 @@
                 <Button
                     android:id="@+id/btnConsulta2"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="40dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
                     android:backgroundTint="@color/secondaryColor"
@@ -160,9 +159,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="4dp"
                     android:layout_marginEnd="8dp"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginBottom="4dp"
                     android:clipChildren="false"
                     android:clipToPadding="false"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -174,9 +173,9 @@
                 <LinearLayout
                     android:id="@+id/linearLayout2"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="40dp"
                     android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="4dp"
                     android:layout_marginEnd="8dp"
                     android:gravity="center"
                     android:orientation="horizontal"
@@ -189,7 +188,8 @@
                         android:id="@+id/spinnerMes"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:layout_margin="8dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
                         android:layout_weight="1"
                         app:layout_constraintEnd_toStartOf="@+id/nPAnio"
                         app:layout_constraintStart_toStartOf="parent"
@@ -201,7 +201,8 @@
                         android:id="@+id/nPAnio"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:layout_margin="8dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
                         android:layout_weight="1"
                         app:layout_constraintEnd_toStartOf="@+id/btnConsulta3"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -211,7 +212,8 @@
                         android:id="@+id/btnConsulta3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="8dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
                         android:backgroundTint="@color/secondaryColor"
                         android:text="@string/graficar"
                         android:textColor="@color/color_custmo_marker"
@@ -236,8 +238,6 @@
 
             </android.support.constraint.ConstraintLayout>
         </FrameLayout>
-
-
 
 
     </LinearLayout>

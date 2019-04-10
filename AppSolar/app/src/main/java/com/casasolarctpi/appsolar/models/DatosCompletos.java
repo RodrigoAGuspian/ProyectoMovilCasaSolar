@@ -1,12 +1,13 @@
 package com.casasolarctpi.appsolar.models;
 
 public class DatosCompletos {
-    private String hora ,temperatura ,humedad, corrienteBateria, corrienteCarga, corrientePanel, irradiancia, voltajeBateria, voltajeCarga;
+    private String hora ,temperatura ,humedad, corrienteBateria, corrienteCarga, corrientePanel, irradiancia, voltajeBateria, voltajeCarga, voltajePanel;
 
     public DatosCompletos() {
     }
 
-    public DatosCompletos(String hora, String temperatura, String humedad, String corrienteBateria, String corrienteCarga, String corrientePanel, String irradiancia, String voltajeBateria, String voltajeCarga) {
+
+    public DatosCompletos(String hora, String temperatura, String humedad, String corrienteBateria, String corrienteCarga, String corrientePanel, String irradiancia, String voltajeBateria, String voltajeCarga, String voltajePanel) {
         this.hora = hora;
         this.temperatura = temperatura;
         this.humedad = humedad;
@@ -16,6 +17,7 @@ public class DatosCompletos {
         this.irradiancia = irradiancia;
         this.voltajeBateria = voltajeBateria;
         this.voltajeCarga = voltajeCarga;
+        this.voltajePanel = voltajePanel;
     }
 
     public String getHora() {
@@ -89,4 +91,13 @@ public class DatosCompletos {
     public void setVoltajeCarga(String voltajeCarga) {
         this.voltajeCarga = voltajeCarga;
     }
+
+    public String getVoltajePanel() {
+        return voltajePanel;
+    }
+
+    public void setVoltajePanel(String voltajePanel) {
+        this.voltajePanel = voltajePanel;
+    }
+
 }

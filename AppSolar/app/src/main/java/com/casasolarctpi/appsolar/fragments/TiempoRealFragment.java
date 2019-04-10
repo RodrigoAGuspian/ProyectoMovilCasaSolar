@@ -284,7 +284,19 @@ public class TiempoRealFragment extends Fragment {
             labelsChart.add(datosTiempoRealList.get(i).getHora());
             float dato=0;
             try {
-                dato=Float.parseFloat(datosTiempoRealList.get(i).getHumedad());
+                switch (modoGraficar) {
+                    case 0:
+                        dato = Float.parseFloat(datosTiempoRealList.get(i).getHumedad());
+                        break;
+
+                    case 1:
+                        dato = Float.parseFloat(datosTiempoRealList.get(i).getTemperatura());
+                        break;
+
+                    case 2:
+                        dato = Float.parseFloat(datosTiempoRealList.get(i).getIrradiancia());
+                        break;
+                }
 
                 if (dato>valorMaximo){
                     valorMaximo = dato;

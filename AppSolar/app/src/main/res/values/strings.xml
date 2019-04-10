@@ -34,6 +34,8 @@
     <string name="dato1">Humedad (%H)</string>
     <string name="dato2">Temperatura (°C)</string>
     <string name="dato3">Irradiancia (W/m²)</string>
+    <string name="dato4">Corriente (A)</string>
+    <string name="dato5">Voltaje (V)</string>
     <string name="titulo_dato1">Humedad (%H) vs Tiempo</string>
     <string name="titulo_dato2">Temperatura (°C) vs Tiempo</string>
     <string name="titulo_dato3">Irradiancia (W/m²) vs Tiempo</string>
@@ -79,8 +81,8 @@
     <string name="mensaje">Contacto: romontano@misena.edu.co</string>
 
     <string name="titulo_irradiancia_humedad">Irradiancia(W/m²), Humedad(%H) vs Tiempo </string>
-    <string name="titulo_irradiancia_corriente">Irradiancia(W/m²), Corriente vs Tiempo </string>
-    <string name="titulo_irradiancia_voltaje">Irradiancia(W/m²), Voltaje vs Tiempo </string>
+    <string name="titulo_irradiancia_corriente">Irradiancia(W/m²), Corriente(A) vs Tiempo </string>
+    <string name="titulo_irradiancia_voltaje">Irradiancia(W/m²), Voltaje(V) vs Tiempo </string>
     <string name="titulo_irradiancia_temperatura">Irradiancia(W/m²), Temperatura(°C) vs Tiempo </string>
     <string name="titulo_humedad_temperatura">Humedad(%H), Temperatura (°C) vs Tiempo </string>
     <string name="mensaje_contactanos">Grupo de investigación INNOVATEC-CTPI\nCentro de teleinformática y producción Industrial del SENA regional Cauca\nLínea de investigación en energías renovables y eficiencia energética\n\nInvestigador Líder: Rodrigo Montaño F.\n\nContacto 1: romontano@misena.edu.co\n\nContacto 2: solarctpi@gmail.com
@@ -91,17 +93,43 @@
     <string name="el_usuario_no_registrado">El usuario no está registrado</string>
     <string name="registro_usuario">Registro de Usuario</string>
     <string name="registrar">Registrar</string>
-    <string name="ingrese_de_nuevo_contrasena">Ingrese de nuevo su contraseña</string>
+    <string name="ingrese_correo_r">Correo electrónico(*)</string>
+    <string name="ingrese_contrasena_r">Contraseña(*)</string>
+    <string name="ingrese_de_nuevo_contrasena">Confirmar contraseña(*)</string>
     <string name="ayuda">Ayuda</string>
     <string name="institucion">Institución</string>
-    <string name="pais">País</string>
-    <string name="departamento">Departamento</string>
-    <string name="ciudad">Ciudad</string>
+    <string name="pais">País(*)</string>
+    <string name="departamento">Departamento(*)</string>
+    <string name="ciudad">Ciudad(*)</string>
     <string name="tipo_uso">Tipo de uso</string>
     <string name="academico">Académido</string>
     <string name="empresarial">Empresarial</string>
     <string name="comercial">Comercial</string>
     <string name="otro">Otro</string>
+    <string name="contrasenas_no_coinciden">Las contraseñas no coinciden</string>
+    <string name="contrasena_muy_corta">La contraseña es muy corta.</string>
+    <string name="contrasena_muy_corta_m2">La contraseña es muy corta, por favor ingrese una contraseña  igual o mayor a 8 caracteres.</string>
+    <string name="revise_datos">Por favor revise sus datos, algunos son requeridos.</string>
+    <string name="mensaje_de_inicio">Por favor ingresa con tu nueva cuenta.</string>
+    <string name="dia">Día</string>
+    <string name="semana">Semana</string>
+    <string name="mes">Mes</string>
+    <string name="actualizar_contrasena">Actualizar o reinciar contraseña.</string>
+    <string name="aceptar">Aceptar</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="mensajeDeReenvio">Por favor vuelva a ingresar el correo electrónico y la contraseña para confirmar sus cambios.</string>
+    <string name="mensajes_campos_vacios">Por favor no deje los campos vacios.</string>
+    <string name="correo_contraseña_no_coincide">El correo y contraseña no coinciden.</string>
+    <string name="se_han_actualizado_datos">Se han actualizado sus datos.</string>
+    <string name="texto_restablecer_contrasena">Por favor recuerda que tu correo es la única credencial para este tipo de cambios.</string>
+    <string name="cambiar_contrasena">Cambiar contraseña</string>
+    <string name="reestablecer_contrasena">Reestablecer contraseña</string>
+    <string name="ingrese_su_contrasena_actual">Ingrese su contraseña actual</string>
+    <string name="ingrese_su_nueva_contrasena">Ingrese su nueva contraseña</string>
+    <string name="confirme_su_contrasena_nueva">Confirme su contraseña nueva</string>
+    <string name="info_reestablecer_contrasena">A su correo le llegará un link el cual le permitirá reestablecer su contraseña</string>
+    <string name="hay_un_error_actualizar_contra">Hay un error en la actualización, por favor intentarlo de nuevo.</string>
+    <string name="las_contrasena_actual_no_coincide">La contraseña actual no es la correcta.</string>
 
 
 </resources>

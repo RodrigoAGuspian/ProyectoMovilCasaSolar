@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -29,16 +30,20 @@ import com.casasolarctpi.appsolar.fragments.TiempoRealFragment;
 import com.casasolarctpi.appsolar.models.ChildClass;
 import com.casasolarctpi.appsolar.models.Constants;
 import com.casasolarctpi.appsolar.models.ExpandableListAdapter;
+import com.casasolarctpi.appsolar.models.UserData;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 import java.util.Objects;
 
-public class MenuPrincipal extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnClickListener {
-
+public class MenuPrincipal extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, OnClickListener {
     //Declaración de variables
     private ExpandableListView expPagina, expConsultas;
     private ExpandableListAdapter listAdapterExpandable, expaAdaperConsultas;
@@ -51,6 +56,10 @@ public class MenuPrincipal extends AppCompatActivity
     private  DrawerLayout drawer;
     public static DatabaseReference reference;
     boolean bandera =true;
+    private FirebaseAuth mAuth;
+    public static UserData userData = new UserData();
+    public static String userKey = " ";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +80,7 @@ public class MenuPrincipal extends AppCompatActivity
         inizialiteFirebaseApp();
         inputListExpandable();
         createExpandableListView();
+        usuarioIdentificado();
 
         if (bandera){
             getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu,new IndexFragment()).commit();
@@ -87,7 +97,6 @@ public class MenuPrincipal extends AppCompatActivity
     }
 
     //Inicialización de vistas.
-
     private void inizialite() {
         contentViewMenu= findViewById(R.id.contentViewMenu);
         //expListView = findViewById(R.id.expandable_list);
@@ -128,14 +137,17 @@ public class MenuPrincipal extends AppCompatActivity
                 return false;
             }
         });
-    }
-    //Conexión entre la app y FirebaseApp ,activar persistencia de la base de datos de Firebase y referenciar la instacia de la base de datos
 
+    }
+
+    //Conexión entre la app y FirebaseApp ,activar persistencia de la base de datos de Firebase y referenciar la instacia de la base de datos
     private void inizialiteFirebaseApp(){
         FirebaseApp.initializeApp(this);
         try {FirebaseDatabase.getInstance().setPersistenceEnabled(false);}catch (Exception e){}
-
         reference= FirebaseDatabase.getInstance().getReference();
+        mAuth = FirebaseAuth.getInstance();
+
+
     }
     @Override
     public void onBackPressed() {
@@ -200,7 +212,6 @@ public class MenuPrincipal extends AppCompatActivity
     }
 
     //Llamado de listas e ingreso de HashMap para el expandablelistview con navigation drawer
-
     public void inputListExpandable(){
         listDataHeader = Constants.GROUP_LIST;
         listDataChild = new HashMap<>();
@@ -225,8 +236,8 @@ public class MenuPrincipal extends AppCompatActivity
 
 
     }
-    //Creación del ExpandableListView y agrego del click
 
+    //Creación del ExpandableListView y agrego del click
     public void createExpandableListView(){
         listAdapterExpandable = new ExpandableListAdapter(this,new String[]{getResources().getString(R.string.paginas)},listDataChild);
 
@@ -258,10 +269,16 @@ public class MenuPrincipal extends AppCompatActivity
                         break;
 
                     case 1:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu, new ConsultasFragment()).commit();
+                        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.irradiancia_corriente);
+                        txtTitle.setText(getResources().getString(R.string.irradiancia_corriente));
                         closeDrawer();
                         break;
 
                     case 2:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.contentViewMenu, new ConsultasFragment()).commit();
+                        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.irradiancia_voltaje);
+                        txtTitle.setText(getResources().getString(R.string.irradiancia_voltaje));
                         closeDrawer();
                         break;
 
@@ -301,7 +318,6 @@ public class MenuPrincipal extends AppCompatActivity
 
 
     }
-
 
     @Override
     public void onClick(View v) {
@@ -378,16 +394,44 @@ public class MenuPrincipal extends AppCompatActivity
                 break;
 
             case R.id.cLCerrarSesion:
-                closeDrawer();
+                Intent intent = new Intent(MenuPrincipal.this,LoginActivity.class);
+                startActivity(intent);
+                FirebaseAuth.getInstance().signOut();
+                finish();
                 break;
 
 
         }
     }
 
+    private void usuarioIdentificado(){
+        final FirebaseUser currentUser = mAuth.getCurrentUser();
+        DatabaseReference usuarios = reference.child("usuarios");
+        usuarios.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot child: dataSnapshot.getChildren()){
+                    UserData tmpUserData =child.getValue(UserData.class);
+                    assert tmpUserData != null;
+                    assert currentUser != null;
+                    if (tmpUserData.getEmail().equals(currentUser.getEmail())){
+                        userData= tmpUserData;
+                        userKey = child.getKey();
+                    }
+                }
 
-    private void setListViewHeight(ExpandableListView listView,
-                                   int group) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    private void setListViewHeight(ExpandableListView listView, int group) {
         ExpandableListAdapter listAdapter = (ExpandableListAdapter) listView.getExpandableListAdapter();
         int totalHeight = 0;
         int desiredWidth = View.MeasureSpec.makeMeasureSpec(listView.getWidth(),
@@ -404,7 +448,6 @@ public class MenuPrincipal extends AppCompatActivity
                     View listItem = listAdapter.getChildView(i, j, false, null,
                             listView);
                     listItem.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
-
                     totalHeight += listItem.getMeasuredHeight();
 
                 }

@@ -1,13 +1,13 @@
 package com.casasolarctpi.appsolar.models;
 
 public class DatosTiempoReal {
-    private String fechaActual,hora, fechaActual1 ,temperatura ,humedad, corrienteBateria, corrienteCarga, corrientePanel, irradiancia, voltajeBateria, voltajeCarga;
+    private String fechaActual,hora, fechaActual1 ,temperatura ,humedad, corrienteBateria, corrienteCarga, corrientePanel, irradiancia, voltajeBateria, voltajeCarga, voltajePanel;
 
     public DatosTiempoReal() {
     }
 
 
-    public DatosTiempoReal(String fechaActual, String hora, String fechaActual1, String temperatura, String humedad, String corrienteBateria, String corrienteCarga, String corrientePanel, String irradiancia, String voltajeBateria, String voltajeCarga) {
+    public DatosTiempoReal(String fechaActual, String hora, String fechaActual1, String temperatura, String humedad, String corrienteBateria, String corrienteCarga, String corrientePanel, String irradiancia, String voltajeBateria, String voltajeCarga, String voltajePanel) {
         this.fechaActual = fechaActual;
         this.hora = hora;
         this.fechaActual1 = fechaActual1;
@@ -19,6 +19,7 @@ public class DatosTiempoReal {
         this.irradiancia = irradiancia;
         this.voltajeBateria = voltajeBateria;
         this.voltajeCarga = voltajeCarga;
+        this.voltajePanel = voltajePanel;
     }
 
     public String getFechaActual() {
@@ -108,4 +109,13 @@ public class DatosTiempoReal {
     public void setVoltajeCarga(String voltajeCarga) {
         this.voltajeCarga = voltajeCarga;
     }
+
+    public String getVoltajePanel() {
+        return voltajePanel;
+    }
+
+    public void setVoltajePanel(String voltajePanel) {
+        this.voltajePanel = voltajePanel;
+    }
+
 }

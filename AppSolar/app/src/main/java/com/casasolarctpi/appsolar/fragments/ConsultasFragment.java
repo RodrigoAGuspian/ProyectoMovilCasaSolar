@@ -1,10 +1,10 @@
 package com.casasolarctpi.appsolar.fragments;
 
-
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.ProgressBar;
 import android.widget.TabHost;
+import android.widget.TabWidget;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,9 +27,11 @@ import com.casasolarctpi.appsolar.R;
 import com.casasolarctpi.appsolar.controllers.MenuPrincipal;
 import com.casasolarctpi.appsolar.models.Constants;
 import com.casasolarctpi.appsolar.models.CustomMarkerViewData2;
+import com.casasolarctpi.appsolar.models.CustomMarkerViewDataMonth;
 import com.casasolarctpi.appsolar.models.DatosCompletos;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -38,9 +41,14 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.DefaultValueFormatter;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -48,6 +56,7 @@ import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.jaredrummler.materialspinner.MaterialSpinner;
 
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -63,12 +72,13 @@ import static com.jaredrummler.materialspinner.MaterialSpinner.OnItemSelectedLis
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ConsultasFragment extends Fragment implements OnClickListener, OnDateSetListener, OnItemSelectedListener {
+public class ConsultasFragment extends Fragment implements OnClickListener, OnDateSetListener{
+    //Declaración de variables
     View view;
     Button btnConsulta1, btnConsulta2, btnConsulta3;
     BarChart barChart1, barChart2;
     LineChart lineChart1;
-    EditText txtDate1, txtDate2;
+    TextView txtDate1, txtDate2;
     MaterialSpinner mSMes;
     NumberPicker nPAnio;
     Date dateToQuery;
@@ -84,33 +94,38 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
     List<BarEntry> entriesBarWeek = new ArrayList<>();
     List<BarEntry> entriesBarWeek1 = new ArrayList<>();
     int month, yearM, numDias;
-    public static int modoGraficar=0;
+    public static int modoGraficar = 0;
     TextView txtTituloGrafica1, txtTituloGrafica2, txtTituloGrafica3;
-
     String datoInfo1;
     String datoInfo2;
 
-    int colorDato1, colorDato2, colorDatoTexto1, colorDatoTexto2, modo1, modo2, yAxisMax1, yAxisMin1, yAxisMax2,yAxisMin2;
-
+    int colorDato1, colorDato2, colorDatoTexto1, colorDatoTexto2, modo1, modo2, yAxisMax1, yAxisMin1, yAxisMax2, yAxisMin2;
 
     public ConsultasFragment() {
         // Required empty public constructor
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_consultas, container, false);
         iniziliate();
         inputValuesToChart();
         inputDataToSpinner();
+        TabHost tabHost = view.findViewById(R.id.tabHost);
+        setCustomTabHost(tabHost);
         return view;
     }
 
+    private void setCustomTabHost(TabHost tabHost) {
+        TabWidget tabWidget = tabHost.getTabWidget();
+
+    }
+
+    //Método para inicializar los valores de las consultas que el usuario a seleccionado
     private void inputValuesToChart() {
 
-        switch (modoGraficar){
+        switch (modoGraficar) {
             case 0:
                 datoInfo1 = getResources().getString(R.string.dato3);
                 datoInfo2 = getResources().getString(R.string.dato1);
@@ -121,17 +136,67 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                 colorDatoTexto1 = getResources().getColor(R.color.colorGraficaLinea3);
                 colorDatoTexto2 = getResources().getColor(R.color.colorGraficaLinea1);
 
-                yAxisMax1=1000;
-                yAxisMax2=120;
-                yAxisMin1=0;
-                yAxisMin2=0;
+                yAxisMax1 = 1000;
+                yAxisMax2 = 120;
+                yAxisMin1 = 0;
+                yAxisMin2 = 0;
 
-                modo1=2;
-                modo2=0;
+                modo1 = 2;
+                modo2 = 0;
 
                 txtTituloGrafica1.setText(R.string.titulo_irradiancia_humedad);
                 txtTituloGrafica2.setText(R.string.titulo_irradiancia_humedad);
                 txtTituloGrafica3.setText(R.string.titulo_irradiancia_humedad);
+
+                break;
+
+            case 1:
+                datoInfo1 = getResources().getString(R.string.dato3);
+                datoInfo2 = getResources().getString(R.string.dato4);
+
+                colorDato1 = getResources().getColor(R.color.colorGraficaPunto3);
+                colorDato2 = getResources().getColor(R.color.colorGraficaPunto4);
+
+                colorDatoTexto1 = getResources().getColor(R.color.colorGraficaLinea3);
+                colorDatoTexto2 = getResources().getColor(R.color.colorGraficaLinea4);
+
+                yAxisMax1 = 1000;
+                yAxisMax2 = 2;
+                yAxisMin1 = 0;
+                yAxisMin2 = 0;
+
+                modo1 = 2;
+                modo2 = 3;
+
+                txtTituloGrafica1.setText(R.string.titulo_irradiancia_corriente);
+                txtTituloGrafica2.setText(R.string.titulo_irradiancia_corriente);
+                txtTituloGrafica3.setText(R.string.titulo_irradiancia_corriente);
+
+                break;
+
+            case 2:
+
+                datoInfo1 = getResources().getString(R.string.dato3);
+                datoInfo2 = getResources().getString(R.string.dato5);
+
+                colorDato1 = getResources().getColor(R.color.colorGraficaPunto3);
+                colorDato2 = getResources().getColor(R.color.colorGraficaPunto5);
+
+                colorDatoTexto1 = getResources().getColor(R.color.colorGraficaLinea3);
+                colorDatoTexto2 = getResources().getColor(R.color.colorGraficaLinea5);
+
+                yAxisMax1 = 1000;
+                yAxisMax2 = 10;
+                yAxisMin1 = 0;
+                yAxisMin2 = 0;
+
+                modo1 = 2;
+                modo2 = 4;
+
+                txtTituloGrafica1.setText(R.string.titulo_irradiancia_voltaje);
+                txtTituloGrafica2.setText(R.string.titulo_irradiancia_voltaje);
+                txtTituloGrafica3.setText(R.string.titulo_irradiancia_voltaje);
+
 
                 break;
 
@@ -145,13 +210,13 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                 colorDatoTexto1 = getResources().getColor(R.color.colorGraficaLinea3);
                 colorDatoTexto2 = getResources().getColor(R.color.colorGraficaLinea2);
 
-                yAxisMax1=1000;
-                yAxisMax2=50;
-                yAxisMin1=0;
-                yAxisMin2=0;
+                yAxisMax1 = 1000;
+                yAxisMax2 = 50;
+                yAxisMin1 = 0;
+                yAxisMin2 = 0;
 
-                modo1=2;
-                modo2=1;
+                modo1 = 2;
+                modo2 = 1;
 
                 txtTituloGrafica1.setText(R.string.titulo_irradiancia_temperatura);
                 txtTituloGrafica2.setText(R.string.titulo_irradiancia_humedad);
@@ -168,13 +233,13 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                 colorDatoTexto1 = getResources().getColor(R.color.colorGraficaLinea1);
                 colorDatoTexto2 = getResources().getColor(R.color.colorGraficaLinea2);
 
-                yAxisMax1=120;
-                yAxisMax2=50;
-                yAxisMin1=0;
-                yAxisMin2=0;
+                yAxisMax1 = 120;
+                yAxisMax2 = 50;
+                yAxisMin1 = 0;
+                yAxisMin2 = 0;
 
-                modo1=0;
-                modo2=1;
+                modo1 = 0;
+                modo2 = 1;
 
                 txtTituloGrafica1.setText(R.string.titulo_irradiancia_humedad);
                 txtTituloGrafica2.setText(R.string.titulo_irradiancia_humedad);
@@ -186,6 +251,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
     }
 
+    //Métod para inicializar las vistas, hacer seleccionables los botones poner en modo invisible algunas vistas.
     private void iniziliate() {
         TabHost tabHost = view.findViewById(R.id.tabHost);
         tabHost.setup();
@@ -193,19 +259,19 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         //Tab 1
         TabHost.TabSpec spec = tabHost.newTabSpec("Tab One");
         spec.setContent(R.id.tab1);
-        spec.setIndicator("Día");
+        spec.setIndicator(createTabView(getContext(),getResources().getString(R.string.dia)));
         tabHost.addTab(spec);
 
         //Tab 2
         spec = tabHost.newTabSpec("Tab Two");
         spec.setContent(R.id.tab2);
-        spec.setIndicator("Semana");
+        spec.setIndicator(createTabView(getContext(),getResources().getString(R.string.semana)));
         tabHost.addTab(spec);
 
         //Tab 3
         spec = tabHost.newTabSpec("Tab Three");
         spec.setContent(R.id.tab3);
-        spec.setIndicator("Mes");
+        spec.setIndicator(createTabView(getContext(),getResources().getString(R.string.mes)));
         tabHost.addTab(spec);
 
         btnConsulta1 = view.findViewById(R.id.btnConsulta1);
@@ -243,7 +309,15 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
     }
 
-    public void inputDataToSpinner(){
+    private static View createTabView(final Context context, final String text) {
+        View view = LayoutInflater.from(context).inflate(R.layout.tab_bg, null);
+        TextView tv = view.findViewById(R.id.tabsText);
+        tv.setText(text);
+        return view;
+    }
+
+    //Métod para ingresar valores al spinner de la vista de mes.
+    public void inputDataToSpinner() {
         mSMes.setItems(Constants.MESES);
 
         Calendar cal = Calendar.getInstance();
@@ -253,21 +327,22 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         nPAnio.setValue(year);
 
 
-
     }
 
-    private void getDataDayOFFireBase(int year, int month, int dayOfMonth){
+    //Método para obtener los valores del día seleccionado.
+    private void getDataDayOFFireBase(int year, int month, int dayOfMonth) {
         final List<DatosCompletos>[] datosCompletos = new List[]{new ArrayList<>()};
-        DatabaseReference datosDia = MenuPrincipal.reference.child("datos").child("y"+year).child("m"+month).child("d"+dayOfMonth);
+        DatabaseReference datosDia = MenuPrincipal.reference.child("datos").child("y" + year).child("m" + month).child("d" + dayOfMonth);
 
         datosDia.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                GenericTypeIndicator<ArrayList<DatosCompletos>> t = new GenericTypeIndicator<ArrayList<DatosCompletos>>() {};
+                GenericTypeIndicator<ArrayList<DatosCompletos>> t = new GenericTypeIndicator<ArrayList<DatosCompletos>>() {
+                };
                 try {
                     showChartDay(dataSnapshot.getValue(t));
 
-                }catch (Exception ignore){
+                } catch (Exception ignore) {
 
                 }
             }
@@ -280,30 +355,33 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         });
     }
 
+    //Método para mostrar el DatePicker del día.
     public void showDatePickerDialog() {
-        DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(),this, Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH), Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+        DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), this, Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH), Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
         datePickerDialog.show();
-
 
     }
 
+    //Método para saber que fecha ha sido seleccionada,
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
         switch (mode) {
             case 1:
+                btnConsulta1.setEnabled(false);
                 txtTituloGrafica1.setVisibility(INVISIBLE);
                 pBConsultas.setVisibility(VISIBLE);
                 int realMonth = month + 1;
                 fechaATexto = dayOfMonth + "-" + realMonth + "-" + year;
-                Calendar calendar = new GregorianCalendar(year,month,dayOfMonth);
+                Calendar calendar = new GregorianCalendar(year, month, dayOfMonth);
                 dateToQuery = calendar.getTime();
-                txtDate1.setText(fechaATexto);
+                txtDate1.setText(getString(R.string.fecha)+": "+fechaATexto);
                 //dateDay = new GregorianCalendar(year,month,dayOfMonth).getTime();
-                getDataDayOFFireBase(year,realMonth,dayOfMonth);
+                getDataDayOFFireBase(year, realMonth, dayOfMonth);
                 break;
         }
     }
 
+    //Método pra mostrar la gráfica de la consulta por dia.
     private void showChartDay(List<DatosCompletos> datosCompletosList) {
         List<Entry> entries = new ArrayList<>();
         List<Entry> entries1 = new ArrayList<>();
@@ -313,33 +391,33 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         DatosCompletos datosCompletos;
         labelsChart = new ArrayList<>();
 
-        txtTituloGrafica1.setVisibility(VISIBLE);
+
         float dato1;
-        if (datosCompletosList!=null) {
+        if (datosCompletosList != null) {
             for (int i = 0; i < datosCompletosList.size(); i++) {
                 datosCompletos = datosCompletosList.get(i);
                 labelsChart.add(datosCompletos.getHora());
                 try {
-                    dato1=Float.parseFloat(datosCompletos.getIrradiancia());
+                    dato1 = Float.parseFloat(datosCompletos.getIrradiancia());
 
-                }catch (Exception ignore){
-                    dato1=0;
+                } catch (Exception ignore) {
+                    dato1 = 0;
                 }
 
                 try {
-                    switch (modoGraficar){
+                    switch (modoGraficar) {
                         case 0:
-                            entries.add(new Entry(i,dato1));
+                            entries.add(new Entry(i, dato1));
                             entries1.add(new Entry(i, Float.parseFloat(datosCompletos.getHumedad())));
                             break;
                         case 1:
-                            entries.add(new Entry(i, Float.parseFloat(datosCompletos.getHumedad())));
-                            entries1.add(new Entry(i, Float.parseFloat(datosCompletos.getTemperatura())));
+                            entries.add(new Entry(i, dato1));
+                            entries1.add(new Entry(i, Float.parseFloat(datosCompletos.getCorrientePanel())));
                             break;
                         case 2:
 
-                            entries.add(new Entry(i, Float.parseFloat(datosCompletos.getHumedad())));
-                            entries1.add(new Entry(i, Float.parseFloat(datosCompletos.getTemperatura())));
+                            entries.add(new Entry(i, dato1));
+                            entries1.add(new Entry(i, Float.parseFloat(datosCompletos.getVoltajePanel())));
                             break;
 
                         case 3:
@@ -355,20 +433,19 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                     }
 
 
-                }catch (Exception ignored){
+                } catch (Exception ignored) {
 
                 }
 
             }
-        }else {
+        } else {
             Toast.makeText(getContext(), getResources().getString(R.string.no_hay_datos), Toast.LENGTH_SHORT).show();
         }
 
         //Log.e("Datos",entries.toString()+"\n"+labelsChart.toString());
 
-        if (entries.size()!=0) {
-
-
+        if (entries.size() != 0) {
+            txtTituloGrafica1.setVisibility(VISIBLE);
             LineDataSet lineDataSet = new LineDataSet(entries, datoInfo1);
             LineDataSet lineDataSet1 = new LineDataSet(entries1, datoInfo2);
 
@@ -395,14 +472,14 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
             data.setDrawValues(false);
             lineChart1.setData(data);
             Description description = new Description();
-            description.setText(getResources().getString(R.string.fecha_datos_tomados) + fechaATexto);
+            description.setText("");
             xAxis = lineChart1.getXAxis();
             xAxis.setValueFormatter(new IndexAxisValueFormatter(labelsChart));
             xAxis.setLabelRotationAngle(-10f);
             xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
             lineChart1.setDescription(description);
             lineChart1.setDrawMarkers(true);
-            CustomMarkerViewData2 customMarkerView = new CustomMarkerViewData2(getContext(),R.layout.item_custom_marker,labelsChart,datoInfo1,datoInfo2,colorDato1,colorDato2);
+            CustomMarkerViewData2 customMarkerView = new CustomMarkerViewData2(getContext(), R.layout.item_custom_marker, labelsChart, datoInfo1, datoInfo2, colorDato1, colorDato2);
             customMarkerView.setSizeList(labelsChart.size());
             lineChart1.setMarker(customMarkerView);
             lineChart1.setTouchEnabled(true);
@@ -411,7 +488,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
             lineChart1.invalidate();
 
 
-        }else {
+        } else {
             Toast.makeText(getContext(), R.string.no_hay_datos, Toast.LENGTH_SHORT).show();
         }
         btnConsulta1.setEnabled(true);
@@ -419,6 +496,8 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
     }
 
+
+    //Método para mostar el DatePicker de la consulta por semana.
     public void showDatePickerWeekDialog(){
 
         Toast.makeText(getContext(), R.string.mensaje_week, Toast.LENGTH_SHORT).show();
@@ -433,6 +512,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
             @SuppressLint("SetTextI18n")
             @Override
             public void onClick(View v) {
+                btnConsulta2.setEnabled(false);
                 pBConsultas.setVisibility(VISIBLE);
                 int mes = datePicker.getMonth()+1;
                 txtTituloGrafica2.setVisibility(INVISIBLE);
@@ -473,7 +553,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
                 @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
 
-                txtDate2.setText(format.format(primerDia)+" "+getResources().getString(R.string.a)+" "+format.format(ultimoDia));
+                txtDate2.setText(getString(R.string.fecha)+": "+format.format(primerDia)+" "+getResources().getString(R.string.a)+" "+format.format(ultimoDia));
 
                 searchDate(primerDia);
                 dialog.cancel();
@@ -494,6 +574,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
     }
 
+    //Método para saber cual es la semana seleccionada por el dia obtenido por el DatePicker de la semana
     private void searchDate(Date primerDia){
         Calendar tmpCalendar = new GregorianCalendar();
         tmpCalendar.setTime(primerDia);
@@ -514,6 +595,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
     }
 
+    //Método para obtención de los datos de la semana
     private void getDataDayOFFireBaseWeek(int year, int month, int dayOfMonth,final int contador){
 
         DatabaseReference datosDia = MenuPrincipal.reference.child("datos").child("y"+year).child("m"+month).child("d"+dayOfMonth);
@@ -535,17 +617,24 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         });
     }
 
+    //Método para graficar los datos de la semana
     private void showChartWeek() {
         entriesBarWeek = new ArrayList<>();
         entriesBarWeek1 = new ArrayList<>();
         barChart1.clearAnimation();
         barChart1.clear();
-        txtTituloGrafica2.setVisibility(VISIBLE);
+
 
         for (int i=0; i<7;i++){
             entriesBarWeek.add(new BarEntry(i,promedioDia(datosCompletosSemana[i],modo1)));
             entriesBarWeek1.add(new BarEntry(i,promedioDia(datosCompletosSemana[i],modo2)));
         }
+
+
+        if(entriesBarWeek1.size()>0){
+            txtTituloGrafica2.setVisibility(VISIBLE);
+        }
+
 
         BarDataSet barDataSet = new BarDataSet(entriesBarWeek,datoInfo1);
         BarDataSet barDataSet1 = new BarDataSet(entriesBarWeek1,datoInfo2);
@@ -553,6 +642,20 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         barDataSet1.setColor(colorDato2);
         barDataSet.setBarShadowColor(colorDatoTexto1);
         barDataSet1.setBarShadowColor(colorDatoTexto2);
+        final DecimalFormat decimalFormat = new DecimalFormat("####.##");
+        barDataSet.setValueFormatter(new IValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
+                return decimalFormat.format(value);
+            }
+        });
+
+        barDataSet1.setValueFormatter(new IValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
+                return decimalFormat.format(value);
+            }
+        });
 
         barDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
         barDataSet1.setAxisDependency(YAxis.AxisDependency.RIGHT);
@@ -565,13 +668,12 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         description.setText(" ");
         data.setBarWidth(0.48f); // set custom bar width
         barChart1.setData(data);
-        barChart1.groupBars(0, 0.04f, 0f);
+        barChart1.groupBars(1, 0.04f, 0f);
         xAxis = barChart1.getXAxis();
         xAxis.setValueFormatter(new IndexAxisValueFormatter(Constants.DIAS_DE_LA_SEMANA));
         xAxis.setCenterAxisLabels(true);
         xAxis.setLabelRotationAngle(-5f);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setTextSize(8);
         xAxis.setAxisMaximum(7);
 
 
@@ -591,35 +693,34 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
     }
 
+    //Método para obtener el número de días de mes seleccionado en el MaterialSpinner
     private void getDataMonth() {
         pBConsultas.setVisibility(VISIBLE);
         barChart2.setVisibility(INVISIBLE);
         yearM = nPAnio.getValue();
         month = mSMes.getSelectedIndex();
         switch(month){
-            case 0:  // Enero
-            case 2:  // Marzo
-            case 4:  // Mayo
-            case 6:  // Julio
-            case 7:  // Agosto
-            case 9:  // Octubre
-            case 11: // Diciembre
+            case 0:
+            case 2:
+            case 6:
+            case 7:
+            case 9:
+            case 11:
                 numDias=31;
                 break;
-            case 3:  // Abril
-            case 5:  // Junio
-            case 8:  // Septiembre
-            case 10: // Noviembre
+            case 3:
+            case 5:
+            case 8:
+            case 10:
                 numDias=30;
                 break;
-            case 1:  // Febrero
+            case 1:
                 if ( ((yearM%100 == 0) && (yearM%400 == 0)) ||
                         ((yearM%100 != 0) && (yearM%  4 == 0))   )
                     numDias=29;
                 else
                     numDias=28;
             default:
-                Log.e("asd","a"+numDias);
         }
 
         int realMonth= month+1;
@@ -633,6 +734,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
     }
 
+    //Método para la obtención de datos del mes por día
     private void getDataDayOFFireBaseDay(int yearM, int realMonth, final int i) {
         final int dias = i+1;
         DatabaseReference datosDia = MenuPrincipal.reference.child("datos").child("y"+yearM).child("m"+realMonth).child("d"+dias);
@@ -664,12 +766,12 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
     }
 
+    //Método para graficar los datos del mes.
     public void showChartMonth(){
         List<BarEntry> entry1 = new ArrayList<>();
         List<BarEntry> entry2 = new ArrayList<>();
         barChart2.clearAnimation();
         barChart2.clear();
-        txtTituloGrafica3.setVisibility(VISIBLE);
         List<String> labelC = new ArrayList<>();
         XAxis xAxis1;
         labelC.add(" ");
@@ -681,12 +783,16 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
         if (entry1.size()!=0) {
 
+            txtTituloGrafica3.setVisibility(VISIBLE);
 
             BarDataSet barDataSet = new BarDataSet(entry1,datoInfo1);
             BarDataSet barDataSet1 = new BarDataSet(entry2,datoInfo2);
 
             barDataSet.setColor(colorDato1);
             barDataSet1.setColor(colorDato2);
+
+            barDataSet.setDrawValues(false);
+            barDataSet1.setDrawValues(false);
 
             barDataSet.setValueTextColor(colorDatoTexto1);
             barDataSet1.setValueTextColor(colorDatoTexto2);
@@ -723,6 +829,8 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
             barChart2.groupBars(1, 0.04f, 0f);
             barChart2.setTouchEnabled(true);
             barChart2.setVisibility(VISIBLE);
+            barChart2.setMarker(new CustomMarkerViewDataMonth(getContext(),R.layout.item_custom_marker,labelC,datoInfo1,datoInfo2,colorDato1,colorDato2));
+            barChart2.highlightValue(null);
             barChart2.invalidate();
 
 
@@ -735,6 +843,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
     }
 
+    //Método para promediar los datos del diá.
     private float promedioDia(List<DatosCompletos> datosFiltrado, int modo) {
         float acumulador=0;
         switch (modo){
@@ -789,6 +898,42 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                 }
 
                 break;
+
+            case 3:
+
+                try {
+                    for (int i=0;i<datosFiltrado.size();i++){
+                        try {
+                            acumulador+=Float.parseFloat(datosFiltrado.get(i).getCorrientePanel());
+                        }catch (Exception ignore){
+
+                        }
+                    }
+
+                }catch (Exception ignore){
+
+                }
+
+                break;
+
+
+            case 4:
+
+                try {
+                    for (int i=0;i<datosFiltrado.size();i++){
+                        try {
+                            acumulador+=Float.parseFloat(datosFiltrado.get(i).getVoltajePanel());
+                        }catch (Exception ignore){
+
+                        }
+                    }
+
+                }catch (Exception ignore){
+
+                }
+
+                break;
+
         }
 
         try {
@@ -801,24 +946,18 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
     }
 
-    @Override
-    public void onItemSelected(MaterialSpinner view, int position, long id, Object item) {
-
-    }
-
+    //Método para saber cual es el botón que está siendo seleccionado
     @Override
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.btnConsulta1:
                 mode=1;
                 showDatePickerDialog();
-                btnConsulta1.setEnabled(false);
                 break;
 
             case R.id.btnConsulta2:
                 mode=2;
                 showDatePickerWeekDialog();
-                btnConsulta2.setEnabled(false);
                 break;
 
 
@@ -830,4 +969,6 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                 break;
         }
     }
+
+
 }

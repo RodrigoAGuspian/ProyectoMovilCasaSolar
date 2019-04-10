@@ -70,6 +70,7 @@ public class CustomMarkerViewData2 extends MarkerView {
 
     }
 
+
     @Override
     public MPPointF getOffset() {
         mOffset = new MPPointF((float) -(getWidth() / 2.2), -getHeight());
@@ -77,8 +78,11 @@ public class CustomMarkerViewData2 extends MarkerView {
         float tmp1 = (resta*100)/getSizeList();
         Log.e("tmp",tmp1 + ";"+resta+";"+getSizeList()+";"+getX1);
         if (tmp1<12) {
-            mOffset = new MPPointF((float) -(getWidth() / 1.3), -getHeight());
+            mOffset = new MPPointF((float) -(getWidth() / 1.2), -getHeight());
         }
         return mOffset;
+
     }
+
+
 }

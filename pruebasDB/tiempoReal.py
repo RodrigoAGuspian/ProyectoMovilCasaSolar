@@ -39,25 +39,26 @@ while True:
     try:
 
        
-        dato1= str(inf).split(": ")[1][0:5]
-        dato2= str(inf).split(": ")[2][0:5]
-        dato3= str(inf).split(": ")[3][0:5]
-        dato4= str(inf).split(": ")[4][0:5]
+        dato1= str(inf).split(": ")[1].split(" ")[0]
+        dato2= str(inf).split(": ")[2].split(",")[0]
+        dato3= str(inf).split(": ")[3].split(" ")[0]
+        dato4= str(inf).split(": ")[4].split(" ")[0]
+        dato5= str(inf).split(": ")[5].split(";")[0]
         #print(dato1+"asd"+dato2)
         print(inf)
         ref.child(str(i)).set({
             'fechaActual':fechaActual,
             'hora':hora,
             'fechaActual1':fechaActual1,
-            'temperatura':dato1,
-            'humedad':dato2,
+            'temperatura':dato2,
+            'humedad':dato3,
             "corrienteBateria" : "0.0",
             "corrienteCargas" : "0.0",
-            "corrientePanel" : "0.0",
+            "corrientePanel" : dato1,
             "irradiancia" : dato4,
             "voltajeBateria" : "0.0",
             "voltajeCargas" : "0.0",
-            "voltajePanel" : "0.0",
+            "voltajePanel" : dato5,
 
         })
         
@@ -72,15 +73,16 @@ while True:
                 pass
             nowRef.child(str(j)).set({
                 'hora':hora,
-                'temperatura':dato1,
-                'humedad':dato2,
+                'temperatura':dato2,
+                'humedad':dato3,
                 "corrienteBateria" : "0.0",
                 "corrienteCargas" : "0.0",
-                "corrientePanel" : "0.0",
+                "corrientePanel" : dato1,
                 "irradiancia" : dato4,
                 "voltajeBateria" : "0.0",
                 "voltajeCargas" : "0.0",
-                "voltajePanel" : "0.0",
+                "voltajePanel" : dato5,
+
             })
         else:
             i=i+1
