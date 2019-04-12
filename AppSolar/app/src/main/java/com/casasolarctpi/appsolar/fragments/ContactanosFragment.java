@@ -64,7 +64,7 @@ public class ContactanosFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent;
-                Uri uri = Uri.parse(txtLinkMap.getText().toString());
+                Uri uri = Uri.parse(getString(R.string.link_googlemaps));
                 intent = new Intent(Intent.ACTION_VIEW, uri);
                 startActivity(intent);
             }

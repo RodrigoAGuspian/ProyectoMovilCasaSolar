@@ -219,8 +219,8 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                 modo2 = 1;
 
                 txtTituloGrafica1.setText(R.string.titulo_irradiancia_temperatura);
-                txtTituloGrafica2.setText(R.string.titulo_irradiancia_humedad);
-                txtTituloGrafica3.setText(R.string.titulo_irradiancia_humedad);
+                txtTituloGrafica2.setText(R.string.titulo_irradiancia_temperatura);
+                txtTituloGrafica3.setText(R.string.titulo_irradiancia_temperatura);
 
                 break;
             case 4:
@@ -241,8 +241,8 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                 modo1 = 0;
                 modo2 = 1;
 
-                txtTituloGrafica1.setText(R.string.titulo_irradiancia_humedad);
-                txtTituloGrafica2.setText(R.string.titulo_irradiancia_humedad);
+                txtTituloGrafica1.setText(R.string.titulo_humedad_temperatura);
+                txtTituloGrafica2.setText(R.string.titulo_humedad_temperatura);
                 txtTituloGrafica3.setText(R.string.titulo_humedad_temperatura);
 
                 break;
@@ -743,6 +743,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 GenericTypeIndicator<ArrayList<DatosCompletos>> t = new GenericTypeIndicator<ArrayList<DatosCompletos>>() {};
                 try {
+
                     datosCompletosMes[i] = dataSnapshot.getValue(t);
                 }catch (Exception ignored){
 
