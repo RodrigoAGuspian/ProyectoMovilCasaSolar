@@ -27,8 +27,7 @@
             android:label="@string/title_activity_menu_principal"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".controllers.LoginActivity"
-            android:configChanges="screenSize|orientation|keyboardHidden" />
+            android:name=".controllers.LoginActivity" />
         <activity
             android:name=".controllers.RegistroActivity"
             android:configChanges="screenSize|orientation|keyboardHidden" />

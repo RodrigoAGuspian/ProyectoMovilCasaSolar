@@ -127,9 +127,17 @@
     <string name="ingrese_su_contrasena_actual">Ingrese su contraseña actual</string>
     <string name="ingrese_su_nueva_contrasena">Ingrese su nueva contraseña</string>
     <string name="confirme_su_contrasena_nueva">Confirme su contraseña nueva</string>
-    <string name="info_reestablecer_contrasena">A su correo le llegará un link el cual le permitirá reestablecer su contraseña</string>
+        <string name="info_reestablecer_contrasena">A su correo le llegará un link el cual le permitirá reestablecer su contraseña al seleccionar ACEPTAR.</string>
     <string name="hay_un_error_actualizar_contra">Hay un error en la actualización, por favor intentarlo de nuevo.</string>
     <string name="las_contrasena_actual_no_coincide">La contraseña actual no es la correcta.</string>
+    <string name="a_ocurrido_un_error">A ocurrido un error, por favor intentalo de nuevo.</string>
+    <string name="se_le_ha_enviado_un_correo">Se le ha enviado un correo para restablecer su contraseña, por favor espere a que este llegue.</string>
+    <string name="se_ha_olvidado_de_contrasena">¿Se ha olvidado de su contraseña?</string>
+    <string name="a_ocurrido_un_error_afuera">A ocurrido un error, revise si el correo escrito si ha estado registrado.</string>
+    <string name="la_contrasena_no_coincide">La contraseña no coincide</string>
+    <string name="campos_vacios">Algunos o todos los campos estan vacios</string>
+    <string name="cambio_de_contrasena_exito">se ha cambiado su contraseña con éxito</string>
+    <string name="welcome">Bienvenido</string>
 
 
 </resources>

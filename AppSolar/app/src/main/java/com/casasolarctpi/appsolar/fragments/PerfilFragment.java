@@ -4,6 +4,8 @@ package com.casasolarctpi.appsolar.fragments;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -15,10 +17,12 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.casasolarctpi.appsolar.R;
 import com.casasolarctpi.appsolar.controllers.MenuPrincipal;
+import com.casasolarctpi.appsolar.controllers.RestaurarContrasenaActivity;
 import com.casasolarctpi.appsolar.models.Constants;
 import com.casasolarctpi.appsolar.models.UserData;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -42,6 +46,7 @@ import java.util.Objects;
 public class PerfilFragment extends Fragment implements OnClickListener {
     EditText txtEmail, txtPrimerN, txtSegundoN, txtPrimerA, txtSegundoA;
     EditText txtInstitucion, txtPais, txtDepartamento, txtCiudad;
+    TextView txtOlvidoLaContrasena;
     MaterialSpinner msTipoDeUso;
     private FirebaseAuth mAuth;
     UserData userData = new UserData();
@@ -76,6 +81,9 @@ public class PerfilFragment extends Fragment implements OnClickListener {
         txtCiudad = view.findViewById(R.id.txtCiudad);
         msTipoDeUso = view.findViewById(R.id.msTipoDeUso);
         msTipoDeUso.setItems(Constants.LIST_TIPO_DE_USO);
+        txtOlvidoLaContrasena = view.findViewById(R.id.txtOlvidoLaContrasena);
+        txtOlvidoLaContrasena.setPaintFlags(Paint.UNDERLINE_TEXT_FLAG);
+        txtOlvidoLaContrasena.setOnClickListener(this);
         view.findViewById(R.id.btnActualizar).setOnClickListener(this);
         view.findViewById(R.id.progressBarPerfil).setVisibility(View.INVISIBLE);
 
@@ -112,7 +120,6 @@ public class PerfilFragment extends Fragment implements OnClickListener {
         if (validarCampos()){
             final Dialog dialog = new Dialog(getContext());
             dialog.setContentView(R.layout.item_reautenticar);
-            final EditText txtEmail1 = dialog.findViewById(R.id.txtEmail);
             final EditText txtContrasena1 = dialog.findViewById(R.id.txtContrasena);
             final Button btnAceptar = dialog.findViewById(R.id.btnAceptar1);
             final Button btnCancelar = dialog.findViewById(R.id.btnCancelar1);
@@ -124,13 +131,12 @@ public class PerfilFragment extends Fragment implements OnClickListener {
                     showProgressDialog();
                     if (validarCamposDialog()){
 
-                        txtEmail1.setEnabled(false);
                         txtContrasena1.setEnabled(false);
                         btnAceptar.setEnabled(false);
                         btnCancelar.setEnabled(false);
                         dialog.findViewById(R.id.pBReautentificar).setVisibility(View.VISIBLE);
 
-                        AuthCredential credential = EmailAuthProvider.getCredential(txtEmail1.getText().toString(), txtContrasena1.getText().toString());
+                        AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), txtContrasena1.getText().toString());
                         assert user != null;
                         user.reauthenticate(credential).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
@@ -164,13 +170,12 @@ public class PerfilFragment extends Fragment implements OnClickListener {
 
 
                                 }else {
-                                    txtEmail1.setEnabled(true);
                                     txtContrasena1.setEnabled(true);
                                     btnAceptar.setEnabled(true);
                                     btnCancelar.setEnabled(true);
                                     dialog.findViewById(R.id.pBReautentificar).setVisibility(View.INVISIBLE);
                                     hideProgressDialog();
-                                    Toast.makeText(getContext(), R.string.correo_contraseña_no_coincide, Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getContext(), R.string.la_contrasena_no_coincide, Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
@@ -178,14 +183,6 @@ public class PerfilFragment extends Fragment implements OnClickListener {
                 }
                 private boolean validarCamposDialog() {
                     boolean valid = true;
-
-                    String email = txtEmail1.getText().toString();
-                    if (TextUtils.isEmpty(email)) {
-                        txtEmail1.setError(getString(R.string.este_valor_requerido));
-                        valid = false;
-                    } else {
-                        txtEmail1.setError(null);
-                    }
 
                     String password = txtContrasena1.getText().toString();
                     if (TextUtils.isEmpty(password)) {
@@ -278,6 +275,7 @@ public class PerfilFragment extends Fragment implements OnClickListener {
         return valid;
     }
 
+    //Función que retorna un objeto UserData para la obtención de los datos previamente modificados.
     private UserData nuevosDatosDelUsuario(){
         UserData tmpUserData = new UserData();
         tmpUserData.setEmail(txtEmail.getText().toString());
@@ -329,6 +327,11 @@ public class PerfilFragment extends Fragment implements OnClickListener {
         switch (v.getId()){
             case R.id.btnActualizar:
                 actualizarDatos();
+                break;
+
+            case R.id.txtOlvidoLaContrasena:
+                Intent intent = new Intent(getContext(), RestaurarContrasenaActivity.class);
+                startActivity(intent);
                 break;
         }
 

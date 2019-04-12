@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -40,15 +41,16 @@ public class RestaurarContrasenaActivity extends AppCompatActivity implements On
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.btnCambiarContrasena:
-                cambioDeContraseña();
+                cambioDeContrasena();
                 break;
                 
             case R.id.btnReestablecerContrasena:
+                restablecerContrasena();
                 break;
         }
     }
 
-    private void cambioDeContraseña() {
+    private void cambioDeContrasena() {
         final Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.item_cambio_contrasena);
         final EditText txtContrasenaActual = dialog.findViewById(R.id.txtContrasenaActual);
@@ -73,6 +75,7 @@ public class RestaurarContrasenaActivity extends AppCompatActivity implements On
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()){
+                                            Toast.makeText(RestaurarContrasenaActivity.this, R.string.cambio_de_contrasena_exito, Toast.LENGTH_SHORT).show();
                                             dialog.cancel();
                                         }else {
                                             hideProgressBar();
@@ -134,11 +137,18 @@ public class RestaurarContrasenaActivity extends AppCompatActivity implements On
                 }
 
                 if (!valid){
-                    Toast.makeText(RestaurarContrasenaActivity.this, "", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RestaurarContrasenaActivity.this, R.string.campos_vacios, Toast.LENGTH_SHORT).show();
+                }
+
+                if (password1.length()<8){
+                    txtNuevaContrasena.setError(getString(R.string.contrasena_muy_corta));
+                    Toast.makeText(RestaurarContrasenaActivity.this, R.string.contrasena_muy_corta_m2, Toast.LENGTH_SHORT).show();
+                    valid=false;
                 }
 
 
-                return valid;
+                 return valid;
+
             }
 
             private boolean compararContrasenas(){
@@ -169,5 +179,71 @@ public class RestaurarContrasenaActivity extends AppCompatActivity implements On
         });
 
         dialog.show();
+    }
+
+    private void restablecerContrasena(){
+        final Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.item_reestablecer_contrasena_dentro);
+        final Button btnAceptar  = dialog.findViewById(R.id.btnAceptar1);
+        final Button btnCancelar = dialog.findViewById(R.id.btnCancelar1);
+        btnAceptar.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showProgressBar();
+                dialog.setCancelable(true);
+                btnAceptar.setEnabled(true);
+                btnCancelar.setEnabled(true);
+                FirebaseAuth auth = FirebaseAuth.getInstance();
+                String emailAddress = user.getEmail();
+                assert emailAddress != null;
+                auth.sendPasswordResetEmail(emailAddress).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Log.d("email de resC", "Email sent.");
+                                    Toast.makeText(RestaurarContrasenaActivity.this, R.string.se_le_ha_enviado_un_correo, Toast.LENGTH_SHORT).show();
+                                    dialog.cancel();
+                                }else {
+                                    hideProgressBar();
+                                    Toast.makeText(RestaurarContrasenaActivity.this, R.string.a_ocurrido_un_error, Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+
+
+
+            }
+
+            private void showProgressBar() {
+                dialog.setCancelable(true);
+                btnAceptar.setEnabled(true);
+                btnCancelar.setEnabled(true);
+                btnAceptar.setEnabled(false);
+                btnCancelar.setEnabled(false);
+                dialog.findViewById(R.id.pbReestablecerD).setVisibility(View.VISIBLE);
+            }
+
+            private void hideProgressBar() {
+                dialog.setCancelable(true);
+                btnAceptar.setEnabled(true);
+                btnCancelar.setEnabled(true);
+                btnAceptar.setEnabled(true);
+                btnCancelar.setEnabled(true);
+                dialog.findViewById(R.id.pbReestablecerD).setVisibility(View.INVISIBLE);
+            }
+
+        });
+
+        btnCancelar.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.cancel();
+            }
+        });
+
+        dialog.setCancelable(true);
+        dialog.show();
+
+
     }
 }
