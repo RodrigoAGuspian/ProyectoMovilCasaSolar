@@ -161,7 +161,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                 colorDatoTexto2 = getResources().getColor(R.color.colorGraficaLinea4);
 
                 yAxisMax1 = 1000;
-                yAxisMax2 = 2;
+                yAxisMax2 = 10;
                 yAxisMin1 = 0;
                 yAxisMin2 = 0;
 
@@ -186,7 +186,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                 colorDatoTexto2 = getResources().getColor(R.color.colorGraficaLinea5);
 
                 yAxisMax1 = 1000;
-                yAxisMax2 = 10;
+                yAxisMax2 = 25;
                 yAxisMin1 = 0;
                 yAxisMin2 = 0;
 
