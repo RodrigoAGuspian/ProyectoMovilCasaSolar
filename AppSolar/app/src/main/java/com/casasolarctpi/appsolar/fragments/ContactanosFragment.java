@@ -40,6 +40,7 @@ public class ContactanosFragment extends Fragment {
         LayoutInflater inflater1 = (LayoutInflater) Objects.requireNonNull(getActivity()).getSystemService(getContext().LAYOUT_INFLATER_SERVICE);
         frameLayout.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
         view =inflater1.inflate(R.layout.fragment_contactanos, null);
+        frameLayout.addView(view);
         inizialiteLink();
 
         return frameLayout;

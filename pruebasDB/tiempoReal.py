@@ -37,11 +37,9 @@ while True:
     fechaActual1 =dia+"-"+mes+"-"+anno+" "+str(fechaNow.strftime("%H"))+":"+str((fechaNow.strftime("%M")))+":"+str((fechaNow.strftime("%S")))
     inf = ser.readline()
     try:
-
-       
         dato1= str(inf).split(": ")[1].split(" ")[0]
-        dato2= str(inf).split(": ")[2].split(",")[0]
-        dato3= str(inf).split(": ")[3].split(" ")[0]
+        dato2= str(inf).split(": ")[2].split("T")[0]
+        dato3= str(inf).split(": ")[3].split(",")[0]
         dato4= str(inf).split(": ")[4].split(" ")[0]
         dato5= str(inf).split(": ")[5].split(";")[0]
         #print(dato1+"asd"+dato2)
@@ -50,12 +48,12 @@ while True:
             'fechaActual':fechaActual,
             'hora':hora,
             'fechaActual1':fechaActual1,
-            'temperatura':dato2,
-            'humedad':dato3,
+            'temperatura':dato3,
+            'humedad':dato4,
             "corrienteBateria" : "0.0",
             "corrienteCargas" : "0.0",
             "corrientePanel" : dato1,
-            "irradiancia" : dato4,
+            "irradiancia" : dato2,
             "voltajeBateria" : "0.0",
             "voltajeCargas" : "0.0",
             "voltajePanel" : dato5,

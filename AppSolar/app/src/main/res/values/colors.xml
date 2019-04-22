@@ -19,6 +19,9 @@
     <color name="colorGraficaPunto5">#C5A23C</color>
     <color name="color_custmo_marker">#FFFFFF</color>
 
+
+    <color name="border_menu">#BBBBBB</color>
+
     <color name="primaryColor">#FA7223</color>
     <color name="primaryColorTransparent">#8DFA7223</color>
     <color name="primaryLightColor">#FFA353</color>
