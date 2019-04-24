@@ -66,41 +66,59 @@ public class Splash extends AppCompatActivity {
 
     public void animationSplash(){
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            Animator animator = ViewAnimationUtils.createCircularReveal(imageView,0,imageView.getWidth(),0,imageView.getHeight()*1.5f);
-            final Animator animator1 = ViewAnimationUtils.createCircularReveal(imageView,imageView.getWidth()/2,imageView.getHeight()/2,imageView.getHeight()*1.5f,0);
-            animator.setDuration(800);
-            animator1.setDuration(800);
-            animator.addListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationStart(Animator animation) {
-                    super.onAnimationStart(animation);
-                    imageView.setVisibility(View.VISIBLE);
-                }
+            try {
 
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    super.onAnimationEnd(animation);
-                    animator1.start();
-                }
-            });
+                Animator animator = ViewAnimationUtils.createCircularReveal(imageView,0,imageView.getWidth(),0,imageView.getHeight()*1.5f);
+                final Animator animator1 = ViewAnimationUtils.createCircularReveal(imageView,imageView.getWidth()/2,imageView.getHeight()/2,imageView.getHeight()*1.5f,0);
+                animator.setDuration(800);
+                animator1.setDuration(800);
+                animator.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+                        super.onAnimationStart(animation);
+                        imageView.setVisibility(View.VISIBLE);
+                    }
 
-            animator1.addListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationStart(Animator animation) {
-                    super.onAnimationStart(animation);
-                }
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        animator1.start();
+                    }
+                });
 
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    imageView.setVisibility(View.INVISIBLE);
-                    super.onAnimationEnd(animation);
+                animator1.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+                        super.onAnimationStart(animation);
+                    }
 
-                    FirebaseUser currentUser = mAuth.getCurrentUser();
-                    updateUI(currentUser);
-                }
-            });
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        imageView.setVisibility(View.INVISIBLE);
+                        super.onAnimationEnd(animation);
 
-            animator.start();
+                        FirebaseUser currentUser = mAuth.getCurrentUser();
+                        updateUI(currentUser);
+                    }
+                });
+
+                animator.start();
+
+
+            }catch (Exception e){
+
+                TimerTask timerTask = new TimerTask() {
+                    @Override
+                    public void run() {
+                        imageView.setVisibility(View.VISIBLE);
+                        FirebaseUser currentUser = mAuth.getCurrentUser();
+                        updateUI(currentUser);
+                    }
+                };
+                new Timer().schedule(timerTask,1000);
+
+            }
+
 
         }else {
             TimerTask timerTask = new TimerTask() {

@@ -21,11 +21,12 @@ try:
         i=0
         pass
 except Exception as e:
+    print("Error de datos")
     pass
 
 
 
-ser = serial.Serial('COM2', 9600)
+ser = serial.Serial('COM2', 115200)
 while True:
     tiempo=0;
     fechaNow = datetime.datetime.now()
@@ -38,8 +39,8 @@ while True:
     inf = ser.readline()
     try:
         dato1= str(inf).split(": ")[1].split(" ")[0]
-        dato2= str(inf).split(": ")[2].split("T")[0]
-        dato3= str(inf).split(": ")[3].split(",")[0]
+        dato2= str(inf).split(": ")[2].split(",")[0]
+        dato3= str(inf).split(": ")[3].split(" ")[0]
         dato4= str(inf).split(": ")[4].split(" ")[0]
         dato5= str(inf).split(": ")[5].split(";")[0]
         #print(dato1+"asd"+dato2)
@@ -48,12 +49,12 @@ while True:
             'fechaActual':fechaActual,
             'hora':hora,
             'fechaActual1':fechaActual1,
-            'temperatura':dato3,
-            'humedad':dato4,
+            'temperatura':dato2,
+            'humedad':dato3,
             "corrienteBateria" : "0.0",
             "corrienteCargas" : "0.0",
             "corrientePanel" : dato1,
-            "irradiancia" : dato2,
+            "irradiancia" : dato4,
             "voltajeBateria" : "0.0",
             "voltajeCargas" : "0.0",
             "voltajePanel" : dato5,
@@ -89,6 +90,7 @@ while True:
 
         
     except Exception as e:
+        print("Error de datos")
         pass
     
     
