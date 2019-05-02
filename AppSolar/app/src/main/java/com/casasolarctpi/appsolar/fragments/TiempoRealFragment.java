@@ -138,9 +138,6 @@ public class TiempoRealFragment extends Fragment {
             }
         });
 
-
-
-
     }
 
     //Método para el ingreso de los valores a la gráfica
@@ -251,7 +248,7 @@ public class TiempoRealFragment extends Fragment {
         }
     }
 
-    //Método para el ingrese de daots a la gráfica a tiempo real
+    //Método para el ingreso de datos a la gráfica a tiempo real
     private void inputValuesRealTime() {
         entry1.clear();
         labelsChart.clear();

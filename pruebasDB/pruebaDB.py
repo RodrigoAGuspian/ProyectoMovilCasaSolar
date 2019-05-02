@@ -1,7 +1,7 @@
-import serial, time, firebase_admin, datetime
+import serial, time
 
 
-ser = serial.Serial('COM2', 9600)
+ser = serial.Serial('COM2', 11500)
 while True:
 
     inf = ser.readline()

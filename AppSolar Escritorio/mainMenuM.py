@@ -1,4 +1,4 @@
-import sys, serial,traceback, datetime,firebase_admin
+import sys, serial,traceback, datetime,firebase_admin,socket
 from PyQt5 import uic
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -7,32 +7,34 @@ from PyQt5.QtCore import *
 from firebase_admin import credentials
 from firebase_admin import db
 
+ser = serial.Serial('COM2', 115200)
+
+cred = credentials.Certificate("datoscasasolar-firebase-adminsdk-42r7y-aaa0af8036.json")
+firebase_admin.initialize_app(cred, {
+    'databaseURL': 'https://datoscasasolar.firebaseio.com/'
+})
+
+ref = db.reference('tiempoReal')
+refData = db.reference('datos')
+snapshot= ref.get()
+
+i=0
+try:
+    i=len(snapshot)
+    if i==60:
+        i=0
+        pass
+except Exception as e:
+    print("Error de datos")
+pass
+
+
 class Ventana(QMainWindow):
     """docstring for ClassName"""
     bandera = True
     bandera1 = False
     counter=0
-    ser = serial.Serial('COM2', 115200)
-
-    cred = credentials.Certificate("datoscasasolar-firebase-adminsdk-42r7y-aaa0af8036.json")
-    firebase_admin.initialize_app(cred, {
-        'databaseURL': 'https://datoscasasolar.firebaseio.com/'
-    })
-
-    ref = db.reference('tiempoReal')
-    refData = db.reference('datos')
-    snapshot= ref.get()
-
-    i=0
-    try:
-        i=len(snapshot)
-        if i==60:
-            i=0
-            pass
-    except Exception as e:
-        print("Error de datos")
-    pass
-
+    
     def __init__(self):
         QMainWindow.__init__(self)
         uic.loadUi("MainMenu.ui",self)
@@ -81,7 +83,9 @@ class Ventana(QMainWindow):
         self.threadpool.start(worker)
 
     def recurring_timer(self):
-        inf = self.ser.readline()
+        global i
+        comInt = True
+        inf = ser.readline()
         tiempo=0;
         fechaNow = datetime.datetime.now()
         dia = str(fechaNow.day)
@@ -91,39 +95,33 @@ class Ventana(QMainWindow):
         fechaActual = dia+"-"+mes+"-"+anno
         fechaActual1 =dia+"-"+mes+"-"+anno+" "+str(fechaNow.strftime("%H"))+":"+str((fechaNow.strftime("%M")))+":"+str((fechaNow.strftime("%S")))
         try:
-            dato1= str(inf).split(": ")[1].split(" ")[0]
-            dato2= str(inf).split(": ")[2].split(",")[0]
-            dato3= str(inf).split(": ")[3].split(" ")[0]
-            dato4= str(inf).split(": ")[4].split(" ")[0]
-            dato5= str(inf).split(": ")[5].split(";")[0]
-            
-            self.ref.child(str(self.i)).set({
-                'fechaActual':fechaActual,
-                'hora':hora,
-                'fechaActual1':fechaActual1,
-                'temperatura':dato2,
-                'humedad':dato3,
-                "corrienteBateria" : "0.0",
-                "corrienteCargas" : "0.0",
-                "corrientePanel" : dato1,
-                "irradiancia" : dato4,
-                "voltajeBateria" : "0.0",
-                "voltajeCargas" : "0.0",
-                "voltajePanel" : dato5,
 
-            })
-            self.txtConsole.appendPlainText(str(inf))
-            if self.i==59:
-                nowRef = refData.child("y"+anno).child("m"+mes).child("d"+dia)
-                self.i=0
-                j=0
-                try:
-                    j= len(nowRef.get())
-                    pass
-                except Exception as a:
-                    pass
-                self.nowRef.child(str(j)).set({
+            testConn = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+            host = socket.gethostbyname("www.google.com")
+
+            try:
+                s = socket.create_connection((host, 80), 2)
+                comInt=True
+                print ("Estamos on-line.")
+            except Exception as ea:
+                comInt=False
+                print ("Lo siento, pero no se ha podido establecer la conexión: "+str(ea))
+                self.txtConsole.appendPlainText("Lo siento, pero no se ha podido establecer la conexión.")
+
+
+            if comInt:
+                
+                dato1= str(inf).split(": ")[1].split(" ")[0]
+                dato2= str(inf).split(": ")[2].split(",")[0]
+                dato3= str(inf).split(": ")[3].split(" ")[0]
+                dato4= str(inf).split(": ")[4].split(" ")[0]
+                dato5= str(inf).split(": ")[5].split(";")[0]
+                print("1")
+                
+                ref.child(str(i)).set({
+                    'fechaActual':fechaActual,
                     'hora':hora,
+                    'fechaActual1':fechaActual1,
                     'temperatura':dato2,
                     'humedad':dato3,
                     "corrienteBateria" : "0.0",
@@ -135,10 +133,35 @@ class Ventana(QMainWindow):
                     "voltajePanel" : dato5,
 
                 })
-            else:
-                i=i+1
+                self.txtConsole.appendPlainText(str(inf))
+                
+                if i==59:
+                    nowRef = refData.child("y"+anno).child("m"+mes).child("d"+dia)
+                    i=0
+                    j=0
+                    try:
+                        j= len(nowRef.get())
+                        pass
+                    except Exception as a:
+                        pass
+                    nowRef.child(str(j)).set({
+                        'hora':hora,
+                        'temperatura':dato2,
+                        'humedad':dato3,
+                        "corrienteBateria" : "0.0",
+                        "corrienteCargas" : "0.0",
+                        "corrientePanel" : dato1,
+                        "irradiancia" : dato4,
+                        "voltajeBateria" : "0.0",
+                        "voltajeCargas" : "0.0",
+                        "voltajePanel" : dato5,
+
+                    })
+                else:
+                    i=i+1
+
         except Exception as e:
-            print("Error de datos")
+            print("Error de datos: "+str(e))
             pass
 
 

@@ -668,7 +668,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         description.setText(" ");
         data.setBarWidth(0.48f); // set custom bar width
         barChart1.setData(data);
-        barChart1.groupBars(1, 0.04f, 0f);
+        barChart1.groupBars(0, 0.04f, 0f);
         xAxis = barChart1.getXAxis();
         xAxis.setValueFormatter(new IndexAxisValueFormatter(Constants.DIAS_DE_LA_SEMANA));
         xAxis.setCenterAxisLabels(true);
