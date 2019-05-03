@@ -316,7 +316,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         return view;
     }
 
-    //Métod para ingresar valores al spinner de la vista de mes.
+    //Métodd para ingresar valores al spinner de la vista de mes.
     public void inputDataToSpinner() {
         mSMes.setItems(Constants.MESES);
 
