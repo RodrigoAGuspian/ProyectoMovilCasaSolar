@@ -138,6 +138,8 @@
     <string name="campos_vacios">Algunos o todos los campos estan vacios</string>
     <string name="cambio_de_contrasena_exito">se ha cambiado su contraseña con éxito</string>
     <string name="welcome">Bienvenido</string>
+    <string name="no_hay_datos_disponibles">No hay datos disponibles.</string>
+    <string name="cargar_de_nuevo">Por favor cargue de nuevo el formulario</string>
 
 
 </resources>
