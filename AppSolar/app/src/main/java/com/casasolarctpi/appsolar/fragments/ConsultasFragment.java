@@ -866,12 +866,14 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
     //Método para promediar los datos del diá.
     private float promedioDia(List<DatosCompletos> datosFiltrado, int modo) {
         float acumulador=0;
+        float contador=0;
         switch (modo){
             case 0:
                 try {
                     for (int i=0;i<datosFiltrado.size();i++){
                         try {
                             acumulador+=Float.parseFloat(datosFiltrado.get(i).getHumedad());
+                            contador++;
 
                         }catch (Exception ignore){
 
@@ -890,6 +892,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                     for (int i=0;i<datosFiltrado.size();i++){
                         try {
                             acumulador+=Float.parseFloat(datosFiltrado.get(i).getTemperatura());
+                            contador++;
 
                         }catch (Exception ignore){
 
@@ -908,6 +911,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                     for (int i=0;i<datosFiltrado.size();i++){
                         try {
                             acumulador+=Float.parseFloat(datosFiltrado.get(i).getIrradiancia());
+                            contador++;
                         }catch (Exception ignore){
 
                         }
@@ -925,6 +929,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                     for (int i=0;i<datosFiltrado.size();i++){
                         try {
                             acumulador+=Float.parseFloat(datosFiltrado.get(i).getCorrientePanel());
+                            contador++;
                         }catch (Exception ignore){
 
                         }
@@ -943,6 +948,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                     for (int i=0;i<datosFiltrado.size();i++){
                         try {
                             acumulador+=Float.parseFloat(datosFiltrado.get(i).getVoltajePanel());
+                            contador++;
                         }catch (Exception ignore){
 
                         }
@@ -957,7 +963,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         }
 
         try {
-            return acumulador/datosFiltrado.size();
+            return acumulador/contador;
 
         }catch (Exception ignore){
             return 0;

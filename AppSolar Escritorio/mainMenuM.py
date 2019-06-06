@@ -9,14 +9,24 @@ from firebase_admin import db
 
 ser = serial.Serial('COM2', 115200)
 
-cred = credentials.Certificate("datoscasasolar-firebase-adminsdk-42r7y-aaa0af8036.json")
-firebase_admin.initialize_app(cred, {
+cred1 = credentials.Certificate("datoscasasolar-firebase-adminsdk-42r7y-aaa0af8036.json")
+cred2 = credentials.Certificate("innovatecfrontend-firebase-adminsdk-6v5zs-413fbc2db0.json")
+
+app1 = firebase_admin.initialize_app(cred1, {
     'databaseURL': 'https://datoscasasolar.firebaseio.com/'
 })
 
-ref = db.reference('tiempoReal')
-refData = db.reference('datos')
-snapshot= ref.get()
+app2 = firebase_admin.initialize_app(cred2, {
+    'databaseURL': 'https://innovatecfrontend.firebaseio.com/'
+},"app2")
+
+ref1 = db.reference('tiempoReal',app1)
+refData = db.reference('datos',app1)
+
+ref2 = db.reference('proyectoIrradiancia',app2).child('tiempoReal')
+refData2 = db.reference('proyectoIrradiancia',app2).child('datos')
+
+snapshot= ref1.get()
 
 i=0
 try:
@@ -48,7 +58,7 @@ class Ventana(QMainWindow):
     def iniciarIngresoDeDatos(self):
         try:
             self.timer = QTimer()
-            self.timer.setInterval(2700)
+            self.timer.setInterval(3000)
             self.timer.timeout.connect(self.recurring_timer)
             self.timer.start()
             pass
@@ -96,69 +106,100 @@ class Ventana(QMainWindow):
         fechaActual1 =dia+"-"+mes+"-"+anno+" "+str(fechaNow.strftime("%H"))+":"+str((fechaNow.strftime("%M")))+":"+str((fechaNow.strftime("%S")))
         try:
 
-            testConn = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-            host = socket.gethostbyname("www.google.com")
-
-            try:
-                s = socket.create_connection((host, 80), 2)
-                comInt=True
-                print ("Estamos on-line.")
-            except Exception as ea:
-                comInt=False
-                print ("Lo siento, pero no se ha podido establecer la conexión: "+str(ea))
-                self.txtConsole.appendPlainText("Lo siento, pero no se ha podido establecer la conexión.")
-
-
-            if comInt:
+            if True:
                 
-                dato1= str(inf).split(": ")[1].split(" ")[0]
-                dato2= str(inf).split(": ")[2].split(",")[0]
-                dato3= str(inf).split(": ")[3].split(" ")[0]
-                dato4= str(inf).split(": ")[4].split(" ")[0]
-                dato5= str(inf).split(": ")[5].split(";")[0]
-                print("1")
-                
-                ref.child(str(i)).set({
-                    'fechaActual':fechaActual,
-                    'hora':hora,
-                    'fechaActual1':fechaActual1,
-                    'temperatura':dato2,
-                    'humedad':dato3,
-                    "corrienteBateria" : "0.0",
-                    "corrienteCargas" : "0.0",
-                    "corrientePanel" : dato1,
-                    "irradiancia" : dato4,
-                    "voltajeBateria" : "0.0",
-                    "voltajeCargas" : "0.0",
-                    "voltajePanel" : dato5,
+                try:
+                    dato1= str(inf).split(": ")[1].split(" ")[0]
+                    dato2= str(inf).split(": ")[2].split(",")[0]
+                    dato3= str(inf).split(": ")[3].split(" ")[0]
+                    dato4= str(inf).split(": ")[4].split(" ")[0]
+                    dato5= str(inf).split(": ")[5].split(";")[0]
 
-                })
-                self.txtConsole.appendPlainText(str(inf))
-                
-                if i==59:
-                    nowRef = refData.child("y"+anno).child("m"+mes).child("d"+dia)
-                    i=0
-                    j=0
-                    try:
-                        j= len(nowRef.get())
+                    tmpVoltaje = float(dato5);
+                    if  tmpVoltaje>= 0.5:
+                        print("1")
+                        ref1.child(str(i)).set({
+                            'fechaActual':fechaActual,
+                            'hora':hora,
+                            'fechaActual1':fechaActual1,
+                            'temperatura':dato2,
+                            'humedad':dato3,
+                            "corrienteBateria" : "0.0",
+                            "corrienteCargas" : "0.0",
+                            "corrientePanel" : dato1,
+                            "irradiancia" : dato4,
+                            "voltajeBateria" : "0.0",
+                            "voltajeCargas" : "0.0",
+                            "voltajePanel" : dato5,
+
+                        })
+                        ref2.child(str(i)).set({
+                            'fechaActual':fechaActual,
+                            'hora':hora,
+                            'fechaActual1':fechaActual1,
+                            'temperatura':dato2,
+                            'humedad':dato3,
+                            "corrienteBateria" : "0.0",
+                            "corrienteCargas" : "0.0",
+                            "corrientePanel" : dato1,
+                            "irradiancia" : dato4,
+                            "voltajeBateria" : "0.0",
+                            "voltajeCargas" : "0.0",
+                            "voltajePanel" : dato5,
+
+                        })
+                        self.txtConsole.appendPlainText(str(inf))
+                        i=i+1
+                        if i==60:
+                            nowRef = refData.child("y"+anno).child("m"+mes).child("d"+dia)
+                            nowRef2 = refData2.child("y"+anno).child("m"+mes).child("d"+dia)
+                            i=0
+                            j=0
+                            k=0
+                            try:
+                                j= len(nowRef.get())
+                                k= len(nowRef2.get())
+                                pass
+                            except Exception as a:
+                                print ("Lo siento, no se ha podido comunicar con la base de datos, espere: "+str(a))
+                                self.txtConsole.appendPlainText("Lo siento, no se ha podido comunicar con la base de datos, espere.")
+                                pass
+                            nowRef.child(str(j)).set({
+                                'hora':hora,
+                                'temperatura':dato2,
+                                'humedad':dato3,
+                                "corrienteBateria" : "0.0",
+                                "corrienteCargas" : "0.0",
+                                "corrientePanel" : dato1,
+                                "irradiancia" : dato4,
+                                "voltajeBateria" : "0.0",
+                                "voltajeCargas" : "0.0",
+                                "voltajePanel" : dato5,
+
+                            })
+
+                            nowRef2.child(str(k)).set({
+                                'hora':hora,
+                                'temperatura':dato2,
+                                'humedad':dato3,
+                                "corrienteBateria" : "0.0",
+                                "corrienteCargas" : "0.0",
+                                "corrientePanel" : dato1,
+                                "irradiancia" : dato4,
+                                "voltajeBateria" : "0.0",
+                                "voltajeCargas" : "0.0",
+                                "voltajePanel" : dato5,
+
+                            })
+                    else:
+                        print ("Estamos en la noche.")
                         pass
-                    except Exception as a:
-                        pass
-                    nowRef.child(str(j)).set({
-                        'hora':hora,
-                        'temperatura':dato2,
-                        'humedad':dato3,
-                        "corrienteBateria" : "0.0",
-                        "corrienteCargas" : "0.0",
-                        "corrientePanel" : dato1,
-                        "irradiancia" : dato4,
-                        "voltajeBateria" : "0.0",
-                        "voltajeCargas" : "0.0",
-                        "voltajePanel" : dato5,
 
-                    })
+                except Exception as e:
+                    print ("Lo siento, no se ha podido comunicar con la base de datos, espere: "+str(e))
+                    self.txtConsole.appendPlainText("Lo siento, no se ha podido comunicar con la base de datos, espere.")
                 else:
-                    i=i+1
+                    pass
 
         except Exception as e:
             print("Error de datos: "+str(e))
@@ -189,3 +230,4 @@ app = QApplication(sys.argv)
 newVentana = Ventana()
 newVentana.show()
 app.exec_()
+
