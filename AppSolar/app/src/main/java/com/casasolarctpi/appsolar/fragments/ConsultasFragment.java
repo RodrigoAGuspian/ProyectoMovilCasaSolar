@@ -712,9 +712,9 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         float tmpYAxisMax1= (float) (yAxisMaxS1*1.014);
         float tmpYAxisMax2= (float) (yAxisMaxS2*1.014);
         yAxisLeft.setAxisMaximum(tmpYAxisMax1);
-        yAxisLeft.setAxisMinimum(yAxisMinS1);
+        yAxisLeft.setAxisMinimum(0);
         yAxisRight.setAxisMaximum(tmpYAxisMax2);
-        yAxisRight.setAxisMinimum(yAxisMinS2);
+        yAxisRight.setAxisMinimum(0);
 
         barChart1.setVisibility(VISIBLE);
         barChart1.setDescription(description);
@@ -922,9 +922,9 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
             float tmpYAxisMax1= (float) (yAxisMax1*1.014);
             float tmpYAxisMax2= (float) (yAxisMax2*1.014);
             yAxisLeft.setAxisMaximum(tmpYAxisMax1);
-            yAxisLeft.setAxisMinimum(yAxisMin1);
+            yAxisLeft.setAxisMinimum(0);
             yAxisRight.setAxisMaximum(tmpYAxisMax2);
-            yAxisRight.setAxisMinimum(yAxisMin2);
+            yAxisRight.setAxisMinimum(0);
 
             barChart2.getBarData().setBarWidth(0.46f);
             barChart2.getXAxis().setAxisMinValue(0);
