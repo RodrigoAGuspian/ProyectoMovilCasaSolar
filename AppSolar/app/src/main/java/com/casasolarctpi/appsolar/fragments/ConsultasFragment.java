@@ -66,10 +66,10 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import static android.view.View.VISIBLE;
 import static com.jaredrummler.materialspinner.MaterialSpinner.INVISIBLE;
-import static com.jaredrummler.materialspinner.MaterialSpinner.OnItemSelectedListener;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -586,7 +586,6 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                 datosCompletosSemana[contador] = dataSnapshot.getValue(t);
                 if (contador==6){
                     showChartWeek();
-
                 }
             }
 
@@ -735,6 +734,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         switch(month){
             case 0:
             case 2:
+            case 4:
             case 6:
             case 7:
             case 9:
@@ -759,45 +759,49 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         int realMonth= month+1;
         datosCompletosMes = new List[numDias];
 
+        getDataToFirebaseForMonth(yearM, realMonth);
 
-        for (int i=0; i<numDias;i++){
-            getDataDayOFFireBaseDay(yearM,realMonth,i);
-
-        }
 
     }
 
-    //Método para la obtención de datos del mes por día
-    private void getDataDayOFFireBaseDay(int yearM, int realMonth, final int i) {
-        final int dias = i+1;
-        DatabaseReference datosDia = MenuPrincipal.reference.child("datos").child("y"+yearM).child("m"+realMonth).child("d"+dias);
-        datosDia.addValueEventListener(new ValueEventListener() {
+    //Método para la obtención de datos del mes
+    private void getDataToFirebaseForMonth(int year, int month){
+        DatabaseReference dbrMonth = MenuPrincipal.reference.child("datos").child("y"+year).child("m"+month);
+        dbrMonth.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                GenericTypeIndicator<ArrayList<DatosCompletos>> t = new GenericTypeIndicator<ArrayList<DatosCompletos>>() {};
-                try {
-
-                    datosCompletosMes[i] = dataSnapshot.getValue(t);
-                }catch (Exception ignored){
-
-                }
-                if (i==numDias-1){
+            public void onDataChange(@androidx.annotation.NonNull DataSnapshot dataSnapshot) {
+                int tmpIndex;
+                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
                     try {
-                        showChartMonth();
-
+                        tmpIndex = Integer.parseInt(Objects.requireNonNull(postSnapshot.getKey()).substring(1));
+                        GenericTypeIndicator<ArrayList<DatosCompletos>> t = new GenericTypeIndicator<ArrayList<DatosCompletos>>() {};
+                        datosCompletosMes[tmpIndex-1] = postSnapshot.getValue(t);
                     }catch (Exception e){
-                        Log.e("Error Grafica",e.getMessage());
+                        Log.e("Error consulta mes", e.getMessage());
                     }
+
                 }
+                try {
+                    showChartMonth();
+                    Log.e("Pasa dato","!");
+
+                }catch (Exception e){
+                    try {
+                        Toast.makeText(getContext(), R.string.no_hay_datos_disponibles, Toast.LENGTH_SHORT).show();
+                    }catch (Exception ignored){
+
+                    }
+                    btnConsulta3.setEnabled(true);
+                    pBConsultas.setVisibility(View.INVISIBLE);
+                }
+
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+            public void onCancelled(@androidx.annotation.NonNull DatabaseError databaseError) {
                 Toast.makeText(getContext(), "No hay conexión a internet", Toast.LENGTH_SHORT).show();
             }
         });
-
-
     }
 
     //Método para graficar los datos del mes.
@@ -813,7 +817,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         float tmpValue2 = 0;
         for (int i=0; i<datosCompletosMes.length;i++) {
             DatosPromedio datosPromedio = promedioDia(datosCompletosMes[i]);
-            switch (modoGraficar){
+            switch (modoGraficar) {
                 case 0:
                     tmpValue = datosPromedio.getIrradianciaPromedio();
                     tmpValue2 = datosPromedio.getHumedadPromedio();
@@ -858,10 +862,21 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                 yAxisMin2 = tmpValue2;
             }
 
-            entry1.add(new BarEntry(i+1,tmpValue));
-            entry2.add(new BarEntry(i+1,tmpValue2));
-            labelC.add(Integer.toString(i+1));
+
+            entry1.add(new BarEntry(i + 1, tmpValue));
+            entry2.add(new BarEntry(i + 1, tmpValue2));
+            labelC.add(Integer.toString(i + 1));
+
+            if (i<=datosCompletosMes.length){
+                barChart2.notifyDataSetChanged();
+                barChart2.invalidate();
+            }
         }
+        for (int i=0; i< numDias+1; i++){
+            labelC.add(i,Integer.toString(i+1));
+
+        }
+
 
         if (entry1.size()!=0) {
 
@@ -887,7 +902,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
             dataBarSets.add(barDataSet);
             dataBarSets.add(barDataSet1);
             BarData data = new BarData(barDataSet,barDataSet1);
-            data.setBarWidth(0.48f); // set custom bar width
+
             barChart2.setData(data);
             Description description = new Description();
             description.setText(" ");
@@ -897,7 +912,9 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
             xAxis1.setPosition(XAxis.XAxisPosition.BOTTOM);
             xAxis1.setValueFormatter(new IndexAxisValueFormatter(labelC));
             xAxis1.setAxisMaximum(datosCompletosMes.length);
-            xAxis1.setLabelCount(2,true);
+            xAxis1.setAxisMinimum(0);
+            xAxis1.setGranularity(1f);
+            xAxis1.setCenterAxisLabels(true);
 
             YAxis yAxisLeft = barChart2.getAxisLeft();
             YAxis yAxisRight = barChart2.getAxisRight();
@@ -909,13 +926,16 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
             yAxisRight.setAxisMaximum(tmpYAxisMax2);
             yAxisRight.setAxisMinimum(yAxisMin2);
 
+            barChart2.getBarData().setBarWidth(0.46f);
+            barChart2.getXAxis().setAxisMinValue(0);
+            barChart2.groupBars(0, 0.08f, 0f);
 
             barChart2.setDescription(description);
-            barChart2.groupBars(1, 0.04f, 0f);
             barChart2.setTouchEnabled(true);
             barChart2.setVisibility(VISIBLE);
             barChart2.setMarker(new CustomMarkerViewDataMonth(getContext(),R.layout.item_custom_marker,labelC,datoInfo1,datoInfo2,colorDato1,colorDato2));
             barChart2.highlightValue(null);
+
             barChart2.invalidate();
 
 
@@ -947,9 +967,23 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                     acumulador.setTemperaturaPromedio(acumulador.getTemperaturaPromedio() + Float.parseFloat(el1.getTemperatura()));
                     contador++;
                 }catch (Exception ignore1) {
+=======
+                    for (int i=0;i<datosFiltrado.size();i++){
+                        try {
+                            acumulador+=Float.parseFloat(datosFiltrado.get(i).getTemperatura());
+                            contador++;
+
+                        }catch (Exception ignore){
+
+                        }
+                    }
+
+                }catch (Exception ignore){
+>>>>>>> fb4cd72e119bc9bbaf4879b081e2fac39e462e02
 
                 }
                 try {
+<<<<<<< HEAD
                     Date horaDato;
                     SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a", Locale.US);
                     horaDato = timeFormat.parse(el1.getHora());
@@ -965,6 +999,32 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                     } else {
                         if (horaDato.getHours() - 1 > acmH || acmH ==0){
                             acmH = horaDato.getHours() + 1;
+=======
+                    for (int i=0;i<datosFiltrado.size();i++){
+                        try {
+                            acumulador+=Float.parseFloat(datosFiltrado.get(i).getIrradiancia());
+                            contador++;
+                        }catch (Exception ignore){
+
+                        }
+                    }
+
+                }catch (Exception ignore){
+
+                }
+
+                break;
+
+            case 3:
+
+                try {
+                    for (int i=0;i<datosFiltrado.size();i++){
+                        try {
+                            acumulador+=Float.parseFloat(datosFiltrado.get(i).getCorrientePanel());
+                            contador++;
+                        }catch (Exception ignore){
+
+>>>>>>> fb4cd72e119bc9bbaf4879b081e2fac39e462e02
                         }
                     }
 
@@ -973,7 +1033,24 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
                 }
 
+<<<<<<< HEAD
             }
+=======
+                break;
+
+
+            case 4:
+
+                try {
+                    for (int i=0;i<datosFiltrado.size();i++){
+                        try {
+                            acumulador+=Float.parseFloat(datosFiltrado.get(i).getVoltajePanel());
+                            contador++;
+                        }catch (Exception ignore){
+
+                        }
+                    }
+>>>>>>> fb4cd72e119bc9bbaf4879b081e2fac39e462e02
 
             for ( float element : irradianciaPorHoras ) {
                 acumulador.setIrradianciaPromedio(element + acumulador.getIrradianciaPromedio());
@@ -988,8 +1065,18 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
         }
 
+<<<<<<< HEAD
 
         return acumulador;
+=======
+        try {
+            return acumulador/contador;
+
+        }catch (Exception ignore){
+            return 0;
+
+        }
+>>>>>>> fb4cd72e119bc9bbaf4879b081e2fac39e462e02
 
     }
 

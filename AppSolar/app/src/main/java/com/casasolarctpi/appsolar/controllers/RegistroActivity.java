@@ -85,7 +85,6 @@ public class RegistroActivity extends AppCompatActivity implements OnClickListen
         if (compareToPasswords()) {
             createAccount(txtEmail.getText().toString(),txtContrasena1.getText().toString());
         }else {
-            Toast.makeText(this, "", Toast.LENGTH_SHORT).show();
         }
 
     }

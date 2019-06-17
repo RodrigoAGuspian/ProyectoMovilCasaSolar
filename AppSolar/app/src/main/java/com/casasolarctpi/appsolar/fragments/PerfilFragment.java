@@ -62,8 +62,19 @@ public class PerfilFragment extends Fragment implements OnClickListener {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_perfil, container, false);
         inizialite();
-        inizialiteFirebase();
-        datosPrevios();
+        try {
+            inizialiteFirebase();
+            datosPrevios();
+        }catch (Exception ignored){
+            view.findViewById(R.id.btnActualizar).setVisibility(View.INVISIBLE);
+            try {
+                Toast.makeText(getContext(), getString(R.string.cargar_de_nuevo), Toast.LENGTH_SHORT).show();
+
+            }catch (Exception ignored2){
+
+            }
+        }
+
         return view;
     }
 
