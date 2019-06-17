@@ -968,18 +968,6 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                     contador++;
                 }catch (Exception ignore1) {
 
-                    for (int i=0;i<datosFiltrado.size();i++){
-                        try {
-                            acumulador+=Float.parseFloat(datosFiltrado.get(i).getTemperatura());
-                            contador++;
-
-                        }catch (Exception ignore){
-
-                        }
-                    }
-
-                }catch (Exception ignore){
-
                 }
                 try {
                     Date horaDato;
@@ -997,30 +985,6 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                     } else {
                         if (horaDato.getHours() - 1 > acmH || acmH ==0){
                             acmH = horaDato.getHours() + 1;
-                    for (int i=0;i<datosFiltrado.size();i++){
-                        try {
-                            acumulador+=Float.parseFloat(datosFiltrado.get(i).getIrradiancia());
-                            contador++;
-                        }catch (Exception ignore){
-
-                        }
-                    }
-
-                }catch (Exception ignore){
-
-                }
-
-                break;
-
-            case 3:
-
-                try {
-                    for (int i=0;i<datosFiltrado.size();i++){
-                        try {
-                            acumulador+=Float.parseFloat(datosFiltrado.get(i).getCorrientePanel());
-                            contador++;
-                        }catch (Exception ignore){
-
                         }
                     }
 
@@ -1029,22 +993,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
                 }
 
-
             }
-                break;
-
-
-            case 4:
-
-                try {
-                    for (int i=0;i<datosFiltrado.size();i++){
-                        try {
-                            acumulador+=Float.parseFloat(datosFiltrado.get(i).getVoltajePanel());
-                            contador++;
-                        }catch (Exception ignore){
-
-                        }
-                    }
 
             for ( float element : irradianciaPorHoras ) {
                 acumulador.setIrradianciaPromedio(element + acumulador.getIrradianciaPromedio());
@@ -1059,15 +1008,8 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
         }
 
+
         return acumulador;
-
-        try {
-            return acumulador/contador;
-
-        }catch (Exception ignore){
-            return 0;
-
-        }
 
     }
 
@@ -1094,6 +1036,4 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                 break;
         }
     }
-
-
 }
