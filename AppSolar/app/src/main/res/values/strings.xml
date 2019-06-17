@@ -39,6 +39,7 @@
     <string name="titulo_dato1">Humedad (%H) vs Tiempo</string>
     <string name="titulo_dato2">Temperatura (°C) vs Tiempo</string>
     <string name="titulo_dato3">Irradiancia (W/m²) vs Tiempo</string>
+    <string name="titulo_dato4">Corriente (°A) vs Tiempo</string>
 
     <string name="innovaTec">InnovaTec</string>
     <string name="mensaje_week">Por favor seleccione un día (esta selección tomará toda la semana de dicho día)</string>
