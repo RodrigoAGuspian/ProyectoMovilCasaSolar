@@ -967,7 +967,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                     acumulador.setTemperaturaPromedio(acumulador.getTemperaturaPromedio() + Float.parseFloat(el1.getTemperatura()));
                     contador++;
                 }catch (Exception ignore1) {
-=======
+
                     for (int i=0;i<datosFiltrado.size();i++){
                         try {
                             acumulador+=Float.parseFloat(datosFiltrado.get(i).getTemperatura());
@@ -979,11 +979,9 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                     }
 
                 }catch (Exception ignore){
->>>>>>> fb4cd72e119bc9bbaf4879b081e2fac39e462e02
 
                 }
                 try {
-<<<<<<< HEAD
                     Date horaDato;
                     SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a", Locale.US);
                     horaDato = timeFormat.parse(el1.getHora());
@@ -999,7 +997,6 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                     } else {
                         if (horaDato.getHours() - 1 > acmH || acmH ==0){
                             acmH = horaDato.getHours() + 1;
-=======
                     for (int i=0;i<datosFiltrado.size();i++){
                         try {
                             acumulador+=Float.parseFloat(datosFiltrado.get(i).getIrradiancia());
@@ -1024,7 +1021,6 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                             contador++;
                         }catch (Exception ignore){
 
->>>>>>> fb4cd72e119bc9bbaf4879b081e2fac39e462e02
                         }
                     }
 
@@ -1033,9 +1029,8 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
                 }
 
-<<<<<<< HEAD
+
             }
-=======
                 break;
 
 
@@ -1050,7 +1045,6 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
                         }
                     }
->>>>>>> fb4cd72e119bc9bbaf4879b081e2fac39e462e02
 
             for ( float element : irradianciaPorHoras ) {
                 acumulador.setIrradianciaPromedio(element + acumulador.getIrradianciaPromedio());
@@ -1065,10 +1059,8 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
         }
 
-<<<<<<< HEAD
-
         return acumulador;
-=======
+
         try {
             return acumulador/contador;
 
@@ -1076,7 +1068,6 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
             return 0;
 
         }
->>>>>>> fb4cd72e119bc9bbaf4879b081e2fac39e462e02
 
     }
 
