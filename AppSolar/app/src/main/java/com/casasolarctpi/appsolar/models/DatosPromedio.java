@@ -1,7 +1,7 @@
 package com.casasolarctpi.appsolar.models;
 
 public class DatosPromedio {
-    private float hora = 0 , temperaturaPromedio = 0, humedadPromedio = 0, corrientePromedio = 0, irradianciaPromedio = 0, voltajePromedio = 0;
+    private float hora = 0 , temperaturaPromedio = 0, humedadPromedio = 0, corrientePromedio = 0, irradianciaPromedio = 0, voltajePromedio = 0, potenciaPromedio = 0;
 
     public DatosPromedio() {
     }
@@ -53,4 +53,13 @@ public class DatosPromedio {
     public void setVoltajePromedio(float voltajePromedio) {
         this.voltajePromedio = voltajePromedio;
     }
+
+    public float getPotenciaPromedio() {
+        return potenciaPromedio;
+    }
+
+    public void setPotenciaPromedio(float potenciaPromedio) {
+        this.potenciaPromedio = potenciaPromedio;
+    }
+
 }

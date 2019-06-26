@@ -5,6 +5,10 @@ import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -13,9 +17,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.ProgressBar;
 import android.widget.TabHost;
@@ -32,7 +36,6 @@ import com.casasolarctpi.appsolar.models.DatosCompletos;
 import com.casasolarctpi.appsolar.models.DatosPromedio;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -42,11 +45,8 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.DefaultValueFormatter;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
-import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.ViewPortHandler;
@@ -338,6 +338,13 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
     //Método para mostrar el DatePicker del día.
     public void showDatePickerDialog() {
         DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), this, Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH), Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+        datePickerDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                lockDeviceRotation(false);
+            }
+        });
+        lockDeviceRotation(true);
         datePickerDialog.show();
 
     }
@@ -357,8 +364,11 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                 txtDate1.setText(getString(R.string.fecha)+": "+fechaATexto);
                 //dateDay = new GregorianCalendar(year,month,dayOfMonth).getTime();
                 getDataDayOFFireBase(year, realMonth, dayOfMonth);
+                lockDeviceRotation(false);
                 break;
         }
+
+
     }
 
     //Método pra mostrar la gráfica de la consulta por dia.
@@ -550,6 +560,13 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
             }
         });
 
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                lockDeviceRotation(false);
+            }
+        });
+        lockDeviceRotation(true);
         dialog.show();
 
     }
@@ -591,7 +608,6 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
             }
         });
     }
@@ -625,7 +641,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                     tmpValue = datosPromedio.getIrradianciaPromedio();
                     tmpValue2 = datosPromedio.getTemperaturaPromedio();
                     break;
-                case 5:
+                case 4:
                     tmpValue = datosPromedio.getHumedadPromedio();
                     tmpValue2 = datosPromedio.getTemperaturaPromedio();
                     break;
@@ -834,7 +850,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                     tmpValue = datosPromedio.getIrradianciaPromedio();
                     tmpValue2 = datosPromedio.getTemperaturaPromedio();
                     break;
-                case 5:
+                case 4:
                     tmpValue = datosPromedio.getHumedadPromedio();
                     tmpValue2 = datosPromedio.getTemperaturaPromedio();
                     break;
@@ -977,7 +993,7 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                         acmH = horaDato.getHours();
                     }
                     if (horaDato.getHours() == acmH){
-                        tmpAcumIrr = Math.round(tmpAcumIrr / contador * 1000) / 1000;
+                        tmpAcumIrr = tmpAcumIrr / contador;
                         irradianciaPorHoras.add(tmpAcumIrr);
                         tmpAcumIrr = 0;
                         acmH++;
@@ -998,11 +1014,10 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
             for ( float element : irradianciaPorHoras ) {
                 acumulador.setIrradianciaPromedio(element + acumulador.getIrradianciaPromedio());
             }
-
-            acumulador.setHumedadPromedio(Math.round(acumulador.getHumedadPromedio() / datosFiltrado.size() * 1000) / 1000);
-            acumulador.setCorrientePromedio(Math.round(acumulador.getCorrientePromedio() / datosFiltrado.size() / 1000) / 1000);
-            acumulador.setVoltajePromedio(Math.round(acumulador.getVoltajePromedio() / datosFiltrado.size() * 1000) / 1000);
-            acumulador.setTemperaturaPromedio(Math.round(acumulador.getTemperaturaPromedio() / datosFiltrado.size() * 1000) / 1000);
+            acumulador.setHumedadPromedio(acumulador.getHumedadPromedio() / datosFiltrado.size());
+            acumulador.setCorrientePromedio(acumulador.getCorrientePromedio() / datosFiltrado.size());
+            acumulador.setVoltajePromedio(acumulador.getVoltajePromedio() / datosFiltrado.size());
+            acumulador.setTemperaturaPromedio(acumulador.getTemperaturaPromedio() / datosFiltrado.size());
 
         }catch (Exception ignore){
 
@@ -1034,6 +1049,25 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                 getDataMonth();
                 btnConsulta3.setEnabled(false);
                 break;
+        }
+    }
+
+    public void lockDeviceRotation(boolean value) {
+
+        if (value) {
+            int currentOrientation = getResources().getConfiguration().orientation;
+            if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+                getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+            } else {
+                getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+            }
+        } else {
+            getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
+            } else {
+                getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+            }
         }
     }
 }

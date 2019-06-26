@@ -141,6 +141,11 @@
     <string name="welcome">Bienvenido</string>
     <string name="no_hay_datos_disponibles">No hay datos disponibles.</string>
     <string name="cargar_de_nuevo">Por favor cargue de nuevo el formulario</string>
+    <string name="leer_mas">Leer más</string>
+    <string name="irradiancia_global_w_h">Irradiancia Global (W/h)</string>
+    <string name="energia_dia">Energía Día (Wh/m²/día)</string>
+    <string name="horas_de_sol">Horas de Sol (W/día)</string>
+    <string name="cerrar">Cerrar</string>
 
 
 </resources>
