@@ -92,10 +92,10 @@ public class TiempoRealFragment extends Fragment {
 
 
             case 1:
-                colorGrafica = getResources().getColor(R.color.colorGraficaLinea2);
-                colorTextoGrafica = getResources().getColor(R.color.colorGraficaPunto2);
-                tipoDeDato = getResources().getString(R.string.dato2);
-                txtGrafica.setText(R.string.titulo_dato2);
+                colorGrafica = getResources().getColor(R.color.colorGraficaLinea4);
+                colorTextoGrafica = getResources().getColor(R.color.colorGraficaPunto4);
+                tipoDeDato = getResources().getString(R.string.dato4);
+                txtGrafica.setText(R.string.titulo_dato4);
 
                 break;
 
@@ -176,7 +176,7 @@ public class TiempoRealFragment extends Fragment {
                         break;
 
                     case 1:
-                        dato=Float.parseFloat(datosTiempoRealList.get(i).getTemperatura());
+                        dato=Float.parseFloat(datosTiempoRealList.get(i).getCorrientePanel());
                         break;
 
                     case 2:
@@ -287,7 +287,7 @@ public class TiempoRealFragment extends Fragment {
                         break;
 
                     case 1:
-                        dato = Float.parseFloat(datosTiempoRealList.get(i).getTemperatura());
+                        dato = Float.parseFloat(datosTiempoRealList.get(i).getCorrientePanel());
                         break;
 
                     case 2:

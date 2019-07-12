@@ -5,6 +5,10 @@ import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -13,9 +17,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.ProgressBar;
 import android.widget.TabHost;
@@ -29,9 +33,9 @@ import com.casasolarctpi.appsolar.models.Constants;
 import com.casasolarctpi.appsolar.models.CustomMarkerViewData2;
 import com.casasolarctpi.appsolar.models.CustomMarkerViewDataMonth;
 import com.casasolarctpi.appsolar.models.DatosCompletos;
+import com.casasolarctpi.appsolar.models.DatosPromedio;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -41,11 +45,8 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.DefaultValueFormatter;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
-import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.ViewPortHandler;
@@ -64,11 +65,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import static android.view.View.VISIBLE;
 import static com.jaredrummler.materialspinner.MaterialSpinner.INVISIBLE;
-import static com.jaredrummler.materialspinner.MaterialSpinner.OnItemSelectedListener;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -100,7 +101,9 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
     String datoInfo1;
     String datoInfo2;
 
-    int colorDato1, colorDato2, colorDatoTexto1, colorDatoTexto2, modo1, modo2, yAxisMax1, yAxisMin1, yAxisMax2, yAxisMin2;
+    int colorDato1, colorDato2, colorDatoTexto1, colorDatoTexto2, modo1, modo2;
+    float yAxisMax1, yAxisMin1, yAxisMax2, yAxisMin2;
+    float yAxisMaxS1, yAxisMinS1, yAxisMaxS2, yAxisMinS2;
 
     public ConsultasFragment() {
         // Required empty public constructor
@@ -137,11 +140,6 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                 colorDatoTexto1 = getResources().getColor(R.color.colorGraficaLinea3);
                 colorDatoTexto2 = getResources().getColor(R.color.colorGraficaLinea1);
 
-                yAxisMax1 = 1000;
-                yAxisMax2 = 120;
-                yAxisMin1 = 0;
-                yAxisMin2 = 0;
-
                 modo1 = 2;
                 modo2 = 0;
 
@@ -161,10 +159,6 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                 colorDatoTexto1 = getResources().getColor(R.color.colorGraficaLinea3);
                 colorDatoTexto2 = getResources().getColor(R.color.colorGraficaLinea4);
 
-                yAxisMax1 = 1000;
-                yAxisMax2 = 10;
-                yAxisMin1 = 0;
-                yAxisMin2 = 0;
 
                 modo1 = 2;
                 modo2 = 3;
@@ -186,11 +180,6 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                 colorDatoTexto1 = getResources().getColor(R.color.colorGraficaLinea3);
                 colorDatoTexto2 = getResources().getColor(R.color.colorGraficaLinea5);
 
-                yAxisMax1 = 1000;
-                yAxisMax2 = 25;
-                yAxisMin1 = 0;
-                yAxisMin2 = 0;
-
                 modo1 = 2;
                 modo2 = 4;
 
@@ -211,11 +200,6 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                 colorDatoTexto1 = getResources().getColor(R.color.colorGraficaLinea3);
                 colorDatoTexto2 = getResources().getColor(R.color.colorGraficaLinea2);
 
-                yAxisMax1 = 1000;
-                yAxisMax2 = 50;
-                yAxisMin1 = 0;
-                yAxisMin2 = 0;
-
                 modo1 = 2;
                 modo2 = 1;
 
@@ -233,11 +217,6 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
                 colorDatoTexto1 = getResources().getColor(R.color.colorGraficaLinea1);
                 colorDatoTexto2 = getResources().getColor(R.color.colorGraficaLinea2);
-
-                yAxisMax1 = 120;
-                yAxisMax2 = 50;
-                yAxisMin1 = 0;
-                yAxisMin2 = 0;
 
                 modo1 = 0;
                 modo2 = 1;
@@ -359,6 +338,13 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
     //Método para mostrar el DatePicker del día.
     public void showDatePickerDialog() {
         DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), this, Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH), Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+        datePickerDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                lockDeviceRotation(false);
+            }
+        });
+        lockDeviceRotation(true);
         datePickerDialog.show();
 
     }
@@ -378,8 +364,11 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
                 txtDate1.setText(getString(R.string.fecha)+": "+fechaATexto);
                 //dateDay = new GregorianCalendar(year,month,dayOfMonth).getTime();
                 getDataDayOFFireBase(year, realMonth, dayOfMonth);
+                lockDeviceRotation(false);
                 break;
         }
+
+
     }
 
     //Método pra mostrar la gráfica de la consulta por dia.
@@ -571,6 +560,13 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
             }
         });
 
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                lockDeviceRotation(false);
+            }
+        });
+        lockDeviceRotation(true);
         dialog.show();
 
     }
@@ -612,7 +608,6 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
             }
         });
     }
@@ -624,10 +619,59 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         barChart1.clearAnimation();
         barChart1.clear();
 
+        float tmpValue = 0;
+        float tmpValue2 = 0;
 
         for (int i=0; i<7;i++){
-            entriesBarWeek.add(new BarEntry(i,promedioDia(datosCompletosSemana[i],modo1)));
-            entriesBarWeek1.add(new BarEntry(i,promedioDia(datosCompletosSemana[i],modo2)));
+            DatosPromedio datosPromedio = promedioDia(datosCompletosSemana[i]);
+            switch (modoGraficar){
+                case 0:
+                    tmpValue = datosPromedio.getIrradianciaPromedio();
+                    tmpValue2 = datosPromedio.getHumedadPromedio();
+                    break;
+                case 1:
+                    tmpValue = datosPromedio.getIrradianciaPromedio();
+                    tmpValue2 = datosPromedio.getCorrientePromedio();
+                    break;
+                case 2:
+                    tmpValue = datosPromedio.getIrradianciaPromedio();
+                    tmpValue2 = datosPromedio.getVoltajePromedio();
+                    break;
+                case 3:
+                    tmpValue = datosPromedio.getIrradianciaPromedio();
+                    tmpValue2 = datosPromedio.getTemperaturaPromedio();
+                    break;
+                case 4:
+                    tmpValue = datosPromedio.getHumedadPromedio();
+                    tmpValue2 = datosPromedio.getTemperaturaPromedio();
+                    break;
+
+            }
+            if (tmpValue > yAxisMaxS1) {
+                yAxisMaxS1 = tmpValue;
+            }
+
+            if (yAxisMinS1 == 0) {
+                yAxisMinS1 = tmpValue;
+            }
+            if (tmpValue < yAxisMinS1) {
+                yAxisMinS1 = tmpValue;
+            }
+
+            if (tmpValue2 > yAxisMaxS2) {
+                yAxisMaxS2 = tmpValue2;
+            }
+
+            if (yAxisMinS2 == 0) {
+                yAxisMinS2 = tmpValue2;
+            }
+            if (tmpValue2 < yAxisMinS2) {
+                yAxisMinS2 = tmpValue2;
+            }
+
+            entriesBarWeek.add(new BarEntry(i,tmpValue));
+            entriesBarWeek1.add(new BarEntry(i,tmpValue2));
+
         }
 
 
@@ -680,10 +724,14 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
         YAxis yAxisLeft = barChart1.getAxisLeft();
         YAxis yAxisRight = barChart1.getAxisRight();
-        yAxisLeft.setAxisMaximum(yAxisMax1);
-        yAxisLeft.setAxisMinimum(yAxisMin1);
-        yAxisRight.setAxisMaximum(yAxisMax2);
-        yAxisRight.setAxisMinimum(yAxisMin2);
+
+        float tmpYAxisMax1= (float) (yAxisMaxS1*1.014);
+        float tmpYAxisMax2= (float) (yAxisMaxS2*1.014);
+        yAxisLeft.setAxisMaximum(tmpYAxisMax1);
+        yAxisLeft.setAxisMinimum(0);
+        yAxisRight.setAxisMaximum(tmpYAxisMax2);
+        yAxisRight.setAxisMinimum(0);
+
         barChart1.setVisibility(VISIBLE);
         barChart1.setDescription(description);
         pBConsultas.setVisibility(INVISIBLE);
@@ -781,19 +829,70 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         List<String> labelC = new ArrayList<>();
         XAxis xAxis1;
         labelC.add(" ");
-        for (int i=0; i< numDias+1; i++){
-            labelC.add(i,Integer.toString(i+1));
+        float tmpValue = 0;
+        float tmpValue2 = 0;
+        for (int i=0; i<datosCompletosMes.length;i++) {
+            DatosPromedio datosPromedio = promedioDia(datosCompletosMes[i]);
+            switch (modoGraficar) {
+                case 0:
+                    tmpValue = datosPromedio.getIrradianciaPromedio();
+                    tmpValue2 = datosPromedio.getHumedadPromedio();
+                    break;
+                case 1:
+                    tmpValue = datosPromedio.getIrradianciaPromedio();
+                    tmpValue2 = datosPromedio.getCorrientePromedio();
+                    break;
+                case 2:
+                    tmpValue = datosPromedio.getIrradianciaPromedio();
+                    tmpValue2 = datosPromedio.getVoltajePromedio();
+                    break;
+                case 3:
+                    tmpValue = datosPromedio.getIrradianciaPromedio();
+                    tmpValue2 = datosPromedio.getTemperaturaPromedio();
+                    break;
+                case 4:
+                    tmpValue = datosPromedio.getHumedadPromedio();
+                    tmpValue2 = datosPromedio.getTemperaturaPromedio();
+                    break;
 
-        }
-        for (int i=0; i<datosCompletosMes.length;i++){
-            entry1.add(new BarEntry(i,promedioDia(datosCompletosMes[i],modo1)));
-            entry2.add(new BarEntry(i,promedioDia(datosCompletosMes[i],modo2)));
+            }
+
+
+            if (tmpValue > yAxisMax1) {
+                yAxisMax1 = tmpValue;
+            }
+            if (yAxisMin1 == 0) {
+                yAxisMin1 = tmpValue;
+            }
+            if (tmpValue < yAxisMin1) {
+                yAxisMin1 = tmpValue;
+            }
+
+            if (tmpValue2 > yAxisMax2) {
+                yAxisMax2 = tmpValue2;
+            }
+            if (yAxisMin2 == 0) {
+                yAxisMin2 = tmpValue2;
+            }
+            if (tmpValue2 < yAxisMin2) {
+                yAxisMin2 = tmpValue2;
+            }
+
+
+            entry1.add(new BarEntry(i + 1, tmpValue));
+            entry2.add(new BarEntry(i + 1, tmpValue2));
+            labelC.add(Integer.toString(i + 1));
 
             if (i<=datosCompletosMes.length){
                 barChart2.notifyDataSetChanged();
                 barChart2.invalidate();
             }
         }
+        for (int i=0; i< numDias+1; i++){
+            labelC.add(i,Integer.toString(i+1));
+
+        }
+
 
         if (entry1.size()!=0) {
 
@@ -835,11 +934,13 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
 
             YAxis yAxisLeft = barChart2.getAxisLeft();
             YAxis yAxisRight = barChart2.getAxisRight();
-            yAxisLeft.setAxisMaximum(yAxisMax1);
-            yAxisLeft.setAxisMinimum(yAxisMin1);
-            yAxisRight.setAxisMaximum(yAxisMax2);
-            yAxisRight.setAxisMinimum(yAxisMin2);
-            yAxisRight.setAxisMinimum(yAxisMin2);
+
+            float tmpYAxisMax1= (float) (yAxisMax1*1.014);
+            float tmpYAxisMax2= (float) (yAxisMax2*1.014);
+            yAxisLeft.setAxisMaximum(tmpYAxisMax1);
+            yAxisLeft.setAxisMinimum(0);
+            yAxisRight.setAxisMaximum(tmpYAxisMax2);
+            yAxisRight.setAxisMinimum(0);
 
             barChart2.getBarData().setBarWidth(0.46f);
             barChart2.getXAxis().setAxisMinValue(0);
@@ -864,111 +965,66 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
     }
 
     //Método para promediar los datos del diá.
-    private float promedioDia(List<DatosCompletos> datosFiltrado, int modo) {
-        float acumulador=0;
-        float contador=0;
-        switch (modo){
-            case 0:
-                try {
-                    for (int i=0;i<datosFiltrado.size();i++){
-                        try {
-                            acumulador+=Float.parseFloat(datosFiltrado.get(i).getHumedad());
-                            contador++;
+    private DatosPromedio promedioDia(List<DatosCompletos> datosFiltrado) {
+        DatosPromedio acumulador= new DatosPromedio();
+        int  acmH = 0;
+        int contador = 0;
 
-                        }catch (Exception ignore){
-
-                        }
-                    }
-
-                }catch (Exception ignore){
-
-                }
-
-                break;
-
-            case 1:
-
-                try {
-                    for (int i=0;i<datosFiltrado.size();i++){
-                        try {
-                            acumulador+=Float.parseFloat(datosFiltrado.get(i).getTemperatura());
-                            contador++;
-
-                        }catch (Exception ignore){
-
-                        }
-                    }
-
-                }catch (Exception ignore){
-
-                }
-
-                break;
-
-            case 2:
-
-                try {
-                    for (int i=0;i<datosFiltrado.size();i++){
-                        try {
-                            acumulador+=Float.parseFloat(datosFiltrado.get(i).getIrradiancia());
-                            contador++;
-                        }catch (Exception ignore){
-
-                        }
-                    }
-
-                }catch (Exception ignore){
-
-                }
-
-                break;
-
-            case 3:
-
-                try {
-                    for (int i=0;i<datosFiltrado.size();i++){
-                        try {
-                            acumulador+=Float.parseFloat(datosFiltrado.get(i).getCorrientePanel());
-                            contador++;
-                        }catch (Exception ignore){
-
-                        }
-                    }
-
-                }catch (Exception ignore){
-
-                }
-
-                break;
-
-
-            case 4:
-
-                try {
-                    for (int i=0;i<datosFiltrado.size();i++){
-                        try {
-                            acumulador+=Float.parseFloat(datosFiltrado.get(i).getVoltajePanel());
-                            contador++;
-                        }catch (Exception ignore){
-
-                        }
-                    }
-
-                }catch (Exception ignore){
-
-                }
-
-                break;
-
-        }
-
+        List<Float> irradianciaPorHoras = new ArrayList<>(1);
+        float tmpAcumIrr =0 ;
         try {
-            return acumulador/contador;
+            for (int i =0 ; i<datosFiltrado.size(); i++){
+                DatosCompletos el1 = datosFiltrado.get(i);
+                try {
+                    tmpAcumIrr+=Float.parseFloat(el1.getIrradiancia());
+                    acumulador.setHumedadPromedio(acumulador.getHumedadPromedio() + Float.parseFloat(el1.getHumedad()));
+                    acumulador.setCorrientePromedio(acumulador.getCorrientePromedio() + Float.parseFloat(el1.getCorrientePanel()));
+                    acumulador.setVoltajePromedio(acumulador.getVoltajePromedio() + Float.parseFloat(el1.getVoltajePanel()));
+                    acumulador.setTemperaturaPromedio(acumulador.getTemperaturaPromedio() + Float.parseFloat(el1.getTemperatura()));
+                    contador++;
+                }catch (Exception ignore1) {
+
+                }
+                try {
+                    Date horaDato;
+                    SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a", Locale.US);
+                    horaDato = timeFormat.parse(el1.getHora());
+                    if (acmH == 0){
+                        acmH = horaDato.getHours();
+                    }
+                    if (horaDato.getHours() == acmH){
+                        tmpAcumIrr = tmpAcumIrr / contador;
+                        irradianciaPorHoras.add(tmpAcumIrr);
+                        tmpAcumIrr = 0;
+                        acmH++;
+                        contador = 0;
+                    } else {
+                        if (horaDato.getHours() - 1 > acmH || acmH ==0){
+                            acmH = horaDato.getHours() + 1;
+                        }
+                    }
+
+                } catch (Exception e) {
+                    Log.e("error",e.getMessage()+ " "+ el1.getHora());
+
+                }
+
+            }
+
+            for ( float element : irradianciaPorHoras ) {
+                acumulador.setIrradianciaPromedio(element + acumulador.getIrradianciaPromedio());
+            }
+            acumulador.setHumedadPromedio(acumulador.getHumedadPromedio() / datosFiltrado.size());
+            acumulador.setCorrientePromedio(acumulador.getCorrientePromedio() / datosFiltrado.size());
+            acumulador.setVoltajePromedio(acumulador.getVoltajePromedio() / datosFiltrado.size());
+            acumulador.setTemperaturaPromedio(acumulador.getTemperaturaPromedio() / datosFiltrado.size());
 
         }catch (Exception ignore){
-            return 0;
 
         }
+
+
+        return acumulador;
 
     }
 
@@ -996,5 +1052,22 @@ public class ConsultasFragment extends Fragment implements OnClickListener, OnDa
         }
     }
 
+    public void lockDeviceRotation(boolean value) {
 
+        if (value) {
+            int currentOrientation = getResources().getConfiguration().orientation;
+            if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+                getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+            } else {
+                getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+            }
+        } else {
+            getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
+            } else {
+                getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+            }
+        }
+    }
 }
