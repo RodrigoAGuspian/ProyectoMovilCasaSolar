@@ -188,6 +188,7 @@ public class IndexFragment extends Fragment {
                         acmH = horaDato.getHours();
                     }
                     if (horaDato.getHours() == acmH){
+                        acumulador.setIrradianciaPromedio(acumulador.getIrradianciaPromedio() / contador);
                         acumulador.setHumedadPromedio(acumulador.getHumedadPromedio() / contador);
                         acumulador.setCorrientePromedio(acumulador.getCorrientePromedio() / contador);
                         acumulador.setVoltajePromedio(acumulador.getVoltajePromedio() / contador);
