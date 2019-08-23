@@ -294,7 +294,6 @@ public class RegistroActivity extends AppCompatActivity implements OnClickListen
         data.setTipoDeUso(msTipoDeUso.getItems().get(index).toString());
         data.setSegundoA(txtSegundoA.getText().toString());
         data.setSegundoA(txtSegundoA.getText().toString());
-
         return data;
     }
 }
